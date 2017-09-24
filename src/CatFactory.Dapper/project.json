@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-alpha-build00",
+  "title": "CatFactory.Dapper",
+  "description": "CatFactory package for Dapper code generation",
+  "packOptions": {
+    "repository": {
+      "url": "https://github.com/hherzl/CatFactory.Dapper"
+    }
+  },
+  "authors": [
+    "C. Herzl"
+  ],
+  "dependencies": {
+    "NETStandard.Library": "1.6.1",
+    "CatFactory": "2.0.0-alpha-build06"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
