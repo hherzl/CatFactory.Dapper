@@ -17,7 +17,7 @@ namespace CatFactory.Dapper.Tests
             {
                 Name = "Store",
                 Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.EfCore\\Store"
+                OutputDirectory = "C:\\Temp\\CatFactory.Dapper\\Store"
             };
 
             // Build features for project, group all entities by schema into a feature
