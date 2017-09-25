@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "CatFactory": "2.0.0-alpha-build06"
+    "CatFactory.DotNetCore": "2.0.0-alpha-build09"
   },
 
   "frameworks": {
