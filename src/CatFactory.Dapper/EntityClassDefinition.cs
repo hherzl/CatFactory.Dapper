@@ -10,25 +10,6 @@ namespace CatFactory.Dapper
 {
     public static class EntityClassDefinition
     {
-        private static ICodeNamingConvention namingConvention;
-
-        static EntityClassDefinition()
-        {
-            namingConvention = new DotNetNamingConvention() as ICodeNamingConvention;
-        }
-
-        public static String GetEntityName(this IDbObject dbObject)
-            => String.Format("{0}", namingConvention.GetClassName(dbObject.Name));
-
-        public static String GetSingularName(this IDbObject dbObject)
-            => NamingService.GetSingularName(dbObject.GetEntityName());
-
-        public static String GetEntityLayerNamespace(this Project project)
-            => namingConvention.GetClassName(String.Format("{0}.{1}", project.Name, (project as DapperProject).Namespaces.EntityLayer));
-
-        public static String GetEntityLayerNamespace(this DapperProject project, String ns)
-            => String.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : String.Join(".", project.Name, project.Namespaces.EntityLayer, ns);
-
         public static CSharpClassDefinition CreateEntity(this DapperProject project, ITable table)
         {
             var definition = new CSharpClassDefinition();
@@ -86,6 +67,47 @@ namespace CatFactory.Dapper
                     {
                         definition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
                     }
+                }
+            }
+
+            definition.Implements.Add("IEntity");
+
+            if (project.Settings.SimplifyDataTypes)
+            {
+                definition.SimplifyDataTypes();
+            }
+
+            return definition;
+        }
+
+        public static CSharpClassDefinition CreateView(this DapperProject project, IView view)
+        {
+            var definition = new CSharpClassDefinition();
+
+            definition.Namespaces.Add("System");
+
+            definition.Namespace = view.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(view.Schema);
+
+            definition.Name = view.GetSingularName();
+
+            definition.Constructors.Add(new ClassConstructorDefinition());
+
+            var typeResolver = new ClrTypeResolver();
+
+            if (!String.IsNullOrEmpty(view.Description))
+            {
+                definition.Documentation.Summary = view.Description;
+            }
+
+            foreach (var column in view.Columns)
+            {
+                if (project.Settings.UseAutomaticPropertiesForEntities)
+                {
+                    definition.Properties.Add(new PropertyDefinition(typeResolver.Resolve(column.Type), column.GetPropertyName()));
+                }
+                else
+                {
+                    definition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
                 }
             }
 

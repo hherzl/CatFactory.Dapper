@@ -24,9 +24,9 @@ namespace CatFactory.Dapper.Tests
             project.BuildFeatures();
 
             // Generate code =^^=
-            //project
-            //    .GenerateEntityLayer()
-            //    .GenerateDataLayer();
+            project
+                .GenerateEntityLayer()
+                .GenerateDataLayer();
         }
     }
 }
