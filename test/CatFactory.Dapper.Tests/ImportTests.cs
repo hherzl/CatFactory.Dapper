@@ -17,7 +17,7 @@ namespace CatFactory.Dapper.Tests
             {
                 Name = "Store",
                 Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.Dapper\\Store"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API"
             };
 
             // Build features for project, group all entities by schema into a feature

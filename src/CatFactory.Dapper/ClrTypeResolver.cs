@@ -2,7 +2,7 @@
 
 namespace CatFactory.Dapper
 {
-    public class ClrTypeResolver
+    public class ClrTypeResolver : ITypeResolver
     {
         public ClrTypeResolver()
         {
@@ -107,6 +107,31 @@ namespace CatFactory.Dapper
             {
                 return UseNullableTypes ? String.Format("{0}?", value) : value;
             }
+        }
+
+        public virtual String GetDbType(String type)
+        {
+            var value = String.Empty;
+
+            switch (type)
+            {
+                case "smallint":
+                    value = "Int16";
+                    break;
+
+                case "int":
+                    value = "Int32";
+                    break;
+
+                case "bigint":
+                    value = "Int64";
+                    break;
+                default:
+                    value = "Object";
+                    break;
+            }
+
+            return String.Format("DbType.{0}", value);
         }
     }
 }
