@@ -20,6 +20,8 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API"
             };
 
+            project.Settings.Exclusions.Add("Timestamp");
+
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
 
