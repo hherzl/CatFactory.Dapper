@@ -185,7 +185,7 @@ namespace CatFactory.Dapper
             lines.Add(new CodeLine(1, "query.Append(\"  ( \");"));
 
             var insertColumns = projectFeature.GetDapperProject().GetInsertColumns(table).ToList();
-            
+
             for (var i = 0; i < insertColumns.Count(); i++)
             {
                 var column = insertColumns[i];
@@ -205,6 +205,14 @@ namespace CatFactory.Dapper
             }
 
             lines.Add(new CodeLine(1, "query.Append(\" ) \");"));
+
+            if (table.Identity != null)
+            {
+                // todo: add logic to retrieve the identity column
+                var identityColumn = table.Columns[0];
+
+                lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", identityColumn.GetSqlServerParameterName()));
+            }
 
             lines.Add(new CodeLine());
 
@@ -232,9 +240,9 @@ namespace CatFactory.Dapper
             {
                 for (var i = 0; i < insertColumns.Count; i++)
                 {
-                    var c = insertColumns[i];
+                    var column = insertColumns[i];
 
-                    lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", c.GetParameterName(), c.GetPropertyName()));
+                    lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
                 }
 
                 // todo: add logic to retrieve the identity column
