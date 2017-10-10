@@ -15,6 +15,9 @@ namespace CatFactory.Dapper
             namingConvention = new DotNetNamingConvention();
         }
 
+        public static String GetFullName(this IDbObject dbObject)
+            => String.Format("[{0}].[{1}]", dbObject.Schema, dbObject.Name);
+
         public static String GetPluralName(this IDbObject dbObject)
             => NamingService.GetPluralName(dbObject.GetEntityName());
 
@@ -36,10 +39,7 @@ namespace CatFactory.Dapper
         public static String GetRemoveRepositoryMethodName(this ITable dbObject)
             => String.Format("Remove{0}Async", dbObject.GetSingularName());
 
-        public static Boolean IsPrimaryKeyGuid(this Table table)
+        public static Boolean IsPrimaryKeyGuid(this ITable table)
             => table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1 && table.Columns[0].Type == "uniqueidentifier" ? true : false;
-
-        public static String GetFullName(this ITable table)
-            => String.Format("[{0}].[{1}]", table.Schema, table.Name);
     }
 }

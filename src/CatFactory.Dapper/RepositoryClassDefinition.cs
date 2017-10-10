@@ -69,14 +69,24 @@ namespace CatFactory.Dapper
 
             var dbos = ProjectFeature.DbObjects.Select(dbo => dbo.FullName).ToList();
             var tables = ProjectFeature.Project.Database.Tables.Where(t => dbos.Contains(t.FullName)).ToList();
+            var views = ProjectFeature.Project.Database.Views.Where(v => dbos.Contains(v.FullName)).ToList();
 
             foreach (var table in tables)
             {
                 Methods.Add(GetGetAllMethod(ProjectFeature, table));
-                Methods.Add(GetGetMethod(ProjectFeature, table));
-                Methods.Add(GetAddMethod(ProjectFeature, table));
-                Methods.Add(GetUpdateMethod(ProjectFeature, table));
-                Methods.Add(GetRemoveMethod(ProjectFeature, table));
+
+                if (table.PrimaryKey != null)
+                {
+                    Methods.Add(GetGetMethod(ProjectFeature, table));
+                    Methods.Add(GetAddMethod(ProjectFeature, table));
+                    Methods.Add(GetUpdateMethod(ProjectFeature, table));
+                    Methods.Add(GetRemoveMethod(ProjectFeature, table));
+                }
+            }
+
+            foreach (var view in views)
+            {
+                Methods.Add(GetGetAllMethod(ProjectFeature, view));
             }
         }
 
@@ -358,6 +368,36 @@ namespace CatFactory.Dapper
             lines.Add(new CodeLine("}"));
 
             return new MethodDefinition("Task<Int32>", table.GetRemoveRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            {
+                IsAsync = true,
+                Lines = lines
+            };
+        }
+
+        public MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, IView table)
+        {
+            var lines = new List<ILine>();
+
+            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
+            lines.Add(new CodeLine("{"));
+            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+            lines.Add(new CodeLine());
+            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+
+            for (var i = 0; i < table.Columns.Count; i++)
+            {
+                var column = table.Columns[i];
+
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : String.Empty));
+            }
+
+            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+            lines.Add(new CodeLine());
+            lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
+            lines.Add(new CodeLine("}"));
+
+            return new MethodDefinition(String.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName())
             {
                 IsAsync = true,
                 Lines = lines
