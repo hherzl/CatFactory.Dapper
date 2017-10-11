@@ -82,6 +82,11 @@ namespace CatFactory.Dapper
                     Methods.Add(GetUpdateMethod(ProjectFeature, table));
                     Methods.Add(GetRemoveMethod(ProjectFeature, table));
                 }
+
+                foreach (var unique in table.Uniques)
+                {
+                    Methods.Add(GetByUniqueMethod(ProjectFeature, table, unique));
+                }
             }
 
             foreach (var view in views)
@@ -160,6 +165,52 @@ namespace CatFactory.Dapper
             }
 
             return new MethodDefinition(String.Format("Task<{0}>", table.GetSingularName()), table.GetGetRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            {
+                IsAsync = true,
+                Lines = lines
+            };
+        }
+
+        public MethodDefinition GetByUniqueMethod(ProjectFeature projectFeature, ITable table, Unique unique)
+        {
+            var lines = new List<ILine>();
+
+            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
+            lines.Add(new CodeLine("{"));
+            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+            lines.Add(new CodeLine());
+            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+
+            for (var i = 0; i < table.Columns.Count; i++)
+            {
+                var column = table.Columns[i];
+
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : String.Empty));
+            }
+
+            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+
+            lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+
+            if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
+            {
+                var column = unique.GetColumns(table).First();
+
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", column.GetColumnName(), column.GetSqlServerParameterName()));
+                lines.Add(new CodeLine());
+
+                lines.Add(new CodeLine(1, "var parameters = new"));
+                lines.Add(new CodeLine(1, "{"));
+                lines.Add(new CodeLine(2, "{0} = entity.{1}", column.GetParameterName(), column.GetPropertyName()));
+                lines.Add(new CodeLine(1, "};"));
+                lines.Add(new CodeLine());
+
+                lines.Add(new CodeLine(1, "return await connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+                lines.Add(new CodeLine("}"));
+            }
+
+            return new MethodDefinition(String.Format("Task<{0}>", table.GetSingularName()), table.GetGetByUniqueRepositoryMethodName(unique), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
