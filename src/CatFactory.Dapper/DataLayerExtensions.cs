@@ -1,4 +1,7 @@
-﻿using CatFactory.DotNetCore;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper
 {
@@ -8,6 +11,7 @@ namespace CatFactory.Dapper
         {
             GenerateAppSettings(project);
             GenerateDataRepositories(project);
+            GenerateReadMe(project);
 
             return project;
         }
@@ -81,6 +85,33 @@ namespace CatFactory.Dapper
             };
 
             codeBuilder.CreateFile(project.GetDataLayerRepositoriesDirectory());
+        }
+
+        private static void GenerateReadMe(this DapperProject project)
+        {
+            var lines = new List<String>();
+
+            lines.Add("CatFactory: Code Generation Made Easy");
+            lines.Add(String.Empty);
+
+            lines.Add("How to use this code on your ASP.NET Core Application");
+            lines.Add(String.Empty);
+
+            lines.Add("Register objects in Startup class, register your repositories in ConfigureServices method:");
+            lines.Add(" services.AddScoped<IDboRepository, DboRepository>();");
+            lines.Add(String.Empty);
+
+            lines.Add("Happy coding!");
+            lines.Add(String.Empty);
+
+            lines.Add("You can check source code on GitHub:");
+            lines.Add("https://github.com/hherzl/CatFactory.Dapper");
+            lines.Add(String.Empty);
+            lines.Add("*** Special Thanks for Edson Ferreira to let me help to Dapper community ***");
+            lines.Add(String.Empty);
+            lines.Add("CatFactory Development Team ==^^==");
+
+            TextFileHelper.CreateFile(Path.Combine(project.OutputDirectory, "ReadMe.txt"), lines.ToStringBuilder().ToString());
         }
     }
 }
