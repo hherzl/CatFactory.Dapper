@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CatFactory.Mapping;
@@ -29,14 +28,13 @@ namespace CatFactory.Dapper
 
                     return new ProjectFeature(item, dbObjects)
                     {
-                        Project = this,
-                        Database = Database
+                        Project = this
                     };
                 })
                 .ToList();
         }
 
-        private IEnumerable<DbObject> GetDbObjects(Database database, String schema)
+        private IEnumerable<DbObject> GetDbObjects(Database database, string schema)
         {
             var result = new List<DbObject>();
 

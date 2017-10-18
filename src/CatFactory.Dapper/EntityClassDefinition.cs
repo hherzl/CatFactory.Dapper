@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.DotNetCore;
@@ -46,7 +45,7 @@ namespace CatFactory.Dapper
                 });
             }
 
-            if (!String.IsNullOrEmpty(table.Description))
+            if (!string.IsNullOrEmpty(table.Description))
             {
                 definition.Documentation.Summary = table.Description;
             }
@@ -94,7 +93,7 @@ namespace CatFactory.Dapper
 
             var typeResolver = new ClrTypeResolver();
 
-            if (!String.IsNullOrEmpty(view.Description))
+            if (!string.IsNullOrEmpty(view.Description))
             {
                 definition.Documentation.Summary = view.Description;
             }

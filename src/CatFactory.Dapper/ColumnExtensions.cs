@@ -1,12 +1,11 @@
-﻿using System;
-using CatFactory.Mapping;
+﻿using CatFactory.Mapping;
 using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper
 {
     public static class ColumnExtensions
     {
-        public static Boolean IsDecimal(this Column column)
+        public static bool IsDecimal(this Column column)
         {
             switch (column.Type)
             {
@@ -18,7 +17,7 @@ namespace CatFactory.Dapper
             }
         }
 
-        public static Boolean IsDouble(this Column column)
+        public static bool IsDouble(this Column column)
         {
             switch (column.Type)
             {
@@ -30,7 +29,7 @@ namespace CatFactory.Dapper
             }
         }
 
-        public static Boolean IsSingle(this Column column)
+        public static bool IsSingle(this Column column)
         {
             switch (column.Type)
             {
@@ -42,7 +41,7 @@ namespace CatFactory.Dapper
             }
         }
 
-        public static Boolean IsString(this Column column)
+        public static bool IsString(this Column column)
         {
             switch (column.Type)
             {
@@ -59,10 +58,10 @@ namespace CatFactory.Dapper
             }
         }
 
-        public static String GetColumnName(this Column column)
-            => String.Format("[{0}]", column.Name);
+        public static string GetColumnName(this Column column)
+            => string.Format("[{0}]", column.Name);
 
-        public static String GetSqlServerParameterName(this Column column)
-            => String.Format("@{0}", column.GetParameterName());
+        public static string GetSqlServerParameterName(this Column column)
+            => string.Format("@{0}", column.GetParameterName());
     }
 }

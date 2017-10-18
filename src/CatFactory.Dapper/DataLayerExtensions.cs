@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using CatFactory.Collections;
 using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper
@@ -21,7 +21,8 @@ namespace CatFactory.Dapper
             var codeBuilder = new CSharpClassBuilder
             {
                 ObjectDefinition = project.GetAppSettingsClassDefinition(),
-                OutputDirectory = project.OutputDirectory
+                OutputDirectory = project.OutputDirectory,
+                ForceOverwrite = project.Settings.ForceOverwrite
             };
 
             codeBuilder.CreateFile(project.GetDataLayerDirectory());
@@ -32,7 +33,8 @@ namespace CatFactory.Dapper
             var codeBuilder = new CSharpInterfaceBuilder
             {
                 ObjectDefinition = interfaceDefinition,
-                OutputDirectory = project.OutputDirectory
+                OutputDirectory = project.OutputDirectory,
+                ForceOverwrite = project.Settings.ForceOverwrite
             };
 
             codeBuilder.CreateFile(project.GetDataLayerContractsDirectory());
@@ -50,16 +52,17 @@ namespace CatFactory.Dapper
                 var codeBuilder = new CSharpClassBuilder
                 {
                     ObjectDefinition = repositoryClassDefinition,
-                    OutputDirectory = project.OutputDirectory
+                    OutputDirectory = project.OutputDirectory,
+                    ForceOverwrite = project.Settings.ForceOverwrite
                 };
 
-                var interfaceDef = repositoryClassDefinition.RefactInterface();
+                var interfaceDefinition = repositoryClassDefinition.RefactInterface();
 
-                interfaceDef.Implements.Add("IRepository");
+                interfaceDefinition.Implements.Add("IRepository");
 
-                interfaceDef.Namespace = project.GetDataLayerContractsNamespace();
+                interfaceDefinition.Namespace = project.GetDataLayerContractsNamespace();
 
-                GenerateDataLayerContract(project, interfaceDef);
+                GenerateDataLayerContract(project, interfaceDefinition);
 
                 codeBuilder.CreateFile(project.GetDataLayerRepositoriesDirectory());
             }
@@ -70,7 +73,8 @@ namespace CatFactory.Dapper
             var codeBuilder = new CSharpInterfaceBuilder
             {
                 ObjectDefinition = new RepositoryInterfaceDefinition(project),
-                OutputDirectory = project.OutputDirectory
+                OutputDirectory = project.OutputDirectory,
+                ForceOverwrite = project.Settings.ForceOverwrite
             };
 
             codeBuilder.CreateFile(project.GetDataLayerContractsDirectory());
@@ -81,7 +85,8 @@ namespace CatFactory.Dapper
             var codeBuilder = new CSharpClassBuilder
             {
                 ObjectDefinition = new RepositoryBaseClassDefinition(project),
-                OutputDirectory = project.OutputDirectory
+                OutputDirectory = project.OutputDirectory,
+                ForceOverwrite = project.Settings.ForceOverwrite
             };
 
             codeBuilder.CreateFile(project.GetDataLayerRepositoriesDirectory());
@@ -89,27 +94,28 @@ namespace CatFactory.Dapper
 
         private static void GenerateReadMe(this DapperProject project)
         {
-            var lines = new List<String>();
+            var lines = new List<string>
+            {
+                "CatFactory: Code Generation Made Easy",
+                string.Empty,
 
-            lines.Add("CatFactory: Code Generation Made Easy");
-            lines.Add(String.Empty);
+                "How to use this code on your ASP.NET Core Application",
+                string.Empty,
 
-            lines.Add("How to use this code on your ASP.NET Core Application");
-            lines.Add(String.Empty);
+                "Register objects in Startup class, register your repositories in ConfigureServices method:",
+                " services.AddScoped<IDboRepository, DboRepository>();",
+                string.Empty,
 
-            lines.Add("Register objects in Startup class, register your repositories in ConfigureServices method:");
-            lines.Add(" services.AddScoped<IDboRepository, DboRepository>();");
-            lines.Add(String.Empty);
+                "Happy coding!",
+                string.Empty,
 
-            lines.Add("Happy coding!");
-            lines.Add(String.Empty);
-
-            lines.Add("You can check source code on GitHub:");
-            lines.Add("https://github.com/hherzl/CatFactory.Dapper");
-            lines.Add(String.Empty);
-            lines.Add("*** Special Thanks for Edson Ferreira to let me help to Dapper community ***");
-            lines.Add(String.Empty);
-            lines.Add("CatFactory Development Team ==^^==");
+                "You can check source code on GitHub:",
+                "https://github.com/hherzl/CatFactory.Dapper",
+                string.Empty,
+                "*** Special Thanks for Edson Ferreira to let me help for Dapper community ***",
+                string.Empty,
+                "CatFactory Development Team ==^^=="
+            };
 
             TextFileHelper.CreateFile(Path.Combine(project.OutputDirectory, "ReadMe.txt"), lines.ToStringBuilder().ToString());
         }

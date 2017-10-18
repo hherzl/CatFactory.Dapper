@@ -15,7 +15,8 @@ namespace CatFactory.Dapper
             var codeBuilder = new CSharpInterfaceBuilder
             {
                 ObjectDefinition = interfaceDefinition,
-                OutputDirectory = project.OutputDirectory
+                OutputDirectory = project.OutputDirectory,
+                ForceOverwrite = project.Settings.ForceOverwrite
             };
 
             codeBuilder.CreateFile(project.GetEntityLayerDirectory());
@@ -30,7 +31,8 @@ namespace CatFactory.Dapper
                 var codeBuilder = new CSharpClassBuilder
                 {
                     ObjectDefinition = project.CreateEntity(table),
-                    OutputDirectory = project.OutputDirectory
+                    OutputDirectory = project.OutputDirectory,
+                    ForceOverwrite = project.Settings.ForceOverwrite
                 };
 
                 codeBuilder.CreateFile(project.GetEntityLayerDirectory());
@@ -41,7 +43,8 @@ namespace CatFactory.Dapper
                 var codeBuilder = new CSharpClassBuilder
                 {
                     ObjectDefinition = project.CreateView(view),
-                    OutputDirectory = project.OutputDirectory
+                    OutputDirectory = project.OutputDirectory,
+                    ForceOverwrite = project.Settings.ForceOverwrite
                 };
 
                 codeBuilder.CreateFile(project.GetEntityLayerDirectory());

@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CatFactory.Dapper
 {
     public class DapperProjectSettings
     {
-        public Boolean SimplifyDataTypes { get; set; }
+        public bool ForceOverwrite { get; set; }
 
-        public Boolean UseAutomaticPropertiesForEntities { get; set; } = true;
+        public bool SimplifyDataTypes { get; set; }
 
-        public Boolean EnableDataBindings { get; set; }
+        public bool UseAutomaticPropertiesForEntities { get; set; } = true;
+
+        public bool EnableDataBindings { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<String> m_exclusions;
+        private List<string> m_exclusions;
 
-        public List<String> Exclusions
+        public List<string> Exclusions
         {
             get
             {
-                return m_exclusions ?? (m_exclusions = new List<String>());
+                return m_exclusions ?? (m_exclusions = new List<string>());
             }
             set
             {
