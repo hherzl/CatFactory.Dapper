@@ -2,23 +2,15 @@
 
 namespace CatFactory.Dapper
 {
-    public class RepositoryInterfaceDefinition : CSharpInterfaceDefinition
+    public static class RepositoryInterfaceDefinition
     {
-        public RepositoryInterfaceDefinition(DapperProject project)
-            : base()
+        public static CSharpInterfaceDefinition GetRepositoryInterfaceDefinition(this DapperProject project)
         {
-            Project = project;
-
-            Init();
-        }
-
-        public DapperProject Project { get; }
-
-        public void Init()
-        {
-            Namespace = Project.GetDataLayerContractsNamespace();
-
-            Name = "IRepository";
+            return new CSharpInterfaceDefinition
+            {
+                Namespace = project.GetDataLayerContractsNamespace(),
+                Name = "IRepository"
+            };
         }
     }
 }

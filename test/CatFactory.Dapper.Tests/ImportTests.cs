@@ -12,7 +12,7 @@ namespace CatFactory.Dapper.Tests
 
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import("server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(logger, "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Ef Core Project
             var project = new DapperProject
@@ -22,9 +22,12 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API",
             };
 
+            // Force overwrite
             project.Settings.ForceOverwrite = true;
 
-            project.Settings.Exclusions.Add("Timestamp");
+            // Add exclusions for insert and update
+            project.Settings.UpdateExclusions.AddRange(new string[] { "CreationUser", "CreationDateTime", "Timestamp" });
+            project.Settings.InsertExclusions.AddRange(new string[] { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" });
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -42,7 +45,7 @@ namespace CatFactory.Dapper.Tests
 
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import("server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Ef Core Project
             var project = new DapperProject
@@ -52,6 +55,7 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind.Dapper.API\src\Northwind.Dapper.API"
             };
 
+            // Force overwrite
             project.Settings.ForceOverwrite = true;
 
             // Build features for project, group all entities by schema into a feature

@@ -8,33 +8,25 @@ using CatFactory.OOP;
 
 namespace CatFactory.Dapper
 {
-    public class RepositoryClassDefinition : CSharpClassDefinition
+    public static class RepositoryClassDefinition
     {
-        public RepositoryClassDefinition(ProjectFeature projectFeature)
-            : base()
+        public static CSharpClassDefinition GetRepositoryClassDefinition(this ProjectFeature ProjectFeature)
         {
-            ProjectFeature = projectFeature;
+            var classDefinition = new CSharpClassDefinition();
 
-            Init();
-        }
-
-        public ProjectFeature ProjectFeature { get; }
-
-        public void Init()
-        {
-            Namespaces.Add("System");
-            Namespaces.Add("System.Collections.Generic");
-            Namespaces.Add("System.Data");
-            Namespaces.Add("System.Data.SqlClient");
-            Namespaces.Add("System.Linq");
-            Namespaces.Add("System.Text");
-            Namespaces.Add("System.Threading.Tasks");
-            Namespaces.Add("Dapper");
-            Namespaces.Add("Microsoft.Extensions.Options");
+            classDefinition.Namespaces.Add("System");
+            classDefinition.Namespaces.Add("System.Collections.Generic");
+            classDefinition.Namespaces.Add("System.Data");
+            classDefinition.Namespaces.Add("System.Data.SqlClient");
+            classDefinition.Namespaces.Add("System.Linq");
+            classDefinition.Namespaces.Add("System.Text");
+            classDefinition.Namespaces.Add("System.Threading.Tasks");
+            classDefinition.Namespaces.Add("Dapper");
+            classDefinition.Namespaces.Add("Microsoft.Extensions.Options");
 
             foreach (var dbObject in ProjectFeature.DbObjects)
             {
-                var table = ProjectFeature.Project.Database.Tables.FirstOrDefault(item => item.FullName == dbObject.FullName);
+                var table = ProjectFeature.Project.Database.FindTableBySchemaAndName(dbObject.FullName);
 
                 if (table == null)
                 {
@@ -43,25 +35,25 @@ namespace CatFactory.Dapper
 
                 if (table.HasDefaultSchema())
                 {
-                    Namespaces.AddUnique(ProjectFeature.Project.GetEntityLayerNamespace());
+                    classDefinition.Namespaces.AddUnique(ProjectFeature.GetDapperProject().GetEntityLayerNamespace());
                 }
                 else
                 {
-                    Namespaces.AddUnique(ProjectFeature.GetDapperProject().GetEntityLayerNamespace(table.Schema));
+                    classDefinition.Namespaces.AddUnique(ProjectFeature.GetDapperProject().GetEntityLayerNamespace(table.Schema));
                 }
 
-                Namespaces.AddUnique(ProjectFeature.GetDapperProject().GetDataLayerContractsNamespace());
+                classDefinition.Namespaces.AddUnique(ProjectFeature.GetDapperProject().GetDataLayerContractsNamespace());
             }
 
-            Namespace = ProjectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace();
+            classDefinition.Namespace = ProjectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace();
 
-            Name = ProjectFeature.GetClassRepositoryName();
+            classDefinition.Name = ProjectFeature.GetClassRepositoryName();
 
-            BaseClass = "Repository";
+            classDefinition.BaseClass = "Repository";
 
-            Implements.Add(ProjectFeature.GetInterfaceRepositoryName());
+            classDefinition.Implements.Add(ProjectFeature.GetInterfaceRepositoryName());
 
-            Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
+            classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
             {
                 Invocation = "base(appSettings)"
             });
@@ -72,29 +64,31 @@ namespace CatFactory.Dapper
 
             foreach (var table in tables)
             {
-                Methods.Add(GetGetAllMethod(ProjectFeature, table));
+                classDefinition.Methods.Add(GetGetAllMethod(ProjectFeature, table));
 
                 if (table.PrimaryKey != null)
                 {
-                    Methods.Add(GetGetMethod(ProjectFeature, table));
-                    Methods.Add(GetAddMethod(ProjectFeature, table));
-                    Methods.Add(GetUpdateMethod(ProjectFeature, table));
-                    Methods.Add(GetRemoveMethod(ProjectFeature, table));
+                    classDefinition.Methods.Add(GetGetMethod(ProjectFeature, table));
+                    classDefinition.Methods.Add(GetAddMethod(ProjectFeature, table));
+                    classDefinition.Methods.Add(GetUpdateMethod(ProjectFeature, table));
+                    classDefinition.Methods.Add(GetRemoveMethod(ProjectFeature, table));
                 }
 
                 foreach (var unique in table.Uniques)
                 {
-                    Methods.Add(GetByUniqueMethod(ProjectFeature, table, unique));
+                    classDefinition.Methods.Add(GetByUniqueMethod(ProjectFeature, table, unique));
                 }
             }
 
             foreach (var view in views)
             {
-                Methods.Add(GetGetAllMethod(ProjectFeature, view));
+                classDefinition.Methods.Add(GetGetAllMethod(ProjectFeature, view));
             }
+
+            return classDefinition;
         }
 
-        public MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, ITable table)
+        private static MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, ITable table)
         {
             var lines = new List<ILine>();
 
@@ -124,7 +118,37 @@ namespace CatFactory.Dapper
             };
         }
 
-        public MethodDefinition GetGetMethod(ProjectFeature projectFeature, ITable table)
+        private static MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, IView table)
+        {
+            var lines = new List<ILine>();
+
+            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
+            lines.Add(new CodeLine("{"));
+            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+            lines.Add(new CodeLine());
+            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+
+            for (var i = 0; i < table.Columns.Count; i++)
+            {
+                var column = table.Columns[i];
+
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+            }
+
+            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+            lines.Add(new CodeLine());
+            lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
+            lines.Add(new CodeLine("}"));
+
+            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName())
+            {
+                IsAsync = true,
+                Lines = lines
+            };
+        }
+
+        private static MethodDefinition GetGetMethod(ProjectFeature projectFeature, ITable table)
         {
             var lines = new List<ILine>();
 
@@ -170,7 +194,7 @@ namespace CatFactory.Dapper
             };
         }
 
-        public MethodDefinition GetByUniqueMethod(ProjectFeature projectFeature, ITable table, Unique unique)
+        private static MethodDefinition GetByUniqueMethod(ProjectFeature projectFeature, ITable table, Unique unique)
         {
             var lines = new List<ILine>();
 
@@ -216,7 +240,7 @@ namespace CatFactory.Dapper
             };
         }
 
-        public MethodDefinition GetAddMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetAddMethod(ProjectFeature projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
@@ -319,7 +343,7 @@ namespace CatFactory.Dapper
             };
         }
 
-        public MethodDefinition GetUpdateMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetUpdateMethod(ProjectFeature projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
@@ -384,7 +408,7 @@ namespace CatFactory.Dapper
             };
         }
 
-        public MethodDefinition GetRemoveMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetRemoveMethod(ProjectFeature projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
@@ -426,36 +450,6 @@ namespace CatFactory.Dapper
             lines.Add(new CodeLine("}"));
 
             return new MethodDefinition("Task<Int32>", table.GetDeleteRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
-            {
-                IsAsync = true,
-                Lines = lines
-            };
-        }
-
-        public MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, IView table)
-        {
-            var lines = new List<ILine>();
-
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
-
-            for (var i = 0; i < table.Columns.Count; i++)
-            {
-                var column = table.Columns[i];
-
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
-            }
-
-            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-            lines.Add(new CodeLine());
-            lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
-            lines.Add(new CodeLine("}"));
-
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName())
             {
                 IsAsync = true,
                 Lines = lines

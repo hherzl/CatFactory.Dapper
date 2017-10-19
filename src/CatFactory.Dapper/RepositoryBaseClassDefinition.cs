@@ -5,32 +5,24 @@ using CatFactory.OOP;
 
 namespace CatFactory.Dapper
 {
-    public class RepositoryBaseClassDefinition : CSharpClassDefinition
+    public static class RepositoryBaseClassDefinition
     {
-        public RepositoryBaseClassDefinition(DapperProject project)
-            : base()
+        public static CSharpClassDefinition GetRepositoryBaseClassDefinition(this DapperProject project)
         {
-            Project = project;
+            var classDefinition = new CSharpClassDefinition();
 
-            Init();
-        }
+            classDefinition.Namespaces.Add("System");
+            classDefinition.Namespaces.Add("System.Linq");
+            classDefinition.Namespaces.Add("System.Threading.Tasks");
+            classDefinition.Namespaces.Add("Microsoft.Extensions.Options");
 
-        public DapperProject Project { get; }
+            classDefinition.Namespaces.Add(project.GetEntityLayerNamespace());
 
-        public void Init()
-        {
-            Namespaces.Add("System");
-            Namespaces.Add("System.Linq");
-            Namespaces.Add("System.Threading.Tasks");
-            Namespaces.Add("Microsoft.Extensions.Options");
+            classDefinition.Namespace = project.GetDataLayerContractsNamespace();
 
-            Namespaces.Add(Project.GetEntityLayerNamespace());
+            classDefinition.Name = "Repository";
 
-            Namespace = Project.GetDataLayerContractsNamespace();
-
-            Name = "Repository";
-
-            Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
+            classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
             {
                 Lines = new List<ILine>()
                 {
@@ -38,7 +30,13 @@ namespace CatFactory.Dapper
                 }
             });
 
-            Properties.Add(new PropertyDefinition("String", "ConnectionString ") { AccessModifier = AccessModifier.Protected, IsReadOnly = true });
+            classDefinition.Properties.Add(new PropertyDefinition("String", "ConnectionString ")
+            {
+                AccessModifier = AccessModifier.Protected,
+                IsReadOnly = true
+            });
+
+            return classDefinition;
         }
     }
 }

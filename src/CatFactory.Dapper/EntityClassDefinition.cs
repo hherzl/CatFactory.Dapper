@@ -11,72 +11,72 @@ namespace CatFactory.Dapper
     {
         public static CSharpClassDefinition CreateEntity(this DapperProject project, ITable table)
         {
-            var definition = new CSharpClassDefinition();
+            var classDefinition = new CSharpClassDefinition();
 
-            definition.Namespaces.Add("System");
+            classDefinition.Namespaces.Add("System");
 
             if (project.Settings.EnableDataBindings)
             {
-                definition.Namespaces.Add("System.ComponentModel");
+                classDefinition.Namespaces.Add("System.ComponentModel");
 
-                definition.Implements.Add("INotifyPropertyChanged");
+                classDefinition.Implements.Add("INotifyPropertyChanged");
 
-                definition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged"));
+                classDefinition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged"));
             }
 
-            definition.Namespace = table.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema);
+            classDefinition.Namespace = table.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema);
 
-            definition.Name = table.GetSingularName();
+            classDefinition.Name = table.GetSingularName();
 
-            definition.Constructors.Add(new ClassConstructorDefinition());
+            classDefinition.Constructors.Add(new ClassConstructorDefinition());
 
             var typeResolver = new ClrTypeResolver();
 
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
             {
-                var column = table.PrimaryKey.GetColumns(table).First();
+                var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                definition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(typeResolver.Resolve(column.Type), column.GetParameterName()))
+                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(typeResolver.Resolve(column.Type), column.GetParameterName()))
                 {
                     Lines = new List<ILine>()
-                        {
-                            new CodeLine("{0} = {1};", column.GetPropertyName(), column.GetParameterName())
-                        }
+                    {
+                        new CodeLine("{0} = {1};", column.GetPropertyName(), column.GetParameterName())
+                    }
                 });
             }
 
             if (!string.IsNullOrEmpty(table.Description))
             {
-                definition.Documentation.Summary = table.Description;
+                classDefinition.Documentation.Summary = table.Description;
             }
 
             foreach (var column in table.Columns)
             {
                 if (project.Settings.EnableDataBindings)
                 {
-                    definition.AddViewModelProperty(typeResolver.Resolve(column.Type), column.GetPropertyName());
+                    classDefinition.AddViewModelProperty(typeResolver.Resolve(column.Type), column.GetPropertyName());
                 }
                 else
                 {
                     if (project.Settings.UseAutomaticPropertiesForEntities)
                     {
-                        definition.Properties.Add(new PropertyDefinition(typeResolver.Resolve(column.Type), column.GetPropertyName()));
+                        classDefinition.Properties.Add(new PropertyDefinition(typeResolver.Resolve(column.Type), column.GetPropertyName()));
                     }
                     else
                     {
-                        definition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
+                        classDefinition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
                     }
                 }
             }
 
-            definition.Implements.Add("IEntity");
+            classDefinition.Implements.Add("IEntity");
 
             if (project.Settings.SimplifyDataTypes)
             {
-                definition.SimplifyDataTypes();
+                classDefinition.SimplifyDataTypes();
             }
 
-            return definition;
+            return classDefinition;
         }
 
         public static CSharpClassDefinition CreateView(this DapperProject project, IView view)

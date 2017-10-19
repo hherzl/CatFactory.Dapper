@@ -14,17 +14,32 @@ namespace CatFactory.Dapper
         public bool EnableDataBindings { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_exclusions;
+        private List<string> m_insertExclusions;
 
-        public List<string> Exclusions
+        public List<string> InsertExclusions
         {
             get
             {
-                return m_exclusions ?? (m_exclusions = new List<string>());
+                return m_insertExclusions ?? (m_insertExclusions = new List<string>());
             }
             set
             {
-                m_exclusions = value;
+                m_insertExclusions = value;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_updateExclusions;
+
+        public List<string> UpdateExclusions
+        {
+            get
+            {
+                return m_updateExclusions ?? (m_updateExclusions = new List<string>());
+            }
+            set
+            {
+                m_updateExclusions = value;
             }
         }
     }
