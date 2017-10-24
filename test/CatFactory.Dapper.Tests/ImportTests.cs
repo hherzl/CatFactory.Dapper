@@ -14,7 +14,7 @@ namespace CatFactory.Dapper.Tests
             var database = SqlServerDatabaseFactory
                 .Import(logger, "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
-            // Create instance of Ef Core Project
+            // Create instance of Dapper Project
             var project = new DapperProject
             {
                 Name = "Store",
@@ -23,9 +23,8 @@ namespace CatFactory.Dapper.Tests
             };
 
             // Force overwrite
-            project.Settings.ForceOverwrite = true;
-
             // Add exclusions for insert and update
+            project.Settings.ForceOverwrite = true;
             project.Settings.UpdateExclusions.AddRange(new string[] { "CreationUser", "CreationDateTime", "Timestamp" });
             project.Settings.InsertExclusions.AddRange(new string[] { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" });
 
@@ -47,7 +46,7 @@ namespace CatFactory.Dapper.Tests
             var database = SqlServerDatabaseFactory
                 .Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
 
-            // Create instance of Ef Core Project
+            // Create instance of Dapper Project
             var project = new DapperProject
             {
                 Name = "Northwind",

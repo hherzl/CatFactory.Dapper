@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CatFactory.Collections;
+using CatFactory.Dapper.Definitions;
 using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper
@@ -18,12 +19,12 @@ namespace CatFactory.Dapper
 
         private static void GenerateAppSettings(DapperProject project)
         {
-            CSharpClassBuilder.Create(project.OutputDirectory, project.GetDataLayerDirectory(), project.Settings.ForceOverwrite, project.GetAppSettingsClassDefinition());
+            CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerDirectory(), project.Settings.ForceOverwrite, project.GetAppSettingsClassDefinition());
         }
 
         private static void GenerateDataLayerContract(DapperProject project, CSharpInterfaceDefinition interfaceDefinition)
         {
-            CSharpInterfaceBuilder.Create(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
+            CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
         }
 
         private static void GenerateDataRepositories(DapperProject project)
@@ -35,13 +36,6 @@ namespace CatFactory.Dapper
             {
                 var repositoryClassDefinition = projectFeature.GetRepositoryClassDefinition();
 
-                var codeBuilder = new CSharpClassBuilder
-                {
-                    ObjectDefinition = repositoryClassDefinition,
-                    OutputDirectory = project.OutputDirectory,
-                    ForceOverwrite = project.Settings.ForceOverwrite
-                };
-
                 var interfaceDefinition = repositoryClassDefinition.RefactInterface();
 
                 interfaceDefinition.Implements.Add("IRepository");
@@ -50,18 +44,18 @@ namespace CatFactory.Dapper
 
                 GenerateDataLayerContract(project, interfaceDefinition);
 
-                codeBuilder.CreateFile(project.GetDataLayerRepositoriesDirectory());
+                CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, repositoryClassDefinition);
             }
         }
 
         private static void GenerateRepositoryInterface(DapperProject project)
         {
-            CSharpInterfaceBuilder.Create(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryInterfaceDefinition());
+            CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryInterfaceDefinition());
         }
 
         private static void GenerateBaseRepositoryClassDefinition(DapperProject project)
         {
-            CSharpClassBuilder.Create(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryBaseClassDefinition());
+            CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryBaseClassDefinition());
         }
 
         private static void GenerateReadMe(this DapperProject project)

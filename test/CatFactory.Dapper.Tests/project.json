@@ -11,7 +11,7 @@
     "Microsoft.Extensions.DependencyInjection": "1.1.0",
     "Microsoft.Extensions.Logging": "1.1.1",
     "Microsoft.Extensions.Logging.Console": "1.1.1",
-    "CatFactory.Dapper": "2.0.0-alpha-build00"
+    "CatFactory.Dapper": "3.0.0-alpha-build00"
   },
   "testRunner": "xunit",
   "frameworks": {

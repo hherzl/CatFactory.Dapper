@@ -14,7 +14,7 @@ namespace CatFactory.Dapper
         {
             namingConvention = new DotNetNamingConvention();
         }
-        
+
         public static string GetEntityLayerNamespace(this DapperProject project, string ns)
             => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : string.Join(".", project.Name, project.Namespaces.EntityLayer, ns);
 

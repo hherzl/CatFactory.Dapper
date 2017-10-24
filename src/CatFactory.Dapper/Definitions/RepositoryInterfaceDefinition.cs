@@ -1,6 +1,6 @@
 ﻿using CatFactory.DotNetCore;
 
-namespace CatFactory.Dapper
+namespace CatFactory.Dapper.Definitions
 {
     public static class RepositoryInterfaceDefinition
     {

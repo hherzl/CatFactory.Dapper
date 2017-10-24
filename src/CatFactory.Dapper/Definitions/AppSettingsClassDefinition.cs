@@ -2,7 +2,7 @@
 using CatFactory.DotNetCore;
 using CatFactory.OOP;
 
-namespace CatFactory.Dapper
+namespace CatFactory.Dapper.Definitions
 {
     public static class AppSettingsClassDefinition
     {

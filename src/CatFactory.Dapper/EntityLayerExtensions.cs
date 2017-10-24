@@ -1,4 +1,5 @@
-﻿using CatFactory.DotNetCore;
+﻿using CatFactory.Dapper.Definitions;
+using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper
 {
@@ -12,14 +13,7 @@ namespace CatFactory.Dapper
                 Name = "IEntity"
             };
 
-            var codeBuilder = new CSharpInterfaceBuilder
-            {
-                ObjectDefinition = interfaceDefinition,
-                OutputDirectory = project.OutputDirectory,
-                ForceOverwrite = project.Settings.ForceOverwrite
-            };
-
-            codeBuilder.CreateFile(project.GetEntityLayerDirectory());
+            CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
         }
 
         public static DapperProject GenerateEntityLayer(this DapperProject project)
@@ -28,26 +22,12 @@ namespace CatFactory.Dapper
 
             foreach (var table in project.Database.Tables)
             {
-                var codeBuilder = new CSharpClassBuilder
-                {
-                    ObjectDefinition = project.CreateEntity(table),
-                    OutputDirectory = project.OutputDirectory,
-                    ForceOverwrite = project.Settings.ForceOverwrite
-                };
-
-                codeBuilder.CreateFile(project.GetEntityLayerDirectory());
+                CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateEntity(table));
             }
 
             foreach (var view in project.Database.Views)
             {
-                var codeBuilder = new CSharpClassBuilder
-                {
-                    ObjectDefinition = project.CreateView(view),
-                    OutputDirectory = project.OutputDirectory,
-                    ForceOverwrite = project.Settings.ForceOverwrite
-                };
-
-                codeBuilder.CreateFile(project.GetEntityLayerDirectory());
+                CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateView(view));
             }
 
             return project;
