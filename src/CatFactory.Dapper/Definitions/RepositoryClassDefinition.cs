@@ -110,12 +110,76 @@ namespace CatFactory.Dapper.Definitions
 
             lines.Add(new CodeLine(1, "query.Append(\" from \");"));
             lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+
+            if (table.ForeignKeys.Count > 0)
+            {
+                lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+
+                for (var i = 0; i < table.ForeignKeys.Count; i++)
+                {
+                    var foreignKey = table.ForeignKeys[i];
+
+                    if (foreignKey.Key.Count == 1)
+                    {
+                        var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
+
+                        lines.Add(new CodeLine(1, "query.Append(\"  ({0} is null or {1} = {0}) {2} \");", column.GetSqlServerParameterName(), column.GetColumnName(), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                    }
+                }
+
+                lines.Add(new CodeLine());
+
+                lines.Add(new CommentLine(1, " Create parameters collection"));
+                lines.Add(new CodeLine(1, "var parameters = new"));
+                lines.Add(new CodeLine(1, "{"));
+
+                for (var i = 0; i < table.ForeignKeys.Count; i++)
+                {
+                    var foreignKey = table.ForeignKeys[i];
+
+                    if (foreignKey.Key.Count == 1)
+                    {
+                        var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
+
+                        lines.Add(new CodeLine(2, "{0} = {0}{1}", column.GetParameterName(), i < table.ForeignKeys.Count - 1 ? "," : string.Empty));
+                    }
+                }
+
+                lines.Add(new CodeLine(1, "};"));
+            }
+
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Retrieve result from database and convert to typed list"));
-            lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
+
+            if (table.ForeignKeys.Count == 0)
+            {
+                lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
+            }
+            else
+            {
+                lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+            }
+
             lines.Add(new CodeLine("}"));
 
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName())
+            var parameters = new List<ParameterDefinition>();
+
+            if (table.ForeignKeys.Count > 0)
+            {
+                var typeResolver = new ClrTypeResolver();
+
+                foreach (var foreignKey in table.ForeignKeys)
+                {
+                    if (foreignKey.Key.Count == 1)
+                    {
+                        var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
+
+                        parameters.Add(new ParameterDefinition(typeResolver.Resolve(column.Type), column.GetParameterName()) { DefaultValue = "null" });
+                    }
+                }
+            }
+
+            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines

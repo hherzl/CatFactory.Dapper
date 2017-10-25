@@ -26,7 +26,11 @@
         {
             // todo: improve the way to pluralize a name
 
-            if (value.EndsWith("ss"))
+            if (value.EndsWith("tatus"))
+            {
+                return string.Format("{0}es", value);
+            }
+            else if (value.EndsWith("ss"))
             {
                 return string.Format("{0}es", value);
             }
