@@ -7,11 +7,11 @@
     "System.Runtime.Serialization.Primitives": "4.1.1",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-build10015",
-    "CatFactory.SqlServer": "3.0.0-alpha-build00",
+    "CatFactory.SqlServer": "3.0.0-alpha-build02",
     "Microsoft.Extensions.DependencyInjection": "1.1.0",
     "Microsoft.Extensions.Logging": "1.1.1",
     "Microsoft.Extensions.Logging.Console": "1.1.1",
-    "CatFactory.Dapper": "3.0.0-alpha-build01"
+    "CatFactory.Dapper": "3.0.0-*"
   },
   "testRunner": "xunit",
   "frameworks": {

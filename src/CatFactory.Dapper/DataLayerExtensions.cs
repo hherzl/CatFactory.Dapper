@@ -8,29 +8,29 @@ namespace CatFactory.Dapper
 {
     public static class DataLayerExtensions
     {
-        public static DapperProject GenerateDataLayer(this DapperProject project)
+        public static DapperProject ScaffoldDataLayer(this DapperProject project)
         {
-            GenerateAppSettings(project);
-            GenerateDataRepositories(project);
-            GenerateReadMe(project);
+            ScaffoldAppSettings(project);
+            ScaffoldDataRepositories(project);
+            ScaffoldReadMe(project);
 
             return project;
         }
 
-        private static void GenerateAppSettings(DapperProject project)
+        private static void ScaffoldAppSettings(DapperProject project)
         {
             CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerDirectory(), project.Settings.ForceOverwrite, project.GetAppSettingsClassDefinition());
         }
 
-        private static void GenerateDataLayerContract(DapperProject project, CSharpInterfaceDefinition interfaceDefinition)
+        private static void ScaffoldDataLayerContract(DapperProject project, CSharpInterfaceDefinition interfaceDefinition)
         {
             CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
         }
 
-        private static void GenerateDataRepositories(DapperProject project)
+        private static void ScaffoldDataRepositories(DapperProject project)
         {
-            GenerateRepositoryInterface(project);
-            GenerateBaseRepositoryClassDefinition(project);
+            ScaffoldRepositoryInterface(project);
+            ScaffoldBaseRepositoryClassDefinition(project);
 
             foreach (var projectFeature in project.Features)
             {
@@ -42,23 +42,23 @@ namespace CatFactory.Dapper
 
                 interfaceDefinition.Namespace = project.GetDataLayerContractsNamespace();
 
-                GenerateDataLayerContract(project, interfaceDefinition);
+                ScaffoldDataLayerContract(project, interfaceDefinition);
 
                 CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, repositoryClassDefinition);
             }
         }
 
-        private static void GenerateRepositoryInterface(DapperProject project)
+        private static void ScaffoldRepositoryInterface(DapperProject project)
         {
             CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryInterfaceDefinition());
         }
 
-        private static void GenerateBaseRepositoryClassDefinition(DapperProject project)
+        private static void ScaffoldBaseRepositoryClassDefinition(DapperProject project)
         {
             CSharpClassBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryBaseClassDefinition());
         }
 
-        private static void GenerateReadMe(this DapperProject project)
+        private static void ScaffoldReadMe(this DapperProject project)
         {
             var lines = new List<string>
             {

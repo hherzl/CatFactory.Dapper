@@ -22,8 +22,7 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API",
             };
 
-            // Force overwrite
-            // Add exclusions for insert and update
+            // Apply settings for project
             project.Settings.ForceOverwrite = true;
             project.Settings.UpdateExclusions.AddRange(new string[] { "CreationUser", "CreationDateTime", "Timestamp" });
             project.Settings.InsertExclusions.AddRange(new string[] { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" });
@@ -31,10 +30,10 @@ namespace CatFactory.Dapper.Tests
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
 
-            // Generate code =^^=
+            // Scaffolding =^^=
             project
-                .GenerateEntityLayer()
-                .GenerateDataLayer();
+                .ScaffoldEntityLayer()
+                .ScaffoldDataLayer();
         }
 
         [Fact]
@@ -54,16 +53,16 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind.Dapper.API\src\Northwind.Dapper.API"
             };
 
-            // Force overwrite
+            // Apply settings for project
             project.Settings.ForceOverwrite = true;
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
 
-            // Generate code =^^=
+            // Scaffolding =^^=
             project
-                .GenerateEntityLayer()
-                .GenerateDataLayer();
+                .ScaffoldEntityLayer()
+                .ScaffoldDataLayer();
         }
     }
 }

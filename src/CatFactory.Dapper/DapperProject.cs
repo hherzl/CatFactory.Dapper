@@ -22,15 +22,7 @@ namespace CatFactory.Dapper
                 .DbObjects
                 .Select(item => item.Schema)
                 .Distinct()
-                .Select(item =>
-                {
-                    var dbObjects = GetDbObjects(Database, item);
-
-                    return new ProjectFeature(item, dbObjects)
-                    {
-                        Project = this
-                    };
-                })
+                .Select(item => new ProjectFeature(item, GetDbObjects(Database, item)) { Project = this })
                 .ToList();
         }
 
