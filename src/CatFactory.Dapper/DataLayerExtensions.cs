@@ -75,6 +75,9 @@ namespace CatFactory.Dapper
                 "Happy coding!",
                 string.Empty,
 
+                "You can check the guide for this package in:",
+                "https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+                string.Empty,
                 "You can check source code on GitHub:",
                 "https://github.com/hherzl/CatFactory.Dapper",
                 string.Empty,
