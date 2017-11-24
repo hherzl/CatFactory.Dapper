@@ -8,23 +8,25 @@ namespace CatFactory.Dapper
     public static class DbObjectExtensions
     {
         private static ICodeNamingConvention namingConvention;
+        private static INamingService namingService;
 
         static DbObjectExtensions()
         {
             namingConvention = new DotNetNamingConvention();
+            namingService = new NamingService();
         }
 
         public static string GetEntityName(this IDbObject dbObject)
             => string.Format("{0}", namingConvention.GetClassName(dbObject.Name));
 
         public static string GetSingularName(this IDbObject dbObject)
-            => NamingService.GetSingularName(dbObject.GetEntityName());
+            => namingService.Singularize(dbObject.GetEntityName());
 
         public static string GetFullName(this IDbObject dbObject)
             => string.Format("[{0}].[{1}]", dbObject.Schema, dbObject.Name);
 
         public static string GetPluralName(this IDbObject dbObject)
-            => NamingService.GetPluralName(dbObject.GetEntityName());
+            => namingService.Pluralize(dbObject.GetEntityName());
 
         public static string GetGetAllRepositoryMethodName(this IDbObject dbObject)
             => string.Format("Get{0}Async", dbObject.GetPluralName());
