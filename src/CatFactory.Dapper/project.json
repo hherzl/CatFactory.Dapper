@@ -1,7 +1,7 @@
 ﻿{
-  "version": "3.0.0-alpha-build04",
+  "version": "3.0.0-alpha-build05",
   "title": "CatFactory.Dapper",
-  "description": "CatFactory package for Dapper code generation",
+  "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "repository": {
       "url": "https://github.com/hherzl/CatFactory.Dapper"
@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "CatFactory.DotNetCore": "3.0.0-alpha-build04"
+    "CatFactory.DotNetCore": "3.0.0-alpha-build06"
   },
 
   "frameworks": {
