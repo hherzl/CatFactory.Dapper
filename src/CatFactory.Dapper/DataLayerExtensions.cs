@@ -62,7 +62,7 @@ namespace CatFactory.Dapper
         {
             var lines = new List<string>
             {
-                "CatFactory: Code Generation Made Easy",
+                "CatFactory: Scaffolding Made Easy",
                 string.Empty,
 
                 "How to use this code on your ASP.NET Core Application",

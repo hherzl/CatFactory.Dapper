@@ -1,18 +1,23 @@
 ﻿{
-  "version": "3.0.0-alpha-build05",
+  "version": "3.0.0-alpha-build06",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
+    "summary": "CatFactory package for Dapper scaffolding",
+    "tags": [ "Dapper" ],
+    "releaseNotes": "3.0.0-alpha-build06 version: Package update.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "requireLicenseAcceptance": false,
     "repository": {
+      "type": "git",
       "url": "https://github.com/hherzl/CatFactory.Dapper"
     }
   },
   "authors": [
-    "C. Herzl"
+    "H. Herzl"
   ],
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "CatFactory.DotNetCore": "3.0.0-alpha-build06"
+    "CatFactory.DotNetCore": "3.0.0-alpha-build07"
   },
 
   "frameworks": {
