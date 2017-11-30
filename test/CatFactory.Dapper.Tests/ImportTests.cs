@@ -19,7 +19,7 @@ namespace CatFactory.Dapper.Tests
             {
                 Name = "Store",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API",
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API"
             };
 
             // Apply settings for project

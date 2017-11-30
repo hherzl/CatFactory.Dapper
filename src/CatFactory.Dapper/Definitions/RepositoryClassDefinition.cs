@@ -69,7 +69,12 @@ namespace CatFactory.Dapper.Definitions
                 if (table.PrimaryKey != null)
                 {
                     classDefinition.Methods.Add(GetGetMethod(ProjectFeature, table));
-                    classDefinition.Methods.Add(GetAddMethod(ProjectFeature, table));
+                }
+
+                classDefinition.Methods.Add(GetAddMethod(ProjectFeature, table));
+
+                if (table.PrimaryKey != null)
+                {
                     classDefinition.Methods.Add(GetUpdateMethod(ProjectFeature, table));
                     classDefinition.Methods.Add(GetRemoveMethod(ProjectFeature, table));
                 }
@@ -95,25 +100,86 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
 
-            for (var i = 0; i < table.Columns.Count; i++)
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
-                var column = table.Columns[i];
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" select \");"));
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+
+                if (table.ForeignKeys.Count > 0)
+                {
+                    lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+
+                    for (var i = 0; i < table.ForeignKeys.Count; i++)
+                    {
+                        var foreignKey = table.ForeignKeys[i];
+
+                        if (foreignKey.Key.Count == 1)
+                        {
+                            var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
+
+                            lines.Add(new CodeLine(1, "query.Append(\"  ({0} is null or {1} = {0}) {2} \");", column.GetSqlServerParameterName(), column.GetColumnName(), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" select "));
+
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "  {0}{1} ", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " from "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+
+                if (table.ForeignKeys.Count > 0)
+                {
+                    lines.Add(new CodeLine(1, " where "));
+
+                    for (var i = 0; i < table.ForeignKeys.Count; i++)
+                    {
+                        var foreignKey = table.ForeignKeys[i];
+
+                        if (foreignKey.Key.Count == 1)
+                        {
+                            var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
+
+                            lines.Add(new CodeLine(1, "  ({0} is null or {1} = {0}) {2} ", column.GetSqlServerParameterName(), column.GetColumnName(), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                        }
+                    }
+                }
+
+                lines.Add(new CodeLine(1, " \";"));
             }
 
-            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-
+            lines.Add(new CodeLine());
+            
             if (table.ForeignKeys.Count > 0)
             {
-                lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+                lines.Add(new CommentLine(1, " Create parameters collection"));
+                lines.Add(new CodeLine(1, "var parameters = new DynamicParameters();"));
+                lines.Add(new CodeLine());
+
+                lines.Add(new CommentLine(1, " Add parameters to collection"));
 
                 for (var i = 0; i < table.ForeignKeys.Count; i++)
                 {
@@ -123,32 +189,13 @@ namespace CatFactory.Dapper.Definitions
                     {
                         var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
 
-                        lines.Add(new CodeLine(1, "query.Append(\"  ({0} is null or {1} = {0}) {2} \");", column.GetSqlServerParameterName(), column.GetColumnName(), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                        lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", {1});", column.GetSqlServerParameterName(), column.GetParameterName()));
                     }
                 }
 
                 lines.Add(new CodeLine());
-
-                lines.Add(new CommentLine(1, " Create parameters collection"));
-                lines.Add(new CodeLine(1, "var parameters = new"));
-                lines.Add(new CodeLine(1, "{"));
-
-                for (var i = 0; i < table.ForeignKeys.Count; i++)
-                {
-                    var foreignKey = table.ForeignKeys[i];
-
-                    if (foreignKey.Key.Count == 1)
-                    {
-                        var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
-
-                        lines.Add(new CodeLine(2, "{0} = {0}{1}", column.GetParameterName(), i < table.ForeignKeys.Count - 1 ? "," : string.Empty));
-                    }
-                }
-
-                lines.Add(new CodeLine(1, "};"));
             }
 
-            lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Retrieve result from database and convert to typed list"));
 
             if (table.ForeignKeys.Count == 0)
@@ -157,7 +204,7 @@ namespace CatFactory.Dapper.Definitions
             }
             else
             {
-                lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+                lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(new CommandDefinition(query.ToString(), parameters));", table.GetEntityName()));
             }
 
             lines.Add(new CodeLine("}"));
@@ -193,22 +240,44 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
 
-            for (var i = 0; i < table.Columns.Count; i++)
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
-                var column = table.Columns[i];
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" select \");"));
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine());
+            }
+            else
+            {
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" select "));
+
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "  {0}{1} ", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " from "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, " \";"));
+                lines.Add(new CodeLine());
             }
 
-            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-            lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Retrieve result from database and convert to typed list"));
             lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName()));
             lines.Add(new CodeLine("}"));
@@ -227,42 +296,83 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+
+            var keyColumns = table.PrimaryKey.GetColumns(table).ToList();
+
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
+            {
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\" from \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+
+                lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", column.GetColumnName(), column.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine());
+                }
+            }
+            else
+            {
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" select "));
+
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine(1, "  {0}{1} ", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " from "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+
+                lines.Add(new CodeLine(1, " where "));
+
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
+
+                    lines.Add(new CodeLine(1, "  {0} = {1} ", column.GetColumnName(), column.GetSqlServerParameterName()));
+                }
+
+                lines.Add(new CodeLine(1, " \";"));
+                lines.Add(new CodeLine());
+            }
+
+            lines.Add(new CommentLine(1, " Create parameters collection"));
+            lines.Add(new CodeLine(1, "var parameters = new DynamicParameters();"));
             lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
 
-            for (var i = 0; i < table.Columns.Count; i++)
+            lines.Add(new CommentLine(1, " Add parameters to collection"));
+
+            for (var i = 0; i < keyColumns.Count; i++)
             {
-                var column = table.Columns[i];
+                var column = keyColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetColumnName(), i < table.Columns.Count - 1 ? "," : string.Empty));
+                lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
             }
 
-            lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+            lines.Add(new CodeLine());
 
-            lines.Add(new CodeLine(1, "query.Append(\" where \");"));
-
-            if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
-            {
-                var column = table.PrimaryKey.GetColumns(table).First();
-
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", column.GetColumnName(), column.GetSqlServerParameterName()));
-                lines.Add(new CodeLine());
-
-                lines.Add(new CommentLine(1, " Create parameters collection"));
-                lines.Add(new CodeLine(1, "var parameters = new"));
-                lines.Add(new CodeLine(1, "{"));
-                lines.Add(new CodeLine(2, "{0} = entity.{1}", column.GetParameterName(), column.GetPropertyName()));
-                lines.Add(new CodeLine(1, "};"));
-                lines.Add(new CodeLine());
-
-                lines.Add(new CommentLine(1, " Retrieve result from database and convert to entity class"));
-                lines.Add(new CodeLine(1, "return await connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
-                lines.Add(new CodeLine("}"));
-            }
+            lines.Add(new CommentLine(1, " Retrieve result from database and convert to entity class"));
+            lines.Add(new CodeLine(1, "return await connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+            lines.Add(new CodeLine("}"));
 
             return new MethodDefinition(string.Format("Task<{0}>", table.GetSingularName()), table.GetGetRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
@@ -304,10 +414,10 @@ namespace CatFactory.Dapper.Definitions
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(1, " Create parameters collection"));
-                lines.Add(new CodeLine(1, "var parameters = new"));
-                lines.Add(new CodeLine(1, "{"));
-                lines.Add(new CodeLine(2, "{0} = entity.{1}", column.GetParameterName(), column.GetPropertyName()));
-                lines.Add(new CodeLine(1, "};"));
+                lines.Add(new CodeLine(1, "var parameters = new DynamicParameters();"));
+                lines.Add(new CodeLine());
+
+                lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(1, " Retrieve result from database and convert to entity class"));
@@ -326,7 +436,7 @@ namespace CatFactory.Dapper.Definitions
         {
             var lines = new List<ILine>();
 
-            if (table.PrimaryKey != null && table.IsPrimaryKeyGuid())
+            if (table.IsPrimaryKeyGuid())
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
                 lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.PrimaryKey.GetColumns(table).First().GetPropertyName()));
@@ -336,42 +446,83 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" insert into \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-            lines.Add(new CodeLine(1, "query.Append(\"  ( \");"));
 
             var insertColumns = projectFeature.GetDapperProject().GetInsertColumns(table).ToList();
 
-            for (var i = 0; i < insertColumns.Count(); i++)
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
-                var column = insertColumns[i];
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" insert into \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  ( \");"));
 
-                lines.Add(new CodeLine(1, "query.Append(\"   {0}{1} \");", column.GetColumnName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                for (var i = 0; i < insertColumns.Count(); i++)
+                {
+                    var column = insertColumns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"   {0}{1} \");", column.GetColumnName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\"  ) \");"));
+                lines.Add(new CodeLine(1, "query.Append(\" values \");"));
+                lines.Add(new CodeLine(1, "query.Append(\" ( \");"));
+
+                for (var i = 0; i < insertColumns.Count(); i++)
+                {
+                    var column = insertColumns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetSqlServerParameterName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\" ) \");"));
+
+                if (table.Identity != null)
+                {
+                    // todo: add logic to retrieve the identity column
+                    var identityColumn = table.Columns[0];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", identityColumn.GetSqlServerParameterName()));
+                }
             }
-
-            lines.Add(new CodeLine(1, "query.Append(\"  ) \");"));
-            lines.Add(new CodeLine(1, "query.Append(\" values \");"));
-            lines.Add(new CodeLine(1, "query.Append(\" ( \");"));
-
-            for (var i = 0; i < insertColumns.Count(); i++)
+            else
             {
-                var column = insertColumns[i];
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" insert into "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  ( "));
+                
+                for (var i = 0; i < insertColumns.Count(); i++)
+                {
+                    var column = insertColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetSqlServerParameterName(), i < insertColumns.Count - 1 ? "," : string.Empty));
-            }
+                    lines.Add(new CodeLine(1, "   {0}{1} ", column.GetColumnName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                }
 
-            lines.Add(new CodeLine(1, "query.Append(\" ) \");"));
+                lines.Add(new CodeLine(1, "  ) "));
+                lines.Add(new CodeLine(1, " values "));
+                lines.Add(new CodeLine(1, " ( "));
 
-            if (table.Identity != null)
-            {
-                // todo: add logic to retrieve the identity column
-                var identityColumn = table.Columns[0];
+                for (var i = 0; i < insertColumns.Count(); i++)
+                {
+                    var column = insertColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", identityColumn.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", column.GetSqlServerParameterName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " ) "));
+
+                if (table.Identity != null)
+                {
+                    // todo: add logic to retrieve the identity column
+                    var identityColumn = table.Columns[0];
+
+                    lines.Add(new CodeLine(1, "  select {0} = @@identity ", identityColumn.GetSqlServerParameterName()));
+                }
+                
+                lines.Add(new CodeLine(1, " \";"));
             }
 
             lines.Add(new CodeLine());
@@ -393,7 +544,7 @@ namespace CatFactory.Dapper.Definitions
 
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Execute query in database"));
-                lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(query.ToString(), parameters);"));
+                lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
                 lines.Add(new CodeLine("}"));
             }
@@ -413,7 +564,7 @@ namespace CatFactory.Dapper.Definitions
 
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Execute query in database"));
-                lines.Add(new CodeLine(1, "var affectedRows = await connection.ExecuteAsync(query.ToString(), parameters);"));
+                lines.Add(new CodeLine(1, "var affectedRows = await connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(1, " Retrieve value for output parameters"));
@@ -439,32 +590,60 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" update \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-            lines.Add(new CodeLine(1, "query.Append(\" set \");"));
 
             var updateColumns = projectFeature.GetDapperProject().GetUpdateColumns(table).ToList();
+            var keyColumns = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
-            for (var i = 0; i < updateColumns.Count(); i++)
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
-                var column = updateColumns[i];
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" update \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\" set \");"));
+                
+                for (var i = 0; i < updateColumns.Count(); i++)
+                {
+                    var column = updateColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2 } \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < updateColumns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2 } \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < updateColumns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+                
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
+
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < keyColumns.Count - 1 ? " and " : string.Empty));
+                }
             }
-
-            lines.Add(new CodeLine(1, "query.Append(\" where \");"));
-
-            var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
-
-            for (var i = 0; i < key.Count; i++)
+            else
             {
-                var column = key[i];
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" update "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, " set "));
+                
+                for (var i = 0; i < updateColumns.Count(); i++)
+                {
+                    var column = updateColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2 } ", column.GetColumnName(), column.GetSqlServerParameterName(), i < updateColumns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " where "));
+
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
+
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < keyColumns.Count - 1 ? " and " : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " \"; "));
             }
 
             lines.Add(new CodeLine());
@@ -482,16 +661,16 @@ namespace CatFactory.Dapper.Definitions
                 lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
             }
 
-            for (var i = 0; i < key.Count; i++)
+            for (var i = 0; i < keyColumns.Count; i++)
             {
-                var column = key[i];
+                var column = keyColumns[i];
 
                 lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
             }
 
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Execute query in database"));
-            lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(query.ToString(), parameters);"));
+            lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
             lines.Add(new CodeLine("}"));
 
@@ -509,21 +688,41 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CommentLine(" Create connection instance"));
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" delete from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
-            lines.Add(new CodeLine(1, "query.Append(\" where \");"));
 
-            var key = table.PrimaryKey.GetColumns(table).ToList();
+            var keyColumns = table.PrimaryKey.GetColumns(table).ToList();
 
-            for (var i = 0; i < key.Count(); i++)
+            if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
-                var column = key[i];
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" delete from \");"));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\" where \");"));
+                
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < keyColumns.Count - 1 ? " and " : string.Empty));
+                }
+            }
+            else
+            {
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" delete from "));
+                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, " where "));
+
+                for (var i = 0; i < keyColumns.Count; i++)
+                {
+                    var column = keyColumns[i];
+
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < keyColumns.Count - 1 ? " and " : string.Empty));
+                }
+
+                lines.Add(new CodeLine(1, " \"; "));
             }
 
             lines.Add(new CodeLine());
@@ -545,7 +744,7 @@ namespace CatFactory.Dapper.Definitions
 
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Execute query in database"));
-            lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(query.ToString(), parameters);"));
+            lines.Add(new CodeLine(1, "return await connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
             lines.Add(new CodeLine("}"));
 

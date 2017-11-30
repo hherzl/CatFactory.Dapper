@@ -1,11 +1,11 @@
 ﻿{
-  "version": "3.0.0-alpha-build06",
+  "version": "3.0.0-alpha-build07",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "summary": "CatFactory package for Dapper scaffolding",
     "tags": [ "Dapper" ],
-    "releaseNotes": "3.0.0-alpha-build06 version: Package update.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "releaseNotes": "3.0.0-alpha-build07 version: Addition of flag to use string builder for queries.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
