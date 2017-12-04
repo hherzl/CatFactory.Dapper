@@ -24,7 +24,7 @@ namespace CatFactory.Dapper.Definitions
 
             classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
             {
-                Lines = new List<ILine>()
+                Lines = new List<ILine>
                 {
                     new CodeLine("ConnectionString = appSettings.Value.ConnectionString;")
                 }

@@ -1,11 +1,11 @@
 ﻿{
-  "version": "3.0.0-alpha-build07",
+  "version": "3.0.0-alpha-build08",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "summary": "CatFactory package for Dapper scaffolding",
     "tags": [ "Dapper" ],
-    "releaseNotes": "3.0.0-alpha-build07 version: Addition of flag to use string builder for queries.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "releaseNotes": "3.0.0-alpha-build08 version: Package update, use of CSharpCodeBuilder class to generate code files and code refactor for naming extensions.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "CatFactory.DotNetCore": "3.0.0-alpha-build07"
+    "CatFactory.DotNetCore": "3.0.0-alpha-build08"
   },
 
   "frameworks": {

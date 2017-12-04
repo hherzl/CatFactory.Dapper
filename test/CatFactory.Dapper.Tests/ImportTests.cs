@@ -6,13 +6,11 @@ namespace CatFactory.Dapper.Tests
     public class ImportTests
     {
         [Fact]
-        public void ProjectGenerationFromExistingDatabaseTest()
+        public void ProjectScaffoldingFromExistingDatabaseTest()
         {
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
-
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(logger, "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject
@@ -37,13 +35,11 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void ProjectGenerationFromNorthwindDatabaseTest()
+        public void ProjectScaffoldingFromNorthwindDatabaseTest()
         {
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
-
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject

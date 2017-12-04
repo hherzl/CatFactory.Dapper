@@ -13,7 +13,7 @@ namespace CatFactory.Dapper
                 Name = "IEntity"
             };
 
-            CSharpInterfaceBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
+            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
         }
 
         public static DapperProject ScaffoldEntityLayer(this DapperProject project)
@@ -22,14 +22,12 @@ namespace CatFactory.Dapper
 
             foreach (var table in project.Database.Tables)
             {
-                CSharpClassBuilder
-                    .CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateEntity(table));
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateEntity(table));
             }
 
             foreach (var view in project.Database.Views)
             {
-                CSharpClassBuilder
-                    .CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateView(view));
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.Settings.ForceOverwrite, project.CreateView(view));
             }
 
             return project;
