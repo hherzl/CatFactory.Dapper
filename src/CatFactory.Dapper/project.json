@@ -1,11 +1,11 @@
 ﻿{
-  "version": "3.0.0-alpha-build09",
+  "version": "3.0.0-alpha-build10",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "summary": "CatFactory package for Dapper scaffolding",
     "tags": [ "Dapper" ],
-    "releaseNotes": "3.0.0-alpha-build09 version: DotNetCore Package update.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "releaseNotes": "3.0.0-alpha-build10 version: Addition of draft for DML.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
