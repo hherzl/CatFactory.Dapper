@@ -16,10 +16,10 @@ namespace CatFactory.Dapper
             namingService = new NamingService();
         }
 
-        public static string GetInterfaceRepositoryName(this ProjectFeature projectFeature)
+        public static string GetInterfaceRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
             => namingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
 
-        public static string GetClassRepositoryName(this ProjectFeature projectFeature)
+        public static string GetClassRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
             => namingConvention.GetClassName(string.Format("{0}Repository", projectFeature.Name));
 
         public static string GetEntityName(this IDbObject dbObject)

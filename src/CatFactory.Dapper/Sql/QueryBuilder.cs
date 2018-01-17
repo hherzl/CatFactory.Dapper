@@ -47,6 +47,11 @@ namespace CatFactory.Dapper.Sql
                 query.Columns.Add(property.Name);
             }
 
+            if (!string.IsNullOrEmpty(query.Identity))
+            {
+                query.Footer = identity;
+            }
+
             return query;
         }
 

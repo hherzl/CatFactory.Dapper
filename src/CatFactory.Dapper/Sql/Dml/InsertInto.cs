@@ -54,9 +54,9 @@ namespace CatFactory.Dapper.Sql.Dml
             output.Append(")");
             output.AppendLine();
 
-            if (!string.IsNullOrEmpty(Identity))
+            if (!string.IsNullOrEmpty(Footer))
             {
-                output.AppendFormat(" select {0} = @@identity ", Identity);
+                output.AppendFormat("select {0} = @@identity", Identity);
                 output.AppendLine();
             }
 

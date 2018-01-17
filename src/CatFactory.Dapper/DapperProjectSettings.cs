@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace CatFactory.Dapper
 {
-    public class DapperProjectSettings
+    public class DapperProjectSettings : ProjectSettings
     {
         public bool ForceOverwrite { get; set; }
 

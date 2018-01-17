@@ -5,7 +5,7 @@ using CatFactory.Mapping;
 
 namespace CatFactory.Dapper
 {
-    public class DapperProject : Project
+    public class DapperProject : Project<DapperProjectSettings>
     {
         public DapperProject()
         {
@@ -22,7 +22,7 @@ namespace CatFactory.Dapper
                 .DbObjects
                 .Select(item => item.Schema)
                 .Distinct()
-                .Select(item => new ProjectFeature(item, GetDbObjects(Database, item)) { Project = this })
+                .Select(item => new ProjectFeature<DapperProjectSettings>(item, GetDbObjects(Database, item)) { Project = this })
                 .ToList();
         }
 

@@ -10,7 +10,7 @@ namespace CatFactory.Dapper.Definitions
 {
     public static class RepositoryClassDefinition
     {
-        public static CSharpClassDefinition GetRepositoryClassDefinition(this ProjectFeature ProjectFeature)
+        public static CSharpClassDefinition GetRepositoryClassDefinition(this ProjectFeature<DapperProjectSettings> ProjectFeature)
         {
             var classDefinition = new CSharpClassDefinition();
 
@@ -26,7 +26,7 @@ namespace CatFactory.Dapper.Definitions
 
             foreach (var dbObject in ProjectFeature.DbObjects)
             {
-                var table = ProjectFeature.Project.Database.FindTableBySchemaAndName(dbObject.FullName);
+                var table = ProjectFeature.Project.Database.FindTable(dbObject.FullName);
 
                 if (table == null)
                 {
@@ -93,7 +93,7 @@ namespace CatFactory.Dapper.Definitions
             return classDefinition;
         }
 
-        private static MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, ITable table)
+        private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
             var lines = new List<ILine>();
 
@@ -233,7 +233,7 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetGetAllMethod(ProjectFeature projectFeature, IView table)
+        private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, IView table)
         {
             var lines = new List<ILine>();
 
@@ -289,7 +289,7 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetGetMethod(ProjectFeature projectFeature, ITable table)
+        private static MethodDefinition GetGetMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
             var lines = new List<ILine>();
 
@@ -297,7 +297,7 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
 
-            var keyColumns = table.PrimaryKey.GetColumns(table).ToList();
+            var keyColumns = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
             if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
@@ -381,7 +381,7 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetByUniqueMethod(ProjectFeature projectFeature, ITable table, Unique unique)
+        private static MethodDefinition GetByUniqueMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table, Unique unique)
         {
             var lines = new List<ILine>();
 
@@ -408,7 +408,7 @@ namespace CatFactory.Dapper.Definitions
 
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
             {
-                var column = unique.GetColumns(table).First();
+                var column = table.GetColumnsFromConstraint(unique).First();
 
                 lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", column.GetColumnName(), column.GetSqlServerParameterName()));
                 lines.Add(new CodeLine());
@@ -432,14 +432,14 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetAddMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetAddMethod(ProjectFeature<DapperProjectSettings> projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
             if (table.IsPrimaryKeyGuid())
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
-                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.PrimaryKey.GetColumns(table).First().GetPropertyName()));
+                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.GetColumnsFromConstraint(table.PrimaryKey).First().GetPropertyName()));
                 lines.Add(new CodeLine());
             }
 
@@ -583,7 +583,7 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetUpdateMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetUpdateMethod(ProjectFeature<DapperProjectSettings> projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
@@ -681,7 +681,7 @@ namespace CatFactory.Dapper.Definitions
             };
         }
 
-        private static MethodDefinition GetRemoveMethod(ProjectFeature projectFeature, Table table)
+        private static MethodDefinition GetRemoveMethod(ProjectFeature<DapperProjectSettings> projectFeature, Table table)
         {
             var lines = new List<ILine>();
 
@@ -689,7 +689,7 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
             lines.Add(new CodeLine("{"));
 
-            var keyColumns = table.PrimaryKey.GetColumns(table).ToList();
+            var keyColumns = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
             if (projectFeature.GetDapperProject().Settings.UseStringBuilderForQueries)
             {
@@ -733,7 +733,7 @@ namespace CatFactory.Dapper.Definitions
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(1, " Add parameters to collection"));
 
-            var columns = table.PrimaryKey.GetColumns(table).ToList();
+            var columns = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
             for (var i = 0; i < columns.Count(); i++)
             {

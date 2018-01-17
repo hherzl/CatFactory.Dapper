@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CatFactory.Mapping;
 
 namespace CatFactory.Dapper
@@ -41,7 +43,7 @@ namespace CatFactory.Dapper
 
         public static IEnumerable<Column> GetUpdateColumns(this DapperProject project, ITable table)
         {
-            foreach (var column in table.GetColumnsWithOutPrimaryKey())
+            foreach (var column in table.GetColumnsWithNoPrimaryKey())
             {
                 if (project.Settings.UpdateExclusions.Contains(column.Name))
                 {
@@ -50,6 +52,55 @@ namespace CatFactory.Dapper
 
                 yield return column;
             }
+        }
+
+        public static DapperProject GlobalSelection(this DapperProject project, Action<DapperProjectSettings> action = null)
+        {
+            var settings = new DapperProjectSettings();
+
+            var selection = project.Selections.FirstOrDefault(item => item.IsGlobal);
+
+            if (selection == null)
+            {
+                selection = new ProjectSelection<DapperProjectSettings>
+                {
+                    Pattern = ProjectSelection<DapperProjectSettings>.GlobalPattern,
+                    Settings = settings
+                };
+
+                project.Selections.Add(selection);
+            }
+            else
+            {
+                settings = selection.Settings;
+            }
+
+            action?.Invoke(settings);
+
+            return project;
+        }
+
+        public static ProjectSelection<DapperProjectSettings> GlobalSelection(this DapperProject project)
+            => project.Selections.FirstOrDefault(item => item.IsGlobal);
+
+        public static DapperProject Select(this DapperProject project, string pattern, Action<DapperProjectSettings> action = null)
+        {
+            var selection = project.Selections.FirstOrDefault(item => item.Pattern == pattern);
+
+            if (selection == null)
+            {
+                selection = new ProjectSelection<DapperProjectSettings>
+                {
+                    Pattern = pattern,
+                    Settings = new DapperProjectSettings()
+                };
+
+                project.Selections.Add(selection);
+            }
+
+            action?.Invoke(selection.Settings);
+
+            return project;
         }
     }
 }
