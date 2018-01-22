@@ -92,7 +92,7 @@ namespace CatFactory.Dapper
                 selection = new ProjectSelection<DapperProjectSettings>
                 {
                     Pattern = pattern,
-                    Settings = new DapperProjectSettings()
+                    Settings = project.GlobalSelection().Settings
                 };
 
                 project.Selections.Add(selection);

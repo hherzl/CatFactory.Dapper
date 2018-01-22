@@ -30,13 +30,11 @@ namespace CatFactory.Dapper.Definitions
 
             classDefinition.Constructors.Add(new ClassConstructorDefinition());
 
-            var typeResolver = new ClrTypeResolver();
-
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(typeResolver.Resolve(column.Type), column.GetParameterName()))
+                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveType(column), column.GetParameterName()))
                 {
                     Lines = new List<ILine>()
                     {
@@ -54,17 +52,17 @@ namespace CatFactory.Dapper.Definitions
             {
                 if (project.Settings.EnableDataBindings)
                 {
-                    classDefinition.AddViewModelProperty(typeResolver.Resolve(column.Type), column.GetPropertyName());
+                    classDefinition.AddViewModelProperty(project.Database.ResolveType(column), column.GetPropertyName());
                 }
                 else
                 {
                     if (project.Settings.UseAutomaticPropertiesForEntities)
                     {
-                        classDefinition.Properties.Add(new PropertyDefinition(typeResolver.Resolve(column.Type), column.GetPropertyName()));
+                        classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
                     }
                     else
                     {
-                        classDefinition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
+                        classDefinition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
                     }
                 }
             }
@@ -91,8 +89,6 @@ namespace CatFactory.Dapper.Definitions
 
             definition.Constructors.Add(new ClassConstructorDefinition());
 
-            var typeResolver = new ClrTypeResolver();
-
             if (!string.IsNullOrEmpty(view.Description))
             {
                 definition.Documentation.Summary = view.Description;
@@ -102,11 +98,11 @@ namespace CatFactory.Dapper.Definitions
             {
                 if (project.Settings.UseAutomaticPropertiesForEntities)
                 {
-                    definition.Properties.Add(new PropertyDefinition(typeResolver.Resolve(column.Type), column.GetPropertyName()));
+                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
                 }
                 else
                 {
-                    definition.AddPropertyWithField(typeResolver.Resolve(column.Type), column.GetPropertyName());
+                    definition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
                 }
             }
 

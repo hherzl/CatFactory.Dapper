@@ -213,15 +213,13 @@ namespace CatFactory.Dapper.Definitions
 
             if (table.ForeignKeys.Count > 0)
             {
-                var typeResolver = new ClrTypeResolver();
-
                 foreach (var foreignKey in table.ForeignKeys)
                 {
                     if (foreignKey.Key.Count == 1)
                     {
                         var column = table.GetColumnsFromConstraint(foreignKey).ToList()[0];
 
-                        parameters.Add(new ParameterDefinition(typeResolver.Resolve(column.Type), column.GetParameterName()) { DefaultValue = "null" });
+                        parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveType(column), column.GetParameterName()) { DefaultValue = "null" });
                     }
                 }
             }
@@ -481,8 +479,7 @@ namespace CatFactory.Dapper.Definitions
 
                 if (table.Identity != null)
                 {
-                    // todo: add logic to retrieve the identity column
-                    var identityColumn = table.Columns[0];
+                    var identityColumn = table.GetIdentityColumn();
 
                     lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", identityColumn.GetSqlServerParameterName()));
                 }
@@ -516,8 +513,7 @@ namespace CatFactory.Dapper.Definitions
 
                 if (table.Identity != null)
                 {
-                    // todo: add logic to retrieve the identity column
-                    var identityColumn = table.Columns[0];
+                    var identityColumn = table.GetIdentityColumn();
 
                     lines.Add(new CodeLine(1, "  select {0} = @@identity ", identityColumn.GetSqlServerParameterName()));
                 }
@@ -557,10 +553,9 @@ namespace CatFactory.Dapper.Definitions
                     lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
                 }
 
-                // todo: add logic to retrieve the identity column
-                var identityColumn = table.Columns[0];
+                var identityColumn = table.GetIdentityColumn();
 
-                lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", dbType: {1}, direction: ParameterDirection.Output);", identityColumn.GetParameterName(), new ClrTypeResolver().GetDbType(identityColumn.Type)));
+                lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", dbType: {1}, direction: ParameterDirection.Output);", identityColumn.GetParameterName(), projectFeature.Project.Database.ResolveDbType(identityColumn)));
 
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Execute query in database"));
@@ -568,7 +563,7 @@ namespace CatFactory.Dapper.Definitions
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(1, " Retrieve value for output parameters"));
-                lines.Add(new CodeLine(1, "entity.{0} = parameters.Get<{1}>(\"{2}\");", identityColumn.GetPropertyName(), new ClrTypeResolver().Resolve(identityColumn.Type), identityColumn.GetParameterName()));
+                lines.Add(new CodeLine(1, "entity.{0} = parameters.Get<{1}>(\"{2}\");", identityColumn.GetPropertyName(), projectFeature.Project.Database.ResolveType(identityColumn), identityColumn.GetParameterName()));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CodeLine(1, "return affectedRows;"));
