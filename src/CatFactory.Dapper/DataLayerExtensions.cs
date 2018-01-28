@@ -86,7 +86,7 @@ namespace CatFactory.Dapper
                 "CatFactory Development Team ==^^=="
             };
 
-            TextFileHelper.CreateFile(Path.Combine(project.OutputDirectory, "ReadMe.txt"), lines.ToStringBuilder().ToString());
+            TextFileHelper.CreateFile(Path.Combine(project.OutputDirectory, "CatFactory.Dapper.ReadMe.txt"), lines.ToStringBuilder().ToString());
         }
     }
 }

@@ -29,9 +29,7 @@ namespace CatFactory.Dapper.Definitions
                 var table = ProjectFeature.Project.Database.FindTable(dbObject.FullName);
 
                 if (table == null)
-                {
                     continue;
-                }
 
                 if (table.HasDefaultSchema())
                 {
@@ -434,7 +432,7 @@ namespace CatFactory.Dapper.Definitions
         {
             var lines = new List<ILine>();
 
-            if (table.IsPrimaryKeyGuid())
+            if (projectFeature.Project.Database.PrimaryKeyIsGuid(table))
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
                 lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.GetColumnsFromConstraint(table.PrimaryKey).First().GetPropertyName()));

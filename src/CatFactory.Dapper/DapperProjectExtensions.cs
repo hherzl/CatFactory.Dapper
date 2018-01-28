@@ -28,14 +28,10 @@ namespace CatFactory.Dapper
             foreach (var column in table.Columns)
             {
                 if (project.Settings.InsertExclusions.Contains(column.Name))
-                {
                     continue;
-                }
 
                 if (table.Identity != null && table.Identity.Name == column.Name)
-                {
                     continue;
-                }
 
                 yield return column;
             }
@@ -46,9 +42,7 @@ namespace CatFactory.Dapper
             foreach (var column in table.GetColumnsWithNoPrimaryKey())
             {
                 if (project.Settings.UpdateExclusions.Contains(column.Name))
-                {
                     continue;
-                }
 
                 yield return column;
             }
@@ -89,10 +83,21 @@ namespace CatFactory.Dapper
 
             if (selection == null)
             {
+                var globalSettings = project.GlobalSelection().Settings;
+
                 selection = new ProjectSelection<DapperProjectSettings>
                 {
                     Pattern = pattern,
-                    Settings = project.GlobalSelection().Settings
+                    Settings = new DapperProjectSettings
+                    {
+                        ForceOverwrite = globalSettings.ForceOverwrite,
+                        SimplifyDataTypes = globalSettings.SimplifyDataTypes,
+                        UseAutomaticPropertiesForEntities = globalSettings.UseAutomaticPropertiesForEntities,
+                        EnableDataBindings = globalSettings.EnableDataBindings,
+                        UseStringBuilderForQueries = globalSettings.UseStringBuilderForQueries,
+                        InsertExclusions = globalSettings.InsertExclusions,
+                        UpdateExclusions = globalSettings.UpdateExclusions,
+                    }
                 };
 
                 project.Selections.Add(selection);
