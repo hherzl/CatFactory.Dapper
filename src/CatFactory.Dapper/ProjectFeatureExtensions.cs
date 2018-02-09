@@ -1,4 +1,6 @@
-﻿namespace CatFactory.Dapper
+﻿using CatFactory.CodeFactory;
+
+namespace CatFactory.Dapper
 {
     public static class ProjectFeatureExtensions
     {
