@@ -1,11 +1,11 @@
 ﻿{
-  "version": "3.0.0-alpha-build15",
+  "version": "3.0.0-alpha-build16",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "summary": "CatFactory package for Dapper scaffolding",
     "tags": [ "Dapper" ],
-    "releaseNotes": "3.0.0-alpha-build15 version: Core package update.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "releaseNotes": "3.0.0-alpha-build16 version: Code fix to use project selection for tables and views instead of global settings and addition of AddPagingForGetAllOperations flag for settings.\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",

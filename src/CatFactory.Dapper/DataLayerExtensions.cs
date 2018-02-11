@@ -19,16 +19,18 @@ namespace CatFactory.Dapper
 
         private static void ScaffoldAppSettings(DapperProject project)
         {
-            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerDirectory(), project.Settings.ForceOverwrite, project.GetAppSettingsClassDefinition());
+            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.GetAppSettingsClassDefinition());
         }
 
         private static void ScaffoldDataLayerContract(DapperProject project, CSharpInterfaceDefinition interfaceDefinition)
         {
-            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, interfaceDefinition);
+            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.GlobalSelection().Settings.ForceOverwrite, interfaceDefinition);
         }
 
         private static void ScaffoldDataRepositories(DapperProject project)
         {
+            var projectSelection = project.GlobalSelection();
+
             ScaffoldRepositoryInterface(project);
             ScaffoldBaseRepositoryClassDefinition(project);
 
@@ -44,18 +46,22 @@ namespace CatFactory.Dapper
 
                 ScaffoldDataLayerContract(project, interfaceDefinition);
 
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, repositoryClassDefinition);
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), projectSelection.Settings.ForceOverwrite, repositoryClassDefinition);
             }
         }
 
         private static void ScaffoldRepositoryInterface(DapperProject project)
         {
-            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryInterfaceDefinition());
+            var projectSelection = project.GlobalSelection();
+
+            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerContractsDirectory(), projectSelection.Settings.ForceOverwrite, project.GetRepositoryInterfaceDefinition());
         }
 
         private static void ScaffoldBaseRepositoryClassDefinition(DapperProject project)
         {
-            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), project.Settings.ForceOverwrite, project.GetRepositoryBaseClassDefinition());
+            var projectSelection = project.GlobalSelection();
+
+            CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetDataLayerRepositoriesDirectory(), projectSelection.Settings.ForceOverwrite, project.GetRepositoryBaseClassDefinition());
         }
 
         private static void ScaffoldReadMe(this DapperProject project)

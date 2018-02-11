@@ -26,9 +26,11 @@ namespace CatFactory.Dapper
 
         public static IEnumerable<Column> GetInsertColumns(this DapperProject project, ITable table)
         {
+            var selection = project.GetSelection(table);
+
             foreach (var column in table.Columns)
             {
-                if (project.Settings.InsertExclusions.Contains(column.Name))
+                if (selection.Settings.InsertExclusions.Contains(column.Name))
                     continue;
 
                 if (table.Identity != null && table.Identity.Name == column.Name)
@@ -40,9 +42,11 @@ namespace CatFactory.Dapper
 
         public static IEnumerable<Column> GetUpdateColumns(this DapperProject project, ITable table)
         {
+            var selection = project.GetSelection(table);
+
             foreach (var column in table.GetColumnsWithNoPrimaryKey())
             {
-                if (project.Settings.UpdateExclusions.Contains(column.Name))
+                if (selection.Settings.UpdateExclusions.Contains(column.Name))
                     continue;
 
                 yield return column;
@@ -98,6 +102,7 @@ namespace CatFactory.Dapper
                         UseStringBuilderForQueries = globalSettings.UseStringBuilderForQueries,
                         InsertExclusions = globalSettings.InsertExclusions,
                         UpdateExclusions = globalSettings.UpdateExclusions,
+                        AddPagingForGetAllOperations = globalSettings.AddPagingForGetAllOperations
                     }
                 };
 

@@ -38,19 +38,19 @@ namespace CatFactory.Dapper
             => string.Format("Get{0}Async", dbObject.GetPluralName());
 
         public static string GetGetRepositoryMethodName(this IDbObject dbObject)
-            => string.Format("Get{0}Async", dbObject.GetSingularName());
+            => string.Format("Get{0}Async", dbObject.GetEntityName());
 
         public static string GetGetByUniqueRepositoryMethodName(this ITable dbObject, Unique unique)
-            => string.Format("Get{0}By{1}Async", dbObject.GetSingularName(), string.Join("And", unique.Key.Select(item => namingConvention.GetPropertyName(item))));
+            => string.Format("Get{0}By{1}Async", dbObject.GetEntityName(), string.Join("And", unique.Key.Select(item => namingConvention.GetPropertyName(item))));
 
         public static string GetAddRepositoryMethodName(this ITable dbObject)
-            => string.Format("Add{0}Async", dbObject.GetSingularName());
+            => string.Format("Add{0}Async", dbObject.GetEntityName());
 
         public static string GetUpdateRepositoryMethodName(this ITable dbObject)
-            => string.Format("Update{0}Async", dbObject.GetSingularName());
+            => string.Format("Update{0}Async", dbObject.GetEntityName());
 
         public static string GetDeleteRepositoryMethodName(this ITable dbObject)
-            => string.Format("Remove{0}Async", dbObject.GetSingularName());
+            => string.Format("Remove{0}Async", dbObject.GetEntityName());
 
         public static string GetEntityLayerNamespace(this DapperProject project)
             => string.Format("{0}.{1}", namingConvention.GetClassName(project.Name), project.Namespaces.EntityLayer);

@@ -15,9 +15,7 @@ namespace CatFactory.Dapper
         public override void BuildFeatures()
         {
             if (Database == null)
-            {
                 return;
-            }
 
             Features = Database
                 .DbObjects
@@ -49,11 +47,5 @@ namespace CatFactory.Dapper
 
         public ProjectNamespaces Namespaces
             => m_namespaces ?? (m_namespaces = new ProjectNamespaces());
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private DapperProjectSettings m_settings;
-
-        public DapperProjectSettings Settings
-            => m_settings ?? (m_settings = new DapperProjectSettings());
     }
 }

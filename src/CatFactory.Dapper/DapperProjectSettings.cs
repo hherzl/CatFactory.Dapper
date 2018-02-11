@@ -51,5 +51,7 @@ namespace CatFactory.Dapper
                 m_updateExclusions = value;
             }
         }
+
+        public bool AddPagingForGetAllOperations { get; set; }
     }
 }

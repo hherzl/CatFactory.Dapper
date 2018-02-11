@@ -15,7 +15,9 @@ namespace CatFactory.Dapper.Definitions
 
             classDefinition.Namespaces.Add("System");
 
-            if (project.Settings.EnableDataBindings)
+            var selection = project.GetSelection(table);
+
+            if (selection.Settings.EnableDataBindings)
             {
                 classDefinition.Namespaces.Add("System.ComponentModel");
 
@@ -26,7 +28,7 @@ namespace CatFactory.Dapper.Definitions
 
             classDefinition.Namespace = table.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema);
 
-            classDefinition.Name = table.GetSingularName();
+            classDefinition.Name = table.GetEntityName();
 
             classDefinition.Constructors.Add(new ClassConstructorDefinition());
 
@@ -44,35 +46,27 @@ namespace CatFactory.Dapper.Definitions
             }
 
             if (!string.IsNullOrEmpty(table.Description))
-            {
                 classDefinition.Documentation.Summary = table.Description;
-            }
 
             foreach (var column in table.Columns)
             {
-                if (project.Settings.EnableDataBindings)
+                if (selection.Settings.EnableDataBindings)
                 {
                     classDefinition.AddViewModelProperty(project.Database.ResolveType(column), column.GetPropertyName());
                 }
                 else
                 {
-                    if (project.Settings.UseAutomaticPropertiesForEntities)
-                    {
+                    if (selection.Settings.UseAutomaticPropertiesForEntities)
                         classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
-                    }
                     else
-                    {
                         classDefinition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
-                    }
                 }
             }
 
             classDefinition.Implements.Add("IEntity");
 
-            if (project.Settings.SimplifyDataTypes)
-            {
+            if (selection.Settings.SimplifyDataTypes)
                 classDefinition.SimplifyDataTypes();
-            }
 
             return classDefinition;
         }
@@ -85,33 +79,27 @@ namespace CatFactory.Dapper.Definitions
 
             definition.Namespace = view.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(view.Schema);
 
-            definition.Name = view.GetSingularName();
+            definition.Name = view.GetEntityName();
 
             definition.Constructors.Add(new ClassConstructorDefinition());
 
             if (!string.IsNullOrEmpty(view.Description))
-            {
                 definition.Documentation.Summary = view.Description;
-            }
+
+            var selection = project.GetSelection(view);
 
             foreach (var column in view.Columns)
             {
-                if (project.Settings.UseAutomaticPropertiesForEntities)
-                {
+                if (selection.Settings.UseAutomaticPropertiesForEntities)
                     definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
-                }
                 else
-                {
                     definition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
-                }
             }
 
             definition.Implements.Add("IEntity");
 
-            if (project.Settings.SimplifyDataTypes)
-            {
+            if (selection.Settings.SimplifyDataTypes)
                 definition.SimplifyDataTypes();
-            }
 
             return definition;
         }
