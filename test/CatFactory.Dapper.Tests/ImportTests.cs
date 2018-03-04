@@ -29,7 +29,7 @@ namespace CatFactory.Dapper.Tests
                 settings.InsertExclusions.AddRange(new string[] { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" });
             });
 
-            project.Select("Production.ProductInventory", settings =>
+            project.Select("Production.*", settings =>
             {
                 settings.UseStringBuilderForQueries = false;
                 settings.AddPagingForGetAllOperations = true;
@@ -92,7 +92,6 @@ namespace CatFactory.Dapper.Tests
         public void ProjectScaffoldingFromAdventureWorksDatabaseTest()
         {
             // Import database
-
             var factory = new SqlServerDatabaseFactory(LoggerMocker.GetLogger<SqlServerDatabaseFactory>())
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",

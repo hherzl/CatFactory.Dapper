@@ -1,26 +1,8 @@
-﻿using System.Collections.Generic;
-using CatFactory.DotNetCore;
-using CatFactory.OOP;
+﻿using CatFactory.DotNetCore;
 
 namespace CatFactory.Dapper.Definitions
 {
-    public static class AppSettingsClassDefinition
+    public class AppSettingsClassDefinition : CSharpClassDefinition
     {
-        public static CSharpClassDefinition GetAppSettingsClassDefinition(this DapperProject project)
-        {
-            return new CSharpClassDefinition
-            {
-                Namespace = project.GetDataLayerNamespace(),
-                Namespaces = new List<string>
-                {
-                    "System"
-                },
-                Name = "AppSettings",
-                Properties = new List<PropertyDefinition>
-                {
-                    new PropertyDefinition("String", "ConnectionString")
-                }
-            };
-        }
     }
 }

@@ -100,8 +100,8 @@ namespace CatFactory.Dapper
                         UseAutomaticPropertiesForEntities = globalSettings.UseAutomaticPropertiesForEntities,
                         EnableDataBindings = globalSettings.EnableDataBindings,
                         UseStringBuilderForQueries = globalSettings.UseStringBuilderForQueries,
-                        InsertExclusions = globalSettings.InsertExclusions,
-                        UpdateExclusions = globalSettings.UpdateExclusions,
+                        InsertExclusions = globalSettings.InsertExclusions.Select(item => item).ToList(),
+                        UpdateExclusions = globalSettings.UpdateExclusions.Select(item => item).ToList(),
                         AddPagingForGetAllOperations = globalSettings.AddPagingForGetAllOperations
                     }
                 };
