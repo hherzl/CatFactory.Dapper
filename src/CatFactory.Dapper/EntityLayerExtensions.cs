@@ -26,16 +26,17 @@ namespace CatFactory.Dapper
 
             foreach (var table in project.Database.Tables)
             {
-                var selection = project.GetSelection(table);
-
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), globalSelection.Settings.ForceOverwrite, project.CreateEntity(table));
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateEntity(table));
             }
 
             foreach (var view in project.Database.Views)
             {
-                var selection = project.GetSelection(view);
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateView(view));
+            }
 
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), globalSelection.Settings.ForceOverwrite, project.CreateView(view));
+            foreach (var tableFunction in project.Database.TableFunctions)
+            {
+                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateView(tableFunction));
             }
 
             return project;

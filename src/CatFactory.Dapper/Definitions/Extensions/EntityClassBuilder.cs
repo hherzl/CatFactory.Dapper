@@ -38,7 +38,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveType(column), column.GetParameterName()))
                 {
-                    Lines = new List<ILine>()
+                    Lines = new List<ILine>
                     {
                         new CodeLine("{0} = {1};", column.GetPropertyName(), column.GetParameterName())
                     }
@@ -52,14 +52,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 if (selection.Settings.EnableDataBindings)
                 {
-                    classDefinition.AddViewModelProperty(project.Database.ResolveType(column), column.GetPropertyName());
+                    classDefinition.AddViewModelProperty(project.Database.ResolveType(column), table.GetPropertyNameHack(column));
                 }
                 else
                 {
                     if (selection.Settings.UseAutomaticPropertiesForEntities)
-                        classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
+                        classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), table.GetPropertyNameHack(column)));
                     else
-                        classDefinition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
+                        classDefinition.AddPropertyWithField(project.Database.ResolveType(column), table.GetPropertyNameHack(column));
                 }
             }
 
@@ -91,9 +91,44 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var column in view.Columns)
             {
                 if (selection.Settings.UseAutomaticPropertiesForEntities)
-                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
+                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), view.GetPropertyNameHack(column)));
                 else
-                    definition.AddPropertyWithField(project.Database.ResolveType(column), column.GetPropertyName());
+                    definition.AddPropertyWithField(project.Database.ResolveType(column), view.GetPropertyNameHack(column));
+            }
+
+            definition.Implements.Add("IEntity");
+
+            if (selection.Settings.SimplifyDataTypes)
+                definition.SimplifyDataTypes();
+
+            return definition;
+        }
+
+        public static EntityClassDefinition CreateView(this DapperProject project, TableFunction tableFunction)
+        {
+            var definition = new EntityClassDefinition();
+
+            definition.Namespaces.Add("System");
+
+            definition.Namespace = tableFunction.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
+
+            definition.Name = tableFunction.GetEntityName();
+
+            definition.Constructors.Add(new ClassConstructorDefinition());
+
+            if (!string.IsNullOrEmpty(tableFunction.Description))
+                definition.Documentation.Summary = tableFunction.Description;
+
+            var selection = project.GetSelection(tableFunction);
+
+            foreach (var column in tableFunction.Columns)
+            {
+                definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
+
+                //if (selection.Settings.UseAutomaticPropertiesForEntities)
+                //    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), tableFunction.GetPropertyNameHack(column)));
+                //else
+                //    definition.AddPropertyWithField(project.Database.ResolveType(column), tableFunction.GetPropertyNameHack(column));
             }
 
             definition.Implements.Add("IEntity");

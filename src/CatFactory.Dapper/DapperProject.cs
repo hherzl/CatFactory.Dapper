@@ -32,12 +32,17 @@ namespace CatFactory.Dapper
             result.AddRange(Database
                 .Tables
                 .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "USER_TABLE" }));
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "Table" }));
 
             result.AddRange(Database
                 .Views
                 .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "VIEW" }));
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "View" }));
+
+            result.AddRange(Database
+                .TableFunctions
+                .Where(x => x.Schema == schema)
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
 
             return result;
         }

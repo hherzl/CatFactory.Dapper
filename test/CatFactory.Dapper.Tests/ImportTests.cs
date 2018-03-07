@@ -74,10 +74,7 @@ namespace CatFactory.Dapper.Tests
             };
 
             // Apply settings for project
-            project.GlobalSelection(settings =>
-            {
-                settings.ForceOverwrite = true;
-            });
+            project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -99,7 +96,8 @@ namespace CatFactory.Dapper.Tests
                 {
                     Exclusions = new List<string> { "dbo.sysdiagrams" },
                     ExclusionTypes = new List<string> { "geography" },
-                    ImportTableFunctions = true
+                    ImportTableFunctions = true,
+                    ImportScalarFunctions = true
                 }
             };
 
@@ -114,10 +112,9 @@ namespace CatFactory.Dapper.Tests
             };
 
             // Apply settings for project
-            project.GlobalSelection(settings =>
-            {
-                settings.ForceOverwrite = true;
-            });
+            project.GlobalSelection(settings => settings.ForceOverwrite = true);
+
+            project.Select("Sales.SalesOrderHeader", settings => settings.AddPagingForGetAllOperations = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
