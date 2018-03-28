@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using CatFactory.CodeFactory;
 using CatFactory.DotNetCore;
 using CatFactory.Mapping;
 
@@ -6,6 +7,28 @@ namespace CatFactory.Dapper
 {
     public static class ColumnExtensions
     {
+        public static ICodeNamingConvention namingConvention;
+
+        static ColumnExtensions()
+        {
+            namingConvention = new DotNetNamingConvention();
+        }
+
+        public static string GetPropertyName(this Column column)
+        {
+            var name = column.Name;
+
+            foreach (var item in DotNetNamingConvention.invalidChars)
+            {
+                name = name.Replace(item, '_');
+            }
+
+            return namingConvention.GetPropertyName(name);
+        }
+
+        public static string GetParameterName(this Column column)
+            => namingConvention.GetParameterName(column.Name);
+
         public static string GetPropertyNameHack(this ITable table, Column column)
         {
             var propertyName = column.HasSameNameEnclosingType(table) ? column.GetNameForEnclosing() : column.GetPropertyName();

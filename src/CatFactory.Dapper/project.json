@@ -1,11 +1,11 @@
 ﻿{
-  "version": "3.0.0-alpha-build18",
+  "version": "3.0.0-alpha-build19",
   "title": "CatFactory.Dapper",
   "description": "CatFactory package for Dapper scaffolding",
   "packOptions": {
     "summary": "CatFactory package for Dapper scaffolding",
     "tags": [ "Dapper" ],
-    "releaseNotes": "3.0.0-alpha-build18 version: Fix for property names with same class name, addition of table functions for entities and repositories (read operations) and code fix for project selection extensions: use DbObject parameter instead of specific type (table, view and table function).\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
+    "releaseNotes": "3.0.0-alpha-build19 version: Fix for property names with same class name, addition of table functions for entities and repositories (read operations) and code fix for project selection extensions: use DbObject parameter instead of specific type (table, view and table function).\r\n\r\nQuick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "CatFactory.DotNetCore": "3.0.0-alpha-build13"
+    "CatFactory.DotNetCore": "3.0.0-alpha-build16"
   },
 
   "frameworks": {
