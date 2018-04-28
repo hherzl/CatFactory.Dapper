@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatFactory.Dapper", "CatFactory.Dapper\CatFactory.Dapper.csproj", "{EB3226F6-26F7-4E54-A15E-38EED4C9456E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatFactory.Dapper.Tests", "CatFactory.Dapper.Tests\CatFactory.Dapper.Tests.csproj", "{EB621C80-5E74-4F4F-A603-148E5FC348AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB3226F6-26F7-4E54-A15E-38EED4C9456E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB3226F6-26F7-4E54-A15E-38EED4C9456E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB3226F6-26F7-4E54-A15E-38EED4C9456E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB3226F6-26F7-4E54-A15E-38EED4C9456E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB621C80-5E74-4F4F-A603-148E5FC348AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB621C80-5E74-4F4F-A603-148E5FC348AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB621C80-5E74-4F4F-A603-148E5FC348AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB621C80-5E74-4F4F-A603-148E5FC348AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66253017-F138-4641-8C3F-68AF93AFEB19}
+	EndGlobalSection
+EndGlobal
