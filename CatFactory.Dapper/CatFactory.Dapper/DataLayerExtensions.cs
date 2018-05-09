@@ -2,7 +2,7 @@
 using System.IO;
 using CatFactory.Collections;
 using CatFactory.Dapper.Definitions.Extensions;
-using CatFactory.DotNetCore;
+using CatFactory.NetCore;
 
 namespace CatFactory.Dapper
 {

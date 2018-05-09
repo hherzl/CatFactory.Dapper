@@ -1,4 +1,4 @@
-﻿using CatFactory.DotNetCore;
+﻿using CatFactory.NetCore;
 
 namespace CatFactory.Dapper.Definitions
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.Collections;
-using CatFactory.DotNetCore;
+using CatFactory.NetCore;
 using CatFactory.Mapping;
 using CatFactory.OOP;
 
@@ -88,11 +88,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var selection = projectFeature.GetDapperProject().GetSelection(table);
 
@@ -256,11 +257,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, IView view)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var selection = projectFeature.GetDapperProject().GetSelection(view);
 
@@ -314,11 +316,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, TableFunction tableFunction)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var selection = projectFeature.GetDapperProject().GetSelection(tableFunction);
 
@@ -408,11 +411,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetGetMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var selection = projectFeature.GetDapperProject().GetSelection(table);
 
@@ -502,16 +506,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetByUniqueMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table, Unique unique)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
-            lines.Add(new CommentLine(1, " Create string builder for query"));
-            lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
-            lines.Add(new CodeLine());
-            lines.Add(new CommentLine(1, " Create sql statement"));
-            lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{"),
+                new CommentLine(1, " Create string builder for query"),
+                new CodeLine(1, "var query = new StringBuilder();"),
+                new CodeLine(),
+                new CommentLine(1, " Create sql statement"),
+                new CodeLine(1, "query.Append(\" select \");")
+            };
 
             for (var i = 0; i < table.Columns.Count; i++)
             {
@@ -714,11 +719,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetUpdateMethod(ProjectFeature<DapperProjectSettings> projectFeature, Table table)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var sets = projectFeature.GetDapperProject().GetUpdateColumns(table).ToList();
             var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
@@ -814,11 +820,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetRemoveMethod(ProjectFeature<DapperProjectSettings> projectFeature, Table table)
         {
-            var lines = new List<ILine>();
-
-            lines.Add(new CommentLine(" Create connection instance"));
-            lines.Add(new CodeLine("using (var connection = new SqlConnection(ConnectionString))"));
-            lines.Add(new CodeLine("{"));
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
 
             var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
