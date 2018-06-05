@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build01</Version>
+    <Version>1.0.0-beta-sun-build03</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build00 Version: Core package update
+    <PackageReleaseNotes>1.0.0-beta-sun-build03 Version: Core Package Update
 
 Quick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory</PackageReleaseNotes>
     <Description>CatFactory package for Dapper scaffolding</Description>
@@ -12,10 +12,11 @@ Quick start https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with
     <RepositoryType>git</RepositoryType>
     <PackageTags>Dapper</PackageTags>
     <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
+    <Company>Herzl Corp.</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build01" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build03" />
   </ItemGroup>
 
 </Project>

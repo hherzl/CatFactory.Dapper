@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Reflection;
 using CatFactory.Dapper.Sql.Dml;
 
 namespace CatFactory.Dapper.Sql
@@ -33,24 +32,18 @@ namespace CatFactory.Dapper.Sql
             var properties = type.GetProperties().ToList();
 
             if (properties.Any(item => item.Name == identity))
-            {
                 query.Identity = identity;
-            }
 
             foreach (var property in properties)
             {
                 if (!string.IsNullOrEmpty(identity) && identity == property.Name)
-                {
                     continue;
-                }
 
                 query.Columns.Add(property.Name);
             }
 
             if (!string.IsNullOrEmpty(query.Identity))
-            {
                 query.Footer = identity;
-            }
 
             return query;
         }
@@ -66,16 +59,12 @@ namespace CatFactory.Dapper.Sql
             var properties = type.GetProperties().ToList();
 
             if (properties.Any(item => item.Name == key))
-            {
                 query.Key = key;
-            }
 
             foreach (var property in properties)
             {
                 if (!string.IsNullOrEmpty(key) && key == property.Name)
-                {
                     continue;
-                }
 
                 query.Columns.Add(property.Name);
             }
@@ -96,9 +85,7 @@ namespace CatFactory.Dapper.Sql
             var properties = type.GetProperties().ToList();
 
             if (properties.Any(item => item.Name == key))
-            {
                 query.Key = key;
-            }
 
             query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = key });
 
