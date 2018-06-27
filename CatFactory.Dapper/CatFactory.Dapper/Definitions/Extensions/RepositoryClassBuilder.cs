@@ -2,7 +2,6 @@
 using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.Collections;
-using CatFactory.NetCore;
 using CatFactory.Mapping;
 using CatFactory.OOP;
 
@@ -50,7 +49,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var dbos = projectFeature.DbObjects.Select(dbo => dbo.FullName).ToList();
             var tables = projectFeature.Project.Database.Tables.Where(t => dbos.Contains(t.FullName)).ToList();
             var views = projectFeature.Project.Database.Views.Where(v => dbos.Contains(v.FullName)).ToList();
-            var tableFunctions = projectFeature.Project.Database.TableFunctions.Where(v => dbos.Contains(v.FullName)).ToList();
+            var tableFunctions = projectFeature.Project.Database.TableFunctions.Where(tf => dbos.Contains(tf.FullName)).ToList();
+            var scalarFunctions = projectFeature.Project.Database.ScalarFunctions.Where(sf => dbos.Contains(sf.FullName)).ToList();
 
             foreach (var table in tables)
             {
@@ -68,20 +68,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
 
                 foreach (var unique in table.Uniques)
-                {
                     classDefinition.Methods.Add(GetByUniqueMethod(projectFeature, table, unique));
-                }
             }
 
             foreach (var view in views)
-            {
                 classDefinition.Methods.Add(GetGetAllMethod(projectFeature, view));
-            }
 
             foreach (var tableFunction in tableFunctions)
-            {
                 classDefinition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
-            }
+
+            foreach (var scalarFunction in scalarFunctions)
+                classDefinition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
 
             return classDefinition;
         }
@@ -97,7 +94,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             var selection = projectFeature.GetDapperProject().GetSelection(table);
 
-            var filters = table.ForeignKeys.Count > 0 || selection.Settings.AddPagingForGetAllOperations ? true : false;
+            var filters = table.ForeignKeys.Count > 0 || selection.Settings.AddPagingForGetAllOperation ? true : false;
 
             if (selection.Settings.UseStringBuilderForQueries)
             {
@@ -134,7 +131,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     }
                 }
 
-                if (selection.Settings.AddPagingForGetAllOperations)
+                if (selection.Settings.AddPagingForGetAllOperation)
                 {
                     lines.Add(new CodeLine(1, "query.Append(\" order by \");"));
 
@@ -181,7 +178,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     }
                 }
 
-                if (selection.Settings.AddPagingForGetAllOperations)
+                if (selection.Settings.AddPagingForGetAllOperation)
                 {
                     lines.Add(new CodeLine(1, " order by "));
 
@@ -204,7 +201,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 lines.Add(new CommentLine(1, " Add parameters to collection"));
 
-                if (selection.Settings.AddPagingForGetAllOperations)
+                if (selection.Settings.AddPagingForGetAllOperation)
                 {
                     lines.Add(new CodeLine(1, "parameters.Add(\"@pageSize\", pageSize);"));
                     lines.Add(new CodeLine(1, "parameters.Add(\"@pageNumber\", pageNumber);"));
@@ -233,15 +230,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             if (filters)
             {
-                if (selection.Settings.AddPagingForGetAllOperations)
+                if (selection.Settings.AddPagingForGetAllOperation)
                 {
                     parameters.Add(new ParameterDefinition("Int32", "pageSize") { DefaultValue = "10" });
                     parameters.Add(new ParameterDefinition("Int32", "pageNumber") { DefaultValue = "1" });
                 }
 
+                // todo: add logic to retrieve multiple columns from foreign key
                 foreach (var foreignKey in table.ForeignKeys)
                 {
-                    // todo: add logic to retrieve multiple columns from foreign key
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
                     parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveType(column), column.GetParameterName()) { DefaultValue = "null" });
@@ -375,9 +372,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CommentLine(1, " Add parameters to collection"));
 
                 foreach (var parameter in tableFunction.Parameters)
-                {
                     lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", {1});", parameter.Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
-                }
 
                 lines.Add(new CodeLine());
             }
@@ -385,13 +380,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(1, " Retrieve result from database and convert to typed list"));
 
             if (tableFunction.Parameters.Count == 0)
-            {
                 lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString());", tableFunction.GetEntityName()));
-            }
             else
-            {
                 lines.Add(new CodeLine(1, "return await connection.QueryAsync<{0}>(query.ToString(), parameters);", tableFunction.GetEntityName()));
-            }
 
             lines.Add(new CodeLine("}"));
 
@@ -403,6 +394,87 @@ namespace CatFactory.Dapper.Definitions.Extensions
             }
 
             return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", tableFunction.GetEntityName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            {
+                IsAsync = true,
+                Lines = lines
+            };
+        }
+
+        private static MethodDefinition GetGetAllMethod(ProjectFeature<DapperProjectSettings> projectFeature, ScalarFunction scalarFunction)
+        {
+            var lines = new List<ILine>
+            {
+                new CommentLine(" Create connection instance"),
+                new CodeLine("using (var connection = new SqlConnection(ConnectionString))"),
+                new CodeLine("{")
+            };
+
+            var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
+            var typeToReturn = projectFeature.Project.Database.ResolveType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type).GetClrType().Name;
+            var scalarFunctionParameters = scalarFunction.Parameters.Where(item => !string.IsNullOrEmpty(item.Name)).ToList();
+
+            if (selection.Settings.UseStringBuilderForQueries)
+            {
+                lines.Add(new CommentLine(1, " Create string builder for query"));
+                lines.Add(new CodeLine(1, "var query = new StringBuilder();"));
+                lines.Add(new CodeLine());
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "query.Append(\" select \");"));
+
+                var selectParameters = scalarFunctionParameters.Count == 0 ? string.Empty : string.Join(", ", scalarFunctionParameters.Select(item => item.Name));
+
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}({1}) \");", scalarFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine());
+            }
+            else
+            {
+                lines.Add(new CommentLine(1, " Create sql statement"));
+                lines.Add(new CodeLine(1, "var query = @\" select "));
+
+                var selectParameters = scalarFunctionParameters.Count == 0 ? string.Empty : string.Join(", ", scalarFunctionParameters.Select(item => item.Name));
+
+                lines.Add(new CodeLine(1, "  {0}({1}) ", scalarFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine(1, " \";"));
+                lines.Add(new CodeLine());
+            }
+
+            if (scalarFunctionParameters.Count > 0)
+            {
+                lines.Add(new CommentLine(1, " Create parameters collection"));
+                lines.Add(new CodeLine(1, "var parameters = new DynamicParameters();"));
+                lines.Add(new CodeLine());
+
+                lines.Add(new CommentLine(1, " Add parameters to collection"));
+
+                foreach (var parameter in scalarFunctionParameters)
+                    lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", {1});", parameter.Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+
+                lines.Add(new CodeLine());
+            }
+
+            lines.Add(new CommentLine(1, " Retrieve scalar from database and cast to specific CLR type"));
+
+            if (scalarFunctionParameters.Count == 0)
+            {
+                lines.Add(new CodeLine(1, "var scalar = await connection.ExecuteScalarAsync(query.ToString());"));
+                lines.Add(new CodeLine(1, "return ({0})scalar;", typeToReturn));
+            }
+            else
+            {
+                lines.Add(new CodeLine(1, "var scalar = await connection.ExecuteScalarAsync(query.ToString(), parameters);", typeToReturn));
+                lines.Add(new CodeLine(1, "return ({0})scalar;", typeToReturn));
+            }
+
+            lines.Add(new CodeLine("}"));
+
+            var parameters = new List<ParameterDefinition>();
+
+            foreach (var parameter in scalarFunctionParameters)
+            {
+                parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveType(parameter.Type).GetClrType().Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+            }
+
+            return new MethodDefinition(string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines

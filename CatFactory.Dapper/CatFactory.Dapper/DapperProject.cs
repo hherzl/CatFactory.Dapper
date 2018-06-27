@@ -44,6 +44,13 @@ namespace CatFactory.Dapper
                 .Where(x => x.Schema == schema)
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
 
+            // todo: add scalar functions
+
+            result.AddRange(Database
+                .ScalarFunctions
+                .Where(x => x.Schema == schema)
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "ScalarFunction" }));
+
             return result;
         }
 

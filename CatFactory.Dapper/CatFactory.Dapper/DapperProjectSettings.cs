@@ -52,6 +52,6 @@ namespace CatFactory.Dapper
             }
         }
 
-        public bool AddPagingForGetAllOperations { get; set; }
+        public bool AddPagingForGetAllOperation { get; set; }
     }
 }

@@ -102,7 +102,7 @@ namespace CatFactory.Dapper
                         UseStringBuilderForQueries = globalSettings.UseStringBuilderForQueries,
                         InsertExclusions = globalSettings.InsertExclusions.Select(item => item).ToList(),
                         UpdateExclusions = globalSettings.UpdateExclusions.Select(item => item).ToList(),
-                        AddPagingForGetAllOperations = globalSettings.AddPagingForGetAllOperations
+                        AddPagingForGetAllOperation = globalSettings.AddPagingForGetAllOperation
                     }
                 };
 

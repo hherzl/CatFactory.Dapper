@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,9 +11,35 @@ namespace CatFactory.Dapper.Sql.Dml
 
         public string Key { get; set; }
 
-        public List<string> Columns { get; set; } = new List<string>();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_columns;
 
-        public List<Condition> Where { get; set; } = new List<Condition>();
+        public List<string> Columns
+        {
+            get
+            {
+                return m_columns ?? (m_columns = new List<string>());
+            }
+            set
+            {
+                m_columns = value;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<Condition> m_where;
+
+        public List<Condition> Where
+        {
+            get
+            {
+                return m_where ?? (m_where = new List<Condition>());
+            }
+            set
+            {
+                m_where = value;
+            }
+        }
 
         public override string ToString()
         {
@@ -46,20 +73,14 @@ namespace CatFactory.Dapper.Sql.Dml
                 for (var i = 0; i < Where.Count; i++)
                 {
                     if (i > 0)
-                    {
                         output.AppendFormat(" {0} ", Where[i].LogicOperator);
-                    }
 
                     var comparisonOperator = string.Empty;
 
                     if (Where[i].ComparisonOperator == ComparisonOperator.Equals)
-                    {
                         comparisonOperator = "=";
-                    }
                     else if (Where[i].ComparisonOperator == ComparisonOperator.NotEquals)
-                    {
                         comparisonOperator = "<>";
-                    }
 
                     output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, Where[i].Column);
                     output.AppendLine();

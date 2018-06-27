@@ -11,14 +11,14 @@ namespace CatFactory.Dapper.Tests
         {
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(LoggerHelper.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject
             {
                 Name = "Store",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store.Dapper.API\src\Store.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store\Store.Dapper.API"
             };
 
             // Apply settings for project
@@ -32,10 +32,10 @@ namespace CatFactory.Dapper.Tests
             project.Select("Production.*", settings =>
             {
                 settings.UseStringBuilderForQueries = false;
-                settings.AddPagingForGetAllOperations = true;
+                settings.AddPagingForGetAllOperation = true;
             });
 
-            project.Select("Sales.Order", settings => settings.AddPagingForGetAllOperations = true);
+            project.Select("Sales.Order", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -63,14 +63,14 @@ namespace CatFactory.Dapper.Tests
         {
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(LoggerHelper.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject
             {
                 Name = "Northwind",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind.Dapper.API\src\Northwind.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind\Northwind.Dapper.API"
             };
 
             // Apply settings for project
@@ -89,7 +89,7 @@ namespace CatFactory.Dapper.Tests
         public void ProjectScaffoldingFromAdventureWorksDatabaseTest()
         {
             // Import database
-            var factory = new SqlServerDatabaseFactory(LoggerMocker.GetLogger<SqlServerDatabaseFactory>())
+            var databaseFactory = new SqlServerDatabaseFactory(LoggerHelper.GetLogger<SqlServerDatabaseFactory>())
             {
                 ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
@@ -101,20 +101,20 @@ namespace CatFactory.Dapper.Tests
                 }
             };
 
-            var database = factory.Import();
+            var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
             var project = new DapperProject
             {
                 Name = "AdventureWorks",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\AdventureWorks.Dapper.API\src\AdventureWorks.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\AdventureWorks\AdventureWorks.Dapper.API"
             };
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
-            project.Select("Sales.SalesOrderHeader", settings => settings.AddPagingForGetAllOperations = true);
+            project.Select("Sales.SalesOrderHeader", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();

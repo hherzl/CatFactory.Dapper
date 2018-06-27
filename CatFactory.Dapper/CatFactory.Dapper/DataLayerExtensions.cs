@@ -87,7 +87,7 @@ namespace CatFactory.Dapper
                 "You can check source code on GitHub:",
                 "https://github.com/hherzl/CatFactory.Dapper",
                 string.Empty,
-                "*** Special Thanks for Edson Ferreira to let me help for Dapper community ***",
+                "*** Special Thanks for Edson Ferreira to let me help to Dapper community ***",
                 string.Empty,
                 "CatFactory Development Team ==^^=="
             };

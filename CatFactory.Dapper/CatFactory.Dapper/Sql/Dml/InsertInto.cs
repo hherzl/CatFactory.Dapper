@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,7 +11,20 @@ namespace CatFactory.Dapper.Sql.Dml
 
         public string Identity { get; set; }
 
-        public List<string> Columns { get; set; } = new List<string>();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_columns;
+
+        public List<string> Columns
+        {
+            get
+            {
+                return m_columns ?? (m_columns = new List<string>());
+            }
+            set
+            {
+                m_columns = value;
+            }
+        }
 
         public override string ToString()
         {
@@ -54,7 +68,7 @@ namespace CatFactory.Dapper.Sql.Dml
             output.Append(")");
             output.AppendLine();
 
-            if (!string.IsNullOrEmpty(Footer))
+            if (!string.IsNullOrEmpty(Identity))
             {
                 output.AppendFormat("select {0} = @@identity", Identity);
                 output.AppendLine();

@@ -124,12 +124,37 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var column in tableFunction.Columns)
             {
                 definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
-
-                //if (selection.Settings.UseAutomaticPropertiesForEntities)
-                //    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), tableFunction.GetPropertyNameHack(column)));
-                //else
-                //    definition.AddPropertyWithField(project.Database.ResolveType(column), tableFunction.GetPropertyNameHack(column));
             }
+
+            definition.Implements.Add("IEntity");
+
+            if (selection.Settings.SimplifyDataTypes)
+                definition.SimplifyDataTypes();
+
+            return definition;
+        }
+
+        public static EntityClassDefinition CreateView(this DapperProject project, ScalarFunction tableFunction)
+        {
+            var definition = new EntityClassDefinition();
+
+            definition.Namespaces.Add("System");
+
+            definition.Namespace = tableFunction.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
+
+            definition.Name = tableFunction.GetEntityName();
+
+            definition.Constructors.Add(new ClassConstructorDefinition());
+
+            if (!string.IsNullOrEmpty(tableFunction.Description))
+                definition.Documentation.Summary = tableFunction.Description;
+
+            var selection = project.GetSelection(tableFunction);
+
+            //foreach (var column in tableFunction.Parameters)
+            //{
+            //    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
+            //}
 
             definition.Implements.Add("IEntity");
 

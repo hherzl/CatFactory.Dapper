@@ -48,13 +48,13 @@ namespace CatFactory.Dapper.Sql
             return query;
         }
 
-        public static Update<TEntity> Update<TEntity>(string key)
+        public static Update<TEntity> Update<TEntity>(string table = null, string key = null)
         {
             var query = new Update<TEntity>();
 
             var type = typeof(TEntity);
 
-            query.Table = type.Name;
+            query.Table = string.IsNullOrEmpty(table) ? type.Name : table;
 
             var properties = type.GetProperties().ToList();
 
@@ -74,13 +74,13 @@ namespace CatFactory.Dapper.Sql
             return query;
         }
 
-        public static DeleteFrom<TEntity> DeleteFrom<TEntity>(string key)
+        public static DeleteFrom<TEntity> DeleteFrom<TEntity>(string table = null, string key = null)
         {
             var query = new DeleteFrom<TEntity>();
 
             var type = typeof(TEntity);
 
-            query.Table = type.Name;
+            query.Table = string.IsNullOrEmpty(table) ? type.Name : table;
 
             var properties = type.GetProperties().ToList();
 

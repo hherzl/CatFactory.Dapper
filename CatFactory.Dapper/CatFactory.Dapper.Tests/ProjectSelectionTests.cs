@@ -12,7 +12,7 @@ namespace CatFactory.Dapper.Tests
 
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(LoggerHelper.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Entity Framework Core project
             var project = new DapperProject
@@ -37,9 +37,7 @@ namespace CatFactory.Dapper.Tests
             var selectionForOrder = project.GetSelection(order);
 
             // Assert
-
             Assert.True(project.Selections.Count == 2);
-
             Assert.True(project.GlobalSelection().Settings.UseStringBuilderForQueries == true);
             Assert.True(selectionForOrder.Settings.UseStringBuilderForQueries == false);
         }
