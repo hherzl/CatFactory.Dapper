@@ -9,9 +9,9 @@ cd %testPath%
 dotnet test
 cd %outputBasePath%\Store\Store.Dapper.API.Tests
 dotnet test
-cd %outputBasePath%\Store\Northwind.Dapper.API.Tests
+cd %outputBasePath%\Northwind\Northwind.Dapper.API.Tests
 dotnet test
-cd %outputBasePath%\Store\AdventureWorks.Dapper.API.Tests
+cd %outputBasePath%\AdventureWorks\AdventureWorks.Dapper.API.Tests
 dotnet test
 cd %srcPath%
 dotnet pack

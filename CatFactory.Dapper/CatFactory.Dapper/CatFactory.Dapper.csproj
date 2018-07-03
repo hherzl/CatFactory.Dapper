@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build04</Version>
+    <Version>1.0.0-beta-sun-build05</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build04 Version: Addition of scaffolding for scalar functions
+    <PackageReleaseNotes>1.0.0-beta-sun-build05 Version: Core package update and scaffold entities with no default schema in separate directories.
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory</PackageReleaseNotes>
     <Description>CatFactory package for Dapper scaffolding</Description>
@@ -16,7 +16,7 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build03" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build04" />
   </ItemGroup>
 
 </Project>

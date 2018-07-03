@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CatFactory.SqlServer;
+﻿using CatFactory.SqlServer;
 using Xunit;
 
 namespace CatFactory.Dapper.Tests
@@ -94,8 +93,8 @@ namespace CatFactory.Dapper.Tests
                 ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
-                    Exclusions = new List<string> { "dbo.sysdiagrams" },
-                    ExclusionTypes = new List<string> { "geography" },
+                    Exclusions = { "dbo.sysdiagrams" },
+                    ExclusionTypes = { "geography" },
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true
                 }

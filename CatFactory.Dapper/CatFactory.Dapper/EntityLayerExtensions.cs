@@ -26,12 +26,26 @@ namespace CatFactory.Dapper
 
             foreach (var table in project.Database.Tables)
             {
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateEntity(table));
+                var selection = project.GetSelection(table);
+
+                var classDefinition = project.CreateEntity(table);
+
+                if (project.Database.HasDefaultSchema(table))
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), selection.Settings.ForceOverwrite, classDefinition);
+                else
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(table.Schema), selection.Settings.ForceOverwrite, classDefinition);
             }
 
             foreach (var view in project.Database.Views)
             {
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateView(view));
+                var selection = project.GetSelection(view);
+
+                var classDefinition = project.CreateEntity(view);
+
+                if (project.Database.HasDefaultSchema(view))
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), selection.Settings.ForceOverwrite, classDefinition);
+                else
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(view.Schema), selection.Settings.ForceOverwrite, classDefinition);
             }
 
             foreach (var tableFunction in project.Database.TableFunctions)

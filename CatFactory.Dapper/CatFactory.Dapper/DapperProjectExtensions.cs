@@ -12,6 +12,9 @@ namespace CatFactory.Dapper
         public static string GetEntityLayerDirectory(this DapperProject project)
             => Path.Combine(project.OutputDirectory, project.Namespaces.EntityLayer);
 
+        public static string GetEntityLayerDirectory(this DapperProject project, string schema)
+            => Path.Combine(project.OutputDirectory, project.Namespaces.EntityLayer, schema);
+
         public static string GetDataLayerDirectory(this DapperProject project)
             => Path.Combine(project.OutputDirectory, project.Namespaces.DataLayer);
 

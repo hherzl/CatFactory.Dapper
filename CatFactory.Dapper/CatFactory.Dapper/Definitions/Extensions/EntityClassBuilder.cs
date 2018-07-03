@@ -71,7 +71,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return classDefinition;
         }
 
-        public static EntityClassDefinition CreateView(this DapperProject project, IView view)
+        public static EntityClassDefinition CreateEntity(this DapperProject project, IView view)
         {
             var definition = new EntityClassDefinition();
 
@@ -150,11 +150,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 definition.Documentation.Summary = tableFunction.Description;
 
             var selection = project.GetSelection(tableFunction);
-
-            //foreach (var column in tableFunction.Parameters)
-            //{
-            //    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
-            //}
 
             definition.Implements.Add("IEntity");
 
