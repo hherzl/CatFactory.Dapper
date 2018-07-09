@@ -90,9 +90,9 @@ namespace CatFactory.Dapper.Tests
             // Import database
             var databaseFactory = new SqlServerDatabaseFactory(LoggerHelper.GetLogger<SqlServerDatabaseFactory>())
             {
-                ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     Exclusions = { "dbo.sysdiagrams" },
                     ExclusionTypes = { "geography" },
                     ImportTableFunctions = true,
