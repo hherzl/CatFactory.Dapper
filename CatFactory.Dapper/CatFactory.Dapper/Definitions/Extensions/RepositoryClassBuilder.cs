@@ -25,7 +25,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var table in projectFeature.Project.Database.Tables)
             {
-                if (table.HasDefaultSchema())
+                if (projectFeature.Project.Database.HasDefaultSchema(table))
                     classDefinition.Namespaces.AddUnique(projectFeature.GetDapperProject().GetEntityLayerNamespace());
                 else
                     classDefinition.Namespaces.AddUnique(projectFeature.GetDapperProject().GetEntityLayerNamespace(table.Schema));
@@ -158,22 +158,19 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine(1, " from "));
                 lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
 
-                if (filters)
+                if (filters && table.ForeignKeys.Count > 0)
                 {
-                    if (table.ForeignKeys.Count > 0)
+                    lines.Add(new CodeLine(1, " where "));
+
+                    for (var i = 0; i < table.ForeignKeys.Count; i++)
                     {
-                        lines.Add(new CodeLine(1, " where "));
+                        var foreignKey = table.ForeignKeys[i];
 
-                        for (var i = 0; i < table.ForeignKeys.Count; i++)
+                        if (foreignKey.Key.Count == 1)
                         {
-                            var foreignKey = table.ForeignKeys[i];
+                            var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                            if (foreignKey.Key.Count == 1)
-                            {
-                                var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
-
-                                lines.Add(new CodeLine(1, "  ({0} is null or {1} = {0}) {2} ", column.GetSqlServerParameterName(), table.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
-                            }
+                            lines.Add(new CodeLine(1, "  ({0} is null or {1} = {0}) {2} ", column.GetSqlServerParameterName(), table.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
                         }
                     }
                 }
@@ -236,7 +233,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     parameters.Add(new ParameterDefinition("Int32", "pageNumber") { DefaultValue = "1" });
                 }
 
-                // todo: add logic to retrieve multiple columns from foreign key
+                // todo: Add logic to retrieve multiple columns from foreign key
                 foreach (var foreignKey in table.ForeignKeys)
                 {
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
@@ -840,7 +837,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = sets[i];
 
-                    lines.Add(new CodeLine(1, "  {0} = {1}{2 } ", column.GetColumnName(), column.GetSqlServerParameterName(), i < sets.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < sets.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " where "));

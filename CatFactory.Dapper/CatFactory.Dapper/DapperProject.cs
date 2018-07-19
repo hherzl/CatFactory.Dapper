@@ -44,12 +44,12 @@ namespace CatFactory.Dapper
                 .Where(x => x.Schema == schema)
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
 
-            // todo: add scalar functions
-
             result.AddRange(Database
                 .ScalarFunctions
                 .Where(x => x.Schema == schema)
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "ScalarFunction" }));
+
+            // todo: Add stored procedures
 
             return result;
         }
@@ -58,6 +58,15 @@ namespace CatFactory.Dapper
         private ProjectNamespaces m_namespaces;
 
         public ProjectNamespaces Namespaces
-            => m_namespaces ?? (m_namespaces = new ProjectNamespaces());
+        {
+            get
+            {
+                return m_namespaces ?? (m_namespaces = new ProjectNamespaces());
+            }
+            set
+            {
+                m_namespaces = value;
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace CatFactory.Dapper.Tests
         {
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(LoggerHelper.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject
@@ -62,7 +62,7 @@ namespace CatFactory.Dapper.Tests
         {
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(LoggerHelper.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Dapper Project
             var project = new DapperProject
@@ -88,9 +88,9 @@ namespace CatFactory.Dapper.Tests
         public void ProjectScaffoldingFromAdventureWorksDatabaseTest()
         {
             // Import database
-            var databaseFactory = new SqlServerDatabaseFactory(LoggerHelper.GetLogger<SqlServerDatabaseFactory>())
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
             {
-                ImportSettings = new DatabaseImportSettings
+                DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     Exclusions = { "dbo.sysdiagrams" },

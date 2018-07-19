@@ -1,29 +1,29 @@
 ﻿using System.Linq;
 using CatFactory.CodeFactory;
-using CatFactory.NetCore;
 using CatFactory.Mapping;
+using CatFactory.NetCore;
 
 namespace CatFactory.Dapper
 {
     public static class NamingExtensions
     {
-        public static ICodeNamingConvention namingConvention;
+        public static ICodeNamingConvention codeNamingConvention;
         public static INamingService namingService;
 
         static NamingExtensions()
         {
-            namingConvention = new DotNetNamingConvention();
+            codeNamingConvention = new DotNetNamingConvention();
             namingService = new NamingService();
         }
 
         public static string GetInterfaceRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
-            => namingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
+            => codeNamingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
 
         public static string GetClassRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
-            => namingConvention.GetClassName(string.Format("{0}Repository", projectFeature.Name));
+            => codeNamingConvention.GetClassName(string.Format("{0}Repository", projectFeature.Name));
 
         public static string GetEntityName(this IDbObject dbObject)
-            => string.Format("{0}", namingConvention.GetClassName(dbObject.Name));
+            => string.Format("{0}", codeNamingConvention.GetClassName(dbObject.Name));
 
         public static string GetSingularName(this IDbObject dbObject)
             => namingService.Singularize(dbObject.GetEntityName());
@@ -41,7 +41,7 @@ namespace CatFactory.Dapper
             => string.Format("Get{0}Async", dbObject.GetEntityName());
 
         public static string GetGetByUniqueRepositoryMethodName(this ITable dbObject, Unique unique)
-            => string.Format("Get{0}By{1}Async", dbObject.GetEntityName(), string.Join("And", unique.Key.Select(item => namingConvention.GetPropertyName(item))));
+            => string.Format("Get{0}By{1}Async", dbObject.GetEntityName(), string.Join("And", unique.Key.Select(item => codeNamingConvention.GetPropertyName(item))));
 
         public static string GetAddRepositoryMethodName(this ITable dbObject)
             => string.Format("Add{0}Async", dbObject.GetEntityName());
@@ -53,21 +53,21 @@ namespace CatFactory.Dapper
             => string.Format("Remove{0}Async", dbObject.GetEntityName());
 
         public static string GetEntityLayerNamespace(this DapperProject project)
-            => string.Format("{0}.{1}", namingConvention.GetClassName(project.Name), project.Namespaces.EntityLayer);
+            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.EntityLayer);
 
         public static string GetEntityLayerNamespace(this DapperProject project, string ns)
-            => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : string.Join(".", project.Name, project.Namespaces.EntityLayer, ns);
+            => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : codeNamingConvention.GetNamespace(project.Name, project.Namespaces.EntityLayer, ns);
 
         public static string GetDataLayerNamespace(this DapperProject project)
-            => string.Join(".", namingConvention.GetClassName(project.Name), project.Namespaces.DataLayer);
+            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer);
 
         public static string GetDataLayerContractsNamespace(this DapperProject project)
-            => string.Join(".", namingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Contracts);
+            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Contracts);
 
         public static string GetDataLayerDataContractsNamespace(this DapperProject project)
-            => string.Join(".", namingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.DataContracts);
+            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.DataContracts);
 
         public static string GetDataLayerRepositoriesNamespace(this DapperProject project)
-            => string.Join(".", namingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Repositories);
+            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Repositories);
     }
 }

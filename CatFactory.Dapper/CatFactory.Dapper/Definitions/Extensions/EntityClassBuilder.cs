@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CatFactory.CodeFactory;
-using CatFactory.NetCore;
 using CatFactory.Mapping;
+using CatFactory.NetCore;
 using CatFactory.OOP;
 
 namespace CatFactory.Dapper.Definitions.Extensions
@@ -11,9 +10,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
     {
         public static EntityClassDefinition CreateEntity(this DapperProject project, ITable table)
         {
-            var classDefinition = new EntityClassDefinition();
-
-            classDefinition.Namespaces.Add("System");
+            var classDefinition = new EntityClassDefinition
+            {
+                Namespaces =
+                {
+                    "System"
+                },
+                Namespace = project.Database.HasDefaultSchema(table) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema),
+                Name = table.GetEntityName()
+            };
 
             var selection = project.GetSelection(table);
 
@@ -26,10 +31,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 classDefinition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged"));
             }
 
-            classDefinition.Namespace = table.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema);
-
-            classDefinition.Name = table.GetEntityName();
-
             classDefinition.Constructors.Add(new ClassConstructorDefinition());
 
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
@@ -38,7 +39,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveType(column), column.GetParameterName()))
                 {
-                    Lines = new List<ILine>
+                    Lines =
                     {
                         new CodeLine("{0} = {1};", column.GetPropertyName(), column.GetParameterName())
                     }
@@ -73,13 +74,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         public static EntityClassDefinition CreateEntity(this DapperProject project, IView view)
         {
-            var definition = new EntityClassDefinition();
-
-            definition.Namespaces.Add("System");
-
-            definition.Namespace = view.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(view.Schema);
-
-            definition.Name = view.GetEntityName();
+            var definition = new EntityClassDefinition
+            {
+                Namespaces =
+                {
+                "System"
+                },
+                Namespace = project.Database.HasDefaultSchema(view) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(view.Schema),
+                Name = view.GetEntityName()
+            };
 
             definition.Constructors.Add(new ClassConstructorDefinition());
 
@@ -110,7 +113,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             definition.Namespaces.Add("System");
 
-            definition.Namespace = tableFunction.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
+            definition.Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
 
             definition.Name = tableFunction.GetEntityName();
 
@@ -140,7 +143,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             definition.Namespaces.Add("System");
 
-            definition.Namespace = tableFunction.HasDefaultSchema() ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
+            definition.Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
 
             definition.Name = tableFunction.GetEntityName();
 
