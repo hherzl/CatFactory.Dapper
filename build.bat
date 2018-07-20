@@ -1,7 +1,7 @@
 cls
 set initialPath=%cd%
-set srcPath=%cd%\CatFactory.Dapper\CatFactory.Dapper
-set testPath=%cd%\CatFactory.Dapper\CatFactory.Dapper.Tests
+set srcPath=%cd%\CatFactory.Dapper
+set testPath=%cd%\CatFactory.Dapper.Tests
 set outputBasePath=C:\Temp\CatFactory.Dapper
 cd %srcPath%
 dotnet build
