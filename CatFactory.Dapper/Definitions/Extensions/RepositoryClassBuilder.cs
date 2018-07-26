@@ -11,17 +11,35 @@ namespace CatFactory.Dapper.Definitions.Extensions
     {
         public static RepositoryClassDefinition GetRepositoryClassDefinition(this ProjectFeature<DapperProjectSettings> projectFeature)
         {
-            var classDefinition = new RepositoryClassDefinition();
-
-            classDefinition.Namespaces.Add("System");
-            classDefinition.Namespaces.Add("System.Collections.Generic");
-            classDefinition.Namespaces.Add("System.Data");
-            classDefinition.Namespaces.Add("System.Data.SqlClient");
-            classDefinition.Namespaces.Add("System.Linq");
-            classDefinition.Namespaces.Add("System.Text");
-            classDefinition.Namespaces.Add("System.Threading.Tasks");
-            classDefinition.Namespaces.Add("Dapper");
-            classDefinition.Namespaces.Add("Microsoft.Extensions.Options");
+            var classDefinition = new RepositoryClassDefinition
+            {
+                Namespaces =
+                {
+                    "System",
+                    "System.Collections.Generic",
+                    "System.Data",
+                    "System.Data.SqlClient",
+                    "System.Linq",
+                    "System.Text",
+                    "System.Threading.Tasks",
+                    "Dapper",
+                    "Microsoft.Extensions.Options"
+                },
+                Namespace = projectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace(),
+                Name = projectFeature.GetClassRepositoryName(),
+                BaseClass = "Repository",
+                Implements =
+                {
+                    projectFeature.GetInterfaceRepositoryName()
+                },
+                Constructors =
+                {
+                    new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
+                    {
+                        Invocation = "base(appSettings)"
+                    }
+                }
+            };
 
             foreach (var table in projectFeature.Project.Database.Tables)
             {
@@ -32,19 +50,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 classDefinition.Namespaces.AddUnique(projectFeature.GetDapperProject().GetDataLayerContractsNamespace());
             }
-
-            classDefinition.Namespace = projectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace();
-
-            classDefinition.Name = projectFeature.GetClassRepositoryName();
-
-            classDefinition.BaseClass = "Repository";
-
-            classDefinition.Implements.Add(projectFeature.GetInterfaceRepositoryName());
-
-            classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
-            {
-                Invocation = "base(appSettings)"
-            });
 
             var dbos = projectFeature.DbObjects.Select(dbo => dbo.FullName).ToList();
             var tables = projectFeature.Project.Database.Tables.Where(t => dbos.Contains(t.FullName)).ToList();

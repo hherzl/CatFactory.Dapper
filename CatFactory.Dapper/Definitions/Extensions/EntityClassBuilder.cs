@@ -107,7 +107,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateView(this DapperProject project, TableFunction tableFunction)
+        public static EntityClassDefinition CreateEntity(this DapperProject project, ITableFunction tableFunction)
         {
             var definition = new EntityClassDefinition();
 
@@ -137,22 +137,22 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateView(this DapperProject project, ScalarFunction tableFunction)
+        public static EntityClassDefinition CreateEntity(this DapperProject project, ScalarFunction scalarFunction)
         {
             var definition = new EntityClassDefinition();
 
             definition.Namespaces.Add("System");
 
-            definition.Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema);
+            definition.Namespace = project.Database.HasDefaultSchema(scalarFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(scalarFunction.Schema);
 
-            definition.Name = tableFunction.GetEntityName();
+            definition.Name = scalarFunction.GetEntityName();
 
             definition.Constructors.Add(new ClassConstructorDefinition());
 
-            if (!string.IsNullOrEmpty(tableFunction.Description))
-                definition.Documentation.Summary = tableFunction.Description;
+            if (!string.IsNullOrEmpty(scalarFunction.Description))
+                definition.Documentation.Summary = scalarFunction.Description;
 
-            var selection = project.GetSelection(tableFunction);
+            var selection = project.GetSelection(scalarFunction);
 
             definition.Implements.Add("IEntity");
 

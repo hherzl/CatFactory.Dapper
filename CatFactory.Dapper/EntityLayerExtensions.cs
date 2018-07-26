@@ -50,7 +50,14 @@ namespace CatFactory.Dapper
 
             foreach (var tableFunction in project.Database.TableFunctions)
             {
-                CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), project.GlobalSelection().Settings.ForceOverwrite, project.CreateView(tableFunction));
+                var selection = project.GetSelection(tableFunction);
+
+                var classDefinition = project.CreateEntity(tableFunction);
+
+                if (project.Database.HasDefaultSchema(tableFunction))
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), selection.Settings.ForceOverwrite, project.CreateEntity(tableFunction));
+                else
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(tableFunction.Schema), selection.Settings.ForceOverwrite, classDefinition);
             }
 
             return project;

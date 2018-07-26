@@ -6,11 +6,25 @@ namespace CatFactory.Dapper.Tests
     public class ImportTests
     {
         [Fact]
-        public void ProjectScaffoldingFromExistingDatabaseTest()
+        public void ProjectScaffoldingFromStoreDatabaseTest()
         {
+            // Create database factory
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    Exclusions =
+                    {
+                        "dbo.sysdiagrams",
+                        "dbo.fn_diagramobjects"
+                    },
+                    ImportTableFunctions = true
+                }
+            };
+
             // Import database
-            var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+            var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
             var project = new DapperProject
@@ -93,8 +107,14 @@ namespace CatFactory.Dapper.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
-                    Exclusions = { "dbo.sysdiagrams" },
-                    ExclusionTypes = { "geography" },
+                    Exclusions =
+                    {
+                        "dbo.sysdiagrams"
+                    },
+                    ExclusionTypes =
+                    {
+                        "geography"
+                    },
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true
                 }

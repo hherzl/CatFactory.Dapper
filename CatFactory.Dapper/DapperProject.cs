@@ -40,14 +40,14 @@ namespace CatFactory.Dapper
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "View" }));
 
             result.AddRange(Database
-                .TableFunctions
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
-
-            result.AddRange(Database
                 .ScalarFunctions
                 .Where(x => x.Schema == schema)
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "ScalarFunction" }));
+
+            result.AddRange(Database
+                .TableFunctions
+                .Where(x => x.Schema == schema)
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
 
             // todo: Add stored procedures
 

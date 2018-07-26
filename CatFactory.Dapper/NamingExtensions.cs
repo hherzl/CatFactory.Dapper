@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using CatFactory.CodeFactory;
 using CatFactory.Mapping;
 using CatFactory.NetCore;
@@ -8,13 +9,79 @@ namespace CatFactory.Dapper
     public static class NamingExtensions
     {
         public static ICodeNamingConvention codeNamingConvention;
+        public static IDatabaseNamingConvention databaseNamingConvention;
         public static INamingService namingService;
 
         static NamingExtensions()
         {
             codeNamingConvention = new DotNetNamingConvention();
+            databaseNamingConvention = new SqlServerDatabaseNamingConvention();
             namingService = new NamingService();
         }
+
+        public static string GetPropertyName(this Column column)
+        {
+            var name = column.Name;
+
+            foreach (var item in DotNetNamingConvention.invalidChars)
+                name = name.Replace(item, '_');
+
+            return codeNamingConvention.GetPropertyName(name);
+        }
+
+        public static string GetParameterName(this Column column)
+            => codeNamingConvention.GetParameterName(column.Name);
+
+        public static string GetPropertyNameHack(this ITable table, Column column)
+        {
+            var propertyName = column.HasSameNameEnclosingType(table) ? column.GetNameForEnclosing() : column.GetPropertyName();
+
+            var regex = new Regex(@"^[0-9]+$");
+
+            if (regex.IsMatch(propertyName))
+                propertyName = string.Format("V{0}", propertyName);
+
+            return propertyName;
+        }
+
+        public static string GetPropertyNameHack(this IView view, Column column)
+        {
+            var propertyName = column.HasSameNameEnclosingType(view) ? column.GetNameForEnclosing() : column.GetPropertyName();
+
+            var regex = new Regex(@"^[0-9]+$");
+
+            if (regex.IsMatch(propertyName))
+                propertyName = string.Format("V{0}", propertyName);
+
+            return propertyName;
+        }
+
+        public static string GetColumnName(this ITable table, Column column)
+            => databaseNamingConvention.GetObjectName(table.Schema, table.Name, column.Name);
+
+        public static string GetColumnName(this IView view, Column column)
+            => databaseNamingConvention.GetObjectName(view.Schema, view.Name, column.Name);
+
+        public static string GetColumnName(this TableFunction tableFunction, Column column)
+            => databaseNamingConvention.GetObjectName(tableFunction.Schema, tableFunction.Name, column.Name);
+
+        public static string GetColumnName(this Column column)
+            => databaseNamingConvention.GetObjectName(column.Name);
+
+        public static string GetSqlServerParameterName(this Column column)
+            => databaseNamingConvention.GetParameterName(column.Name);
+
+        public static string GetSqlServerParameterName(this Parameter param)
+            => databaseNamingConvention.GetParameterName(param.Name);
+
+        public static bool HasSameNameEnclosingType(this Column column, ITable table)
+            => column.Name == table.Name;
+
+        public static bool HasSameNameEnclosingType(this Column column, IView view)
+            => column.Name == view.Name;
+
+        public static string GetNameForEnclosing(this Column column)
+            => string.Format("{0}1", column.Name);
 
         public static string GetInterfaceRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
             => codeNamingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
@@ -25,11 +92,11 @@ namespace CatFactory.Dapper
         public static string GetEntityName(this IDbObject dbObject)
             => string.Format("{0}", codeNamingConvention.GetClassName(dbObject.Name));
 
+        public static string GetFullName(this IDbObject dbObject)
+            => databaseNamingConvention.GetObjectName(dbObject.Schema, dbObject.Name);
+
         public static string GetSingularName(this IDbObject dbObject)
             => namingService.Singularize(dbObject.GetEntityName());
-
-        public static string GetFullName(this IDbObject dbObject)
-            => string.Format("[{0}].[{1}]", dbObject.Schema, dbObject.Name);
 
         public static string GetPluralName(this IDbObject dbObject)
             => namingService.Pluralize(dbObject.GetEntityName());
