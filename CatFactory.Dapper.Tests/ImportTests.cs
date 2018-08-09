@@ -1,4 +1,5 @@
-﻿using CatFactory.SqlServer;
+﻿using System.Collections.Generic;
+using CatFactory.SqlServer;
 using Xunit;
 
 namespace CatFactory.Dapper.Tests
@@ -14,12 +15,12 @@ namespace CatFactory.Dapper.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ImportTableFunctions = true,
                     Exclusions =
                     {
                         "dbo.sysdiagrams",
                         "dbo.fn_diagramobjects"
-                    },
-                    ImportTableFunctions = true
+                    }
                 }
             };
 
@@ -38,8 +39,8 @@ namespace CatFactory.Dapper.Tests
             project.GlobalSelection(settings =>
             {
                 settings.ForceOverwrite = true;
-                settings.UpdateExclusions.AddRange(new string[] { "CreationUser", "CreationDateTime", "Timestamp" });
-                settings.InsertExclusions.AddRange(new string[] { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" });
+                settings.UpdateExclusions = new List<string> { "CreationUser", "CreationDateTime", "Timestamp" };
+                settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
             });
 
             project.Select("Production.*", settings =>
@@ -107,6 +108,8 @@ namespace CatFactory.Dapper.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
+                    ImportTableFunctions = true,
+                    ImportScalarFunctions = true,
                     Exclusions =
                     {
                         "dbo.sysdiagrams"
@@ -114,9 +117,7 @@ namespace CatFactory.Dapper.Tests
                     ExclusionTypes =
                     {
                         "geography"
-                    },
-                    ImportTableFunctions = true,
-                    ImportScalarFunctions = true
+                    }
                 }
             };
 

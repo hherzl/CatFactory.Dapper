@@ -9,13 +9,11 @@ namespace CatFactory.Dapper
     public static class NamingExtensions
     {
         public static ICodeNamingConvention codeNamingConvention;
-        public static IDatabaseNamingConvention databaseNamingConvention;
         public static INamingService namingService;
 
         static NamingExtensions()
         {
             codeNamingConvention = new DotNetNamingConvention();
-            databaseNamingConvention = new SqlServerDatabaseNamingConvention();
             namingService = new NamingService();
         }
 
@@ -56,23 +54,26 @@ namespace CatFactory.Dapper
             return propertyName;
         }
 
-        public static string GetColumnName(this ITable table, Column column)
-            => databaseNamingConvention.GetObjectName(table.Schema, table.Name, column.Name);
+        public static string GetFullName(this Database database, IDbObject dbObject)
+            => database.NamingConvention.GetObjectName(dbObject.Schema, dbObject.Name);
 
-        public static string GetColumnName(this IView view, Column column)
-            => databaseNamingConvention.GetObjectName(view.Schema, view.Name, column.Name);
+        public static string GetColumnName(this Database database, ITable table, Column column)
+            => database.NamingConvention.GetObjectName(table.Schema, table.Name, column.Name);
 
-        public static string GetColumnName(this TableFunction tableFunction, Column column)
-            => databaseNamingConvention.GetObjectName(tableFunction.Schema, tableFunction.Name, column.Name);
+        public static string GetColumnName(this Database database, IView view, Column column)
+            => database.NamingConvention.GetObjectName(view.Schema, view.Name, column.Name);
 
-        public static string GetColumnName(this Column column)
-            => databaseNamingConvention.GetObjectName(column.Name);
+        public static string GetColumnName(this Database database, TableFunction tableFunction, Column column)
+            => database.NamingConvention.GetObjectName(tableFunction.Schema, tableFunction.Name, column.Name);
 
-        public static string GetSqlServerParameterName(this Column column)
-            => databaseNamingConvention.GetParameterName(column.Name);
+        public static string GetColumnName(this Database database, Column column)
+            => database.NamingConvention.GetObjectName(column.Name);
 
-        public static string GetSqlServerParameterName(this Parameter param)
-            => databaseNamingConvention.GetParameterName(param.Name);
+        public static string GetSqlServerParameterName(this Database database, Column column)
+            => database.NamingConvention.GetParameterName(column.Name);
+
+        public static string GetSqlServerParameterName(this Database database, Parameter param)
+            => database.NamingConvention.GetParameterName(param.Name);
 
         public static bool HasSameNameEnclosingType(this Column column, ITable table)
             => column.Name == table.Name;
@@ -91,9 +92,6 @@ namespace CatFactory.Dapper
 
         public static string GetEntityName(this IDbObject dbObject)
             => string.Format("{0}", codeNamingConvention.GetClassName(dbObject.Name));
-
-        public static string GetFullName(this IDbObject dbObject)
-            => databaseNamingConvention.GetObjectName(dbObject.Schema, dbObject.Name);
 
         public static string GetSingularName(this IDbObject dbObject)
             => namingService.Singularize(dbObject.GetEntityName());

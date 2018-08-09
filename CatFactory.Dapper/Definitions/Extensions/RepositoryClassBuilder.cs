@@ -113,11 +113,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", table.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
 
                 if (filters)
                 {
@@ -131,7 +131,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                         {
                             var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                            lines.Add(new CodeLine(1, "query.Append(\"  ({0} is null or {1} = {0}) {2} \");", column.GetSqlServerParameterName(), table.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                            lines.Add(new CodeLine(1, "query.Append(\"  ({0} is null or {1} = {0}) {2} \");", projectFeature.Project.Database.GetSqlServerParameterName(column), projectFeature.Project.Database.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
                         }
                     }
                 }
@@ -140,7 +140,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     lines.Add(new CodeLine(1, "query.Append(\" order by \");"));
 
-                    lines.Add(new CodeLine(1, "query.Append(\" {0} \");", table.GetColumnName(table.Columns.First())));
+                    lines.Add(new CodeLine(1, "query.Append(\" {0} \");", projectFeature.Project.Database.GetColumnName(table.Columns.First())));
 
                     lines.Add(new CodeLine(1, "query.Append(\" offset @pageSize * (@pageNumber - 1) rows \");"));
                     lines.Add(new CodeLine(1, "query.Append(\" fetch next @pageSize rows only \");"));
@@ -157,11 +157,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine(1, "  {0}{1} ", table.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", projectFeature.Project.Database.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " from "));
-                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(table)));
 
                 if (filters && table.ForeignKeys.Count > 0)
                 {
@@ -175,7 +175,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                         {
                             var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                            lines.Add(new CodeLine(1, "  ({0} is null or {1} = {0}) {2} ", column.GetSqlServerParameterName(), table.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                            lines.Add(new CodeLine(1, "  ({0} is null or {1} = {0}) {2} ", projectFeature.Project.Database.GetSqlServerParameterName(column), projectFeature.Project.Database.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
                         }
                     }
                 }
@@ -184,7 +184,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     lines.Add(new CodeLine(1, " order by "));
 
-                    lines.Add(new CodeLine(1, " {0} ", table.GetColumnName(table.Columns.First())));
+                    lines.Add(new CodeLine(1, " {0} ", projectFeature.Project.Database.GetColumnName(table.Columns.First())));
 
                     lines.Add(new CodeLine(1, " offset @pageSize * (@pageNumber - 1) rows "));
                     lines.Add(new CodeLine(1, " fetch next @pageSize rows only "));
@@ -213,7 +213,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                    lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", {1});", column.GetSqlServerParameterName(), column.GetParameterName()));
+                    lines.Add(new CodeLine(1, "parameters.Add(\"{0}\", {1});", projectFeature.Project.Database.GetSqlServerParameterName(column), column.GetParameterName()));
                 }
 
                 lines.Add(new CodeLine());
@@ -277,11 +277,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = view.Columns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", view.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", view.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(view)));
                 lines.Add(new CodeLine());
             }
             else
@@ -293,11 +293,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = view.Columns[i];
 
-                    lines.Add(new CodeLine(1, "  {0}{1} ", view.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", projectFeature.Project.Database.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " from "));
-                lines.Add(new CodeLine(1, "  {0} ", view.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(view)));
                 lines.Add(new CodeLine(1, " \";"));
                 lines.Add(new CodeLine());
             }
@@ -336,13 +336,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = tableFunction.Columns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", tableFunction.GetColumnName(column), i < tableFunction.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < tableFunction.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 var selectParameters = tableFunction.Parameters.Count == 0 ? string.Empty : string.Join(", ", tableFunction.Parameters.Select(item => item.Name));
 
                 lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}({1}) \");", tableFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}({1}) \");", projectFeature.Project.Database.GetFullName(tableFunction), selectParameters));
                 lines.Add(new CodeLine());
             }
             else
@@ -354,13 +354,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = tableFunction.Columns[i];
 
-                    lines.Add(new CodeLine(1, "  {0}{1} ", tableFunction.GetColumnName(column), i < tableFunction.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", projectFeature.Project.Database.GetColumnName(column), i < tableFunction.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 var selectParameters = tableFunction.Parameters.Count == 0 ? string.Empty : string.Join(", ", tableFunction.Parameters.Select(item => item.Name));
 
                 lines.Add(new CodeLine(1, " from "));
-                lines.Add(new CodeLine(1, "  {0}({1}) ", tableFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine(1, "  {0}({1}) ", projectFeature.Project.Database.GetFullName(tableFunction), selectParameters));
                 lines.Add(new CodeLine(1, " \";"));
                 lines.Add(new CodeLine());
             }
@@ -425,7 +425,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 var selectParameters = scalarFunctionParameters.Count == 0 ? string.Empty : string.Join(", ", scalarFunctionParameters.Select(item => item.Name));
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}({1}) \");", scalarFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}({1}) \");", projectFeature.Project.Database.GetFullName(scalarFunction), selectParameters));
                 lines.Add(new CodeLine());
             }
             else
@@ -435,7 +435,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 var selectParameters = scalarFunctionParameters.Count == 0 ? string.Empty : string.Join(", ", scalarFunctionParameters.Select(item => item.Name));
 
-                lines.Add(new CodeLine(1, "  {0}({1}) ", scalarFunction.GetFullName(), selectParameters));
+                lines.Add(new CodeLine(1, "  {0}({1}) ", projectFeature.Project.Database.GetFullName(scalarFunction), selectParameters));
                 lines.Add(new CodeLine(1, " \";"));
                 lines.Add(new CodeLine());
             }
@@ -508,11 +508,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", table.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
 
                 lines.Add(new CodeLine(1, "query.Append(\" where \");"));
 
@@ -520,7 +520,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", table.GetColumnName(column), column.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} \");", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column)));
                     lines.Add(new CodeLine());
                 }
             }
@@ -533,11 +533,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine(1, "  {0}{1} ", table.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", projectFeature.Project.Database.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " from "));
-                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(table)));
 
                 lines.Add(new CodeLine(1, " where "));
 
@@ -545,7 +545,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "  {0} = {1} ", table.GetColumnName(column), column.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine(1, "  {0} = {1} ", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column)));
                 }
 
                 lines.Add(new CodeLine(1, " \";"));
@@ -596,11 +596,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = table.Columns[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", table.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
             }
 
             lines.Add(new CodeLine(1, "query.Append(\" from \");"));
-            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+            lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
 
             lines.Add(new CodeLine(1, "query.Append(\" where \");"));
 
@@ -610,7 +610,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} {2} \");", table.GetColumnName(column), column.GetSqlServerParameterName(), i < key.Count - 1 ? "and" : string.Empty));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1} {2} \");", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < key.Count - 1 ? "and" : string.Empty));
             }
 
             lines.Add(new CodeLine());
@@ -618,7 +618,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(1, " Create parameters collection"));
             lines.Add(new CodeLine(1, "var parameters = new DynamicParameters();"));
             lines.Add(new CodeLine());
-            
+
             lines.Add(new CommentLine(1, " Add parameters to collection"));
 
             for (var i = 0; i < key.Count; i++)
@@ -667,14 +667,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "query.Append(\" insert into \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, "query.Append(\"  ( \");"));
 
                 for (var i = 0; i < insertColumns.Count(); i++)
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"   {0}{1} \");", column.GetColumnName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"   {0}{1} \");", projectFeature.Project.Database.GetColumnName(column), i < insertColumns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\"  ) \");"));
@@ -685,7 +685,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", column.GetSqlServerParameterName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0}{1} \");", projectFeature.Project.Database.GetSqlServerParameterName(column), i < insertColumns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\" ) \");"));
@@ -694,21 +694,21 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var identityColumn = table.GetIdentityColumn();
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", identityColumn.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine(1, "query.Append(\"  select {0} = @@identity \");", projectFeature.Project.Database.GetSqlServerParameterName(identityColumn)));
                 }
             }
             else
             {
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "var query = @\" insert into "));
-                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, "  ( "));
 
                 for (var i = 0; i < insertColumns.Count(); i++)
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine(1, "   {0}{1} ", column.GetColumnName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "   {0}{1} ", projectFeature.Project.Database.GetColumnName(column), i < insertColumns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "  ) "));
@@ -719,7 +719,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine(1, "  {0}{1} ", column.GetSqlServerParameterName(), i < insertColumns.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0}{1} ", projectFeature.Project.Database.GetSqlServerParameterName(column), i < insertColumns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " ) "));
@@ -728,7 +728,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var identityColumn = table.GetIdentityColumn();
 
-                    lines.Add(new CodeLine(1, "  select {0} = @@identity ", identityColumn.GetSqlServerParameterName()));
+                    lines.Add(new CodeLine(1, "  select {0} = @@identity ", projectFeature.Project.Database.GetSqlServerParameterName(identityColumn)));
                 }
 
                 lines.Add(new CodeLine(1, " \";"));
@@ -812,14 +812,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "query.Append(\" update \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, "query.Append(\" set \");"));
 
                 for (var i = 0; i < sets.Count(); i++)
                 {
                     var column = sets[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2 } \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < sets.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2 } \");", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < sets.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, "query.Append(\" where \");"));
@@ -828,21 +828,21 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < key.Count - 1 ? " and " : string.Empty));
                 }
             }
             else
             {
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "var query = @\" update "));
-                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, " set "));
 
                 for (var i = 0; i < sets.Count(); i++)
                 {
                     var column = sets[i];
 
-                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < sets.Count - 1 ? "," : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < sets.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " where "));
@@ -851,7 +851,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < key.Count - 1 ? " and " : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " \"; "));
@@ -912,28 +912,28 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "query.Append(\" delete from \");"));
-                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", table.GetFullName()));
+                lines.Add(new CodeLine(1, "query.Append(\"  {0} \");", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, "query.Append(\" where \");"));
 
                 for (var i = 0; i < key.Count; i++)
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "query.Append(\"  {0} = {1}{2} \");", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < key.Count - 1 ? " and " : string.Empty));
                 }
             }
             else
             {
                 lines.Add(new CommentLine(1, " Create sql statement"));
                 lines.Add(new CodeLine(1, "var query = @\" delete from "));
-                lines.Add(new CodeLine(1, "  {0} ", table.GetFullName()));
+                lines.Add(new CodeLine(1, "  {0} ", projectFeature.Project.Database.GetFullName(table)));
                 lines.Add(new CodeLine(1, " where "));
 
                 for (var i = 0; i < key.Count; i++)
                 {
                     var column = key[i];
 
-                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", column.GetColumnName(), column.GetSqlServerParameterName(), i < key.Count - 1 ? " and " : string.Empty));
+                    lines.Add(new CodeLine(1, "  {0} = {1}{2} ", projectFeature.Project.Database.GetColumnName(column), projectFeature.Project.Database.GetSqlServerParameterName(column), i < key.Count - 1 ? " and " : string.Empty));
                 }
 
                 lines.Add(new CodeLine(1, " \"; "));
