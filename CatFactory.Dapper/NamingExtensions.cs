@@ -69,10 +69,10 @@ namespace CatFactory.Dapper
         public static string GetColumnName(this Database database, Column column)
             => database.NamingConvention.GetObjectName(column.Name);
 
-        public static string GetSqlServerParameterName(this Database database, Column column)
+        public static string GetParameterName(this Database database, Column column)
             => database.NamingConvention.GetParameterName(column.Name);
 
-        public static string GetSqlServerParameterName(this Database database, Parameter param)
+        public static string GetParameterName(this Database database, Parameter param)
             => database.NamingConvention.GetParameterName(param.Name);
 
         public static bool HasSameNameEnclosingType(this Column column, ITable table)

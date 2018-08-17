@@ -45,6 +45,7 @@ namespace CatFactory.Dapper.Tests
 
             project.Select("Production.*", settings =>
             {
+                settings.DeclareConnectionAsParameter = true;
                 settings.UseStringBuilderForQueries = false;
                 settings.AddPagingForGetAllOperation = true;
             });

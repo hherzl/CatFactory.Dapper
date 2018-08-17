@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build10</Version>
+    <Version>1.0.0-beta-sun-build11</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build10 Version: Remove of SqlServerDatabaseNamingConvention class.
+    <PackageReleaseNotes>1.0.0-beta-sun-build11 Version: Implement DeclareConnectionAsParameter feature for Dapper project.
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory</PackageReleaseNotes>
     <Description>CatFactory Package for Dapper</Description>

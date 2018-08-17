@@ -14,6 +14,8 @@ namespace CatFactory.Dapper
 
         public bool EnableDataBindings { get; set; }
 
+        public bool DeclareConnectionAsParameter { get; set; }
+
         public bool UseStringBuilderForQueries { get; set; } = true;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -47,9 +49,6 @@ namespace CatFactory.Dapper
         }
 
         public bool AddPagingForGetAllOperation { get; set; }
-
-        // todo: Add this feature
-        //public bool DeclareConnectionAsProperty { get; set; } = true;
 
         // todo: Add this feature
         //public bool ScaffoldStoredProcedures { get; set; }
