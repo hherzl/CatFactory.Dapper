@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build11</Version>
+    <Version>1.0.0-beta-sun-build12</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build11 Version: Implement DeclareConnectionAsParameter feature for Dapper project.
+    <PackageReleaseNotes>1.0.0-beta-sun-build12 Version: Core package update.
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory</PackageReleaseNotes>
     <Description>CatFactory Package for Dapper</Description>
@@ -16,7 +16,7 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build06" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build07" />
   </ItemGroup>
 
 </Project>

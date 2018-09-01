@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.Collections;
+using CatFactory.Mapping;
 using CatFactory.OOP;
 
 namespace CatFactory.Dapper.Definitions.Extensions

@@ -1,4 +1,5 @@
 ﻿using CatFactory.Dapper.Definitions.Extensions;
+using CatFactory.Mapping;
 using CatFactory.NetCore;
 
 namespace CatFactory.Dapper

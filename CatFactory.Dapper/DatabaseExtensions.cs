@@ -5,12 +5,9 @@ namespace CatFactory.Dapper
 {
     public static class DatabaseExtensions
     {
-        public static bool HasDefaultSchema(this Database database, IDbObject dbObj)
-            => string.IsNullOrEmpty(dbObj.Schema) || string.Compare(dbObj.Schema, database.DefaultSchema, true) == 0;
-
         public static string ResolveType(this Database database, Column column)
         {
-            var map = database.Mappings.FirstOrDefault(item => item.DatabaseType == column.Type);
+            var map = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == column.Type);
 
             if (map == null || map.GetClrType() == null)
                 return "object";
@@ -20,7 +17,7 @@ namespace CatFactory.Dapper
 
         public static string ResolveDbType(this Database database, Column column)
         {
-            var map = database.Mappings.FirstOrDefault(item => item.DatabaseType == column.Type);
+            var map = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == column.Type);
 
             if (map == null || map.GetClrType() == null)
                 return "object";
