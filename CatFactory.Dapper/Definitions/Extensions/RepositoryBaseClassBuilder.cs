@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CatFactory.CodeFactory;
+﻿using CatFactory.CodeFactory;
 using CatFactory.OOP;
 
 namespace CatFactory.Dapper.Definitions.Extensions
@@ -11,27 +10,24 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 Namespaces =
                 {
-                    "System",
-                    "System.Linq",
-                    "System.Threading.Tasks",
-                    "Microsoft.Extensions.Options",
+                    "System.Data",
                     project.GetEntityLayerNamespace()
                 },
                 Namespace = project.GetDataLayerContractsNamespace(),
                 Name = "Repository",
                 Constructors =
                 {
-                    new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
+                    new ClassConstructorDefinition(new ParameterDefinition("IDbConnection", "connection"))
                     {
-                        Lines = new List<ILine>
+                        Lines =
                         {
-                            new CodeLine("ConnectionString = appSettings.Value.ConnectionString;")
+                            new CodeLine("Connection = connection;")
                         }
                     }
                 },
                 Properties =
                 {
-                    new PropertyDefinition("String", "ConnectionString ")
+                    new PropertyDefinition("IDbConnection", "Connection")
                     {
                         AccessModifier = AccessModifier.Protected,
                         IsReadOnly = true

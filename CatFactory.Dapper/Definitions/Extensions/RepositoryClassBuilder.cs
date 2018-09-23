@@ -33,9 +33,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Constructors =
                 {
-                    new ClassConstructorDefinition(new ParameterDefinition("IOptions<AppSettings>", "appSettings"))
+                    new ClassConstructorDefinition(new ParameterDefinition("IDbConnection", "connection"))
                     {
-                        Invocation = "base(appSettings)"
+                        Invocation = "base(connection)"
                     }
                 }
             };
@@ -63,41 +63,20 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var selection = projectFeature.GetDapperProject().GetSelection(table);
 
-                if (selection.Settings.DeclareConnectionAsParameter)
+                classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsLocal(projectFeature, table));
+
+                if (table.PrimaryKey != null)
+                    classDefinition.Methods.Add(GetGetMethodAsLocal(projectFeature, table));
+
+                foreach (var unique in table.Uniques)
+                    classDefinition.Methods.Add(GetByUniqueMethodAsLocal(projectFeature, table, unique));
+
+                classDefinition.Methods.Add(GetAddMethodAsLocal(projectFeature, table));
+
+                if (table.PrimaryKey != null)
                 {
-                    classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsParameter(projectFeature, table));
-
-                    if (table.PrimaryKey != null)
-                        classDefinition.Methods.Add(GetGetMethodAsParameter(projectFeature, table));
-
-                    foreach (var unique in table.Uniques)
-                        classDefinition.Methods.Add(GetByUniqueMethodAsParameter(projectFeature, table, unique));
-
-                    classDefinition.Methods.Add(GetAddMethodAsParameter(projectFeature, table));
-
-                    if (table.PrimaryKey != null)
-                    {
-                        classDefinition.Methods.Add(GetUpdateMethodAsParameter(projectFeature, table));
-                        classDefinition.Methods.Add(GetRemoveMethodAsParameter(projectFeature, table));
-                    }
-                }
-                else
-                {
-                    classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsLocal(projectFeature, table));
-
-                    if (table.PrimaryKey != null)
-                        classDefinition.Methods.Add(GetGetMethodAsLocal(projectFeature, table));
-
-                    foreach (var unique in table.Uniques)
-                        classDefinition.Methods.Add(GetByUniqueMethodAsLocal(projectFeature, table, unique));
-
-                    classDefinition.Methods.Add(GetAddMethodAsLocal(projectFeature, table));
-
-                    if (table.PrimaryKey != null)
-                    {
-                        classDefinition.Methods.Add(GetUpdateMethodAsLocal(projectFeature, table));
-                        classDefinition.Methods.Add(GetRemoveMethodAsLocal(projectFeature, table));
-                    }
+                    classDefinition.Methods.Add(GetUpdateMethodAsLocal(projectFeature, table));
+                    classDefinition.Methods.Add(GetRemoveMethodAsLocal(projectFeature, table));
                 }
             }
 
@@ -105,30 +84,21 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var selection = projectFeature.GetDapperProject().GetSelection(view);
 
-                if (selection.Settings.DeclareConnectionAsParameter)
-                    classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsParameter(projectFeature, view));
-                else
-                    classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsLocal(projectFeature, view));
+                classDefinition.Methods.Add(GetGetAllMethodWithConnectionAsLocal(projectFeature, view));
             }
 
             foreach (var scalarFunction in scalarFunctions)
             {
                 var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
 
-                if (selection.Settings.DeclareConnectionAsParameter)
-                    classDefinition.Methods.Add(GetGetAllMethodAsParameter(projectFeature, scalarFunction));
-                else
-                    classDefinition.Methods.Add(GetGetAllMethodAsLocal(projectFeature, scalarFunction));
+                classDefinition.Methods.Add(GetGetAllMethodAsLocal(projectFeature, scalarFunction));
             }
 
             foreach (var tableFunction in tableFunctions)
             {
                 var selection = projectFeature.GetDapperProject().GetSelection(tableFunction);
 
-                if (selection.Settings.DeclareConnectionAsParameter)
-                    classDefinition.Methods.Add(GetGetAllMethodAsParameter(projectFeature, tableFunction));
-                else
-                    classDefinition.Methods.Add(GetGetAllMethodAsLocal(projectFeature, tableFunction));
+                classDefinition.Methods.Add(GetGetAllMethodAsLocal(projectFeature, tableFunction));
             }
 
             return classDefinition;

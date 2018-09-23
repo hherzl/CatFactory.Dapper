@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using CatFactory.CodeFactory;
 
@@ -13,8 +14,6 @@ namespace CatFactory.Dapper
         public bool UseAutomaticPropertiesForEntities { get; set; } = true;
 
         public bool EnableDataBindings { get; set; }
-
-        public bool DeclareConnectionAsParameter { get; set; }
 
         public bool UseStringBuilderForQueries { get; set; } = true;
 
@@ -49,6 +48,9 @@ namespace CatFactory.Dapper
         }
 
         public bool AddPagingForGetAllOperation { get; set; }
+
+        [Obsolete("Connection is not a parameter for repository methods anymore, set connection instance in repository constructor.")]
+        public bool DeclareConnectionAsParameter { get; set; }
 
         // todo: Add this feature
         //public bool ScaffoldStoredProcedures { get; set; }
