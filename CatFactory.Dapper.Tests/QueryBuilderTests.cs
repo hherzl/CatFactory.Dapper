@@ -10,10 +10,10 @@ namespace CatFactory.Dapper.Tests
         public void TestSelect()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .Select<Shipper>();
 
+            // Act
             var sql = query.ToString();
 
             // Assert
@@ -25,11 +25,11 @@ namespace CatFactory.Dapper.Tests
         public void TestSelectByID()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .Select<Shipper>()
                 .Where("ShipperID", ComparisonOperator.Equals, 1);
 
+            // Act
             var sql = query.ToString();
 
             // Assert
@@ -42,12 +42,12 @@ namespace CatFactory.Dapper.Tests
         public void TestSelectSearch()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .Select<Shipper>()
                 .Where("ShipperID", ComparisonOperator.Equals, 1)
                 .And("CompanyName", ComparisonOperator.Equals, "Speedy Express");
 
+            // Act
             var sql = query.ToString();
 
             // Assert
@@ -60,10 +60,10 @@ namespace CatFactory.Dapper.Tests
         public void TestInsertInto()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .InsertInto<Shipper>(identity: "ShipperID");
 
+            // Act
             var sql = query.ToString();
 
             // Assert
@@ -75,10 +75,10 @@ namespace CatFactory.Dapper.Tests
         public void TestUpdate()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .Update<Shipper>(key: "ShipperID");
 
+            // Act
             var sql = query.ToString();
 
             // Assert
@@ -90,10 +90,10 @@ namespace CatFactory.Dapper.Tests
         public void TestDelete()
         {
             // Arrange
-            // Act
             var query = QueryBuilder
                 .DeleteFrom<Shipper>(key: "ShipperID");
 
+            // Act
             var sql = query.ToString();
 
             // Assert
