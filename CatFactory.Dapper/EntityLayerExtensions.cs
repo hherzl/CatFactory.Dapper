@@ -1,6 +1,7 @@
 ﻿using CatFactory.Dapper.Definitions.Extensions;
 using CatFactory.Mapping;
 using CatFactory.NetCore;
+using CatFactory.NetCore.CodeFactory;
 
 namespace CatFactory.Dapper
 {
