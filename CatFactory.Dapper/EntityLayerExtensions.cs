@@ -1,7 +1,7 @@
 ﻿using CatFactory.Dapper.Definitions.Extensions;
-using CatFactory.Mapping;
-using CatFactory.NetCore;
 using CatFactory.NetCore.CodeFactory;
+using CatFactory.NetCore.ObjectOrientedProgramming;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper
 {

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CatFactory.CodeFactory;
-using CatFactory.Mapping;
-using CatFactory.OOP;
+using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.ObjectOrientedProgramming;
+using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.Dapper.Definitions.Extensions
 {

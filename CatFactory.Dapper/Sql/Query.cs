@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper.Sql
 {

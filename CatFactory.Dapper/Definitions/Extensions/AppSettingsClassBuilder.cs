@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CatFactory.OOP;
+﻿using CatFactory.ObjectOrientedProgramming;
 
 namespace CatFactory.Dapper.Definitions.Extensions
 {
@@ -10,7 +9,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 Namespace = project.GetDataLayerNamespace(),
                 Name = "AppSettings",
-                Properties = new List<PropertyDefinition>
+                Properties =
                 {
                     new PropertyDefinition("string", "ConnectionString")
                 }

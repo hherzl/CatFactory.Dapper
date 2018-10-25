@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using CatFactory.CodeFactory;
-using CatFactory.Mapping;
+using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper
 {
     public class DapperProject : Project<DapperProjectSettings>
     {
         public DapperProject()
+            : base()
         {
         }
 

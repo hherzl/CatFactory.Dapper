@@ -2,11 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build18</Version>
+    <Version>1.0.0-beta-sun-build19</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build18 Version: Core package update.
+    <PackageReleaseNotes>1.0.0-beta-sun-build19 Version:
 
-Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory</PackageReleaseNotes>
+* Change OOP namespace to ObjectOrientedProgramming
+* Change Mapping namespace to ObjectRelationalMapping
+* Core package update
+* Code review
+
+Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
+</PackageReleaseNotes>
     <Description>CatFactory Package for Dapper</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.Dapper</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -16,7 +22,7 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build12" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build13" />
   </ItemGroup>
 
 </Project>

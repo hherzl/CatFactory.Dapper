@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using CatFactory.CodeFactory;
-using CatFactory.Mapping;
-using CatFactory.NetCore;
+using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.NetCore.CodeFactory;
+using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.Dapper
 {

@@ -2,8 +2,8 @@
 using System.IO;
 using CatFactory.Collections;
 using CatFactory.Dapper.Definitions.Extensions;
-using CatFactory.NetCore;
 using CatFactory.NetCore.CodeFactory;
+using CatFactory.NetCore.ObjectOrientedProgramming;
 
 namespace CatFactory.Dapper
 {

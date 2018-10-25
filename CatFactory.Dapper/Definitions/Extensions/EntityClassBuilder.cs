@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using CatFactory.CodeFactory;
-using CatFactory.Mapping;
-using CatFactory.NetCore;
-using CatFactory.OOP;
+using CatFactory.NetCore.ObjectOrientedProgramming;
+using CatFactory.ObjectOrientedProgramming;
+using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.Dapper.Definitions.Extensions
 {
