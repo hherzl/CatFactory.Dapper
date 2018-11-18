@@ -144,5 +144,45 @@ namespace CatFactory.Dapper.Tests
                 .ScaffoldEntityLayer()
                 .ScaffoldDataLayer();
         }
+
+        [Fact]
+        public void ProjectScaffoldingFromWideWorldImportersDatabaseTest()
+        {
+            // Import database
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;",
+                    Exclusions =
+                    {
+                        "dbo.sysdiagrams"
+                    }
+                }
+            };
+
+            var database = databaseFactory.Import();
+
+            // Create instance of Dapper Project
+            var project = new DapperProject
+            {
+                Name = "WideWorldImporters",
+                Database = database,
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\WideWorldImporters\WideWorldImporters.Dapper.API"
+            };
+
+            // Apply settings for project
+            project.GlobalSelection(settings => settings.ForceOverwrite = true);
+
+            project.Select("Warehouse.StockItems", settings => settings.AddPagingForGetAllOperation = true);
+
+            // Build features for project, group all entities by schema into a feature
+            project.BuildFeatures();
+
+            // Scaffolding =^^=
+            project
+                .ScaffoldEntityLayer()
+                .ScaffoldDataLayer();
+        }
     }
 }

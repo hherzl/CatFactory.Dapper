@@ -15,6 +15,9 @@ namespace CatFactory.Dapper
             return map.AllowClrNullable ? string.Format("{0}?", map.GetClrType().Name) : map.GetClrType().Name;
         }
 
+        public static DatabaseTypeMap ResolveType(this Database database, string type)
+            => database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == type);
+
         public static string ResolveDbType(this Database database, Column column)
         {
             var map = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == column.Type);
