@@ -21,8 +21,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     "System.Linq",
                     "System.Text",
                     "System.Threading.Tasks",
-                    "Dapper",
-                    "Microsoft.Extensions.Options"
+                    "Dapper"
                 },
                 Namespace = projectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace(),
                 Name = projectFeature.GetClassRepositoryName(),

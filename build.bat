@@ -7,11 +7,11 @@ cd %srcPath%
 dotnet build
 cd %testPath%
 dotnet test
-cd %outputBasePath%\Store\Store.Dapper.API.Tests
+cd %outputBasePath%\OnLineStore.Core.UnitTests
 dotnet test
-cd %outputBasePath%\Northwind\Northwind.Dapper.API.Tests
+cd %outputBasePath%\Northwind.Core.UnitTests
 dotnet test
-cd %outputBasePath%\AdventureWorks\AdventureWorks.Dapper.API.Tests
+cd %outputBasePath%\AdventureWorks.Core.UnitTests
 dotnet test
 cd %srcPath%
 dotnet pack

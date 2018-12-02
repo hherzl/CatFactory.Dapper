@@ -120,21 +120,21 @@ namespace CatFactory.Dapper
             => string.Format("Remove{0}Async", dbObject.GetEntityName());
 
         public static string GetEntityLayerNamespace(this DapperProject project)
-            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.EntityLayer);
+            => codeNamingConvention.GetNamespace(project.Name, project.Namespaces.EntityLayer);
 
         public static string GetEntityLayerNamespace(this DapperProject project, string ns)
             => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : codeNamingConvention.GetNamespace(project.Name, project.Namespaces.EntityLayer, ns);
 
         public static string GetDataLayerNamespace(this DapperProject project)
-            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer);
+            => codeNamingConvention.GetNamespace(project.Name, project.Namespaces.DataLayer);
 
         public static string GetDataLayerContractsNamespace(this DapperProject project)
-            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Contracts);
+            => codeNamingConvention.GetNamespace(project.Name, project.Namespaces.DataLayer, project.Namespaces.Contracts);
 
         public static string GetDataLayerDataContractsNamespace(this DapperProject project)
-            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.DataContracts);
+            => codeNamingConvention.GetNamespace(project.Name, project.Namespaces.DataLayer, project.Namespaces.DataContracts);
 
         public static string GetDataLayerRepositoriesNamespace(this DapperProject project)
-            => codeNamingConvention.GetNamespace(codeNamingConvention.GetClassName(project.Name), project.Namespaces.DataLayer, project.Namespaces.Repositories);
+            => codeNamingConvention.GetNamespace(project.Name, project.Namespaces.DataLayer, project.Namespaces.Repositories);
     }
 }

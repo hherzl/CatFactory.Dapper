@@ -7,14 +7,14 @@ namespace CatFactory.Dapper.Tests
     public class ImportTests
     {
         [Fact]
-        public void ProjectScaffoldingFromStoreDatabaseTest()
+        public void ProjectScaffoldingFromOnLineStoreDatabaseTest()
         {
             // Create database factory
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
                     ImportTableFunctions = true,
                     Exclusions =
                     {
@@ -30,9 +30,9 @@ namespace CatFactory.Dapper.Tests
             // Create instance of Dapper Project
             var project = new DapperProject
             {
-                Name = "Store",
+                Name = "OnLineStore.Core",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Store\Store.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnLineStore.Core"
             };
 
             // Apply settings for project
@@ -43,13 +43,13 @@ namespace CatFactory.Dapper.Tests
                 settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
             });
 
-            project.Select("Production.*", settings =>
+            project.Select("Warehouse.*", settings =>
             {
                 settings.UseStringBuilderForQueries = false;
                 settings.AddPagingForGetAllOperation = true;
             });
 
-            project.Select("Sales.Order", settings => settings.AddPagingForGetAllOperation = true);
+            project.Select("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -82,9 +82,9 @@ namespace CatFactory.Dapper.Tests
             // Create instance of Dapper Project
             var project = new DapperProject
             {
-                Name = "Northwind",
+                Name = "Northwind.Core",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind\Northwind.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind.Core"
             };
 
             // Apply settings for project
@@ -126,9 +126,9 @@ namespace CatFactory.Dapper.Tests
             // Create instance of Dapper Project
             var project = new DapperProject
             {
-                Name = "AdventureWorks",
+                Name = "AdventureWorks.Core",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\AdventureWorks\AdventureWorks.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\AdventureWorks.Core"
             };
 
             // Apply settings for project
@@ -166,9 +166,9 @@ namespace CatFactory.Dapper.Tests
             // Create instance of Dapper Project
             var project = new DapperProject
             {
-                Name = "WideWorldImporters",
+                Name = "WideWorldImporters.Core",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\WideWorldImporters\WideWorldImporters.Dapper.API"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\WideWorldImporters.Core"
             };
 
             // Apply settings for project

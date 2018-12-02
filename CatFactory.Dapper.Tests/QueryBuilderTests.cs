@@ -1,5 +1,6 @@
 ﻿using CatFactory.Dapper.Sql;
 using CatFactory.Dapper.Sql.Dml;
+using CatFactory.Dapper.Tests.Models;
 using Xunit;
 
 namespace CatFactory.Dapper.Tests

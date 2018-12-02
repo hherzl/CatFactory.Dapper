@@ -538,7 +538,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var lines = new List<ILine>();
             var db = projectFeature.Project.Database;
 
-            if (db.PrimaryKeyIsGuid(table))
+            if (table.PrimaryKey != null && db.PrimaryKeyIsGuid(table))
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
                 lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.GetColumnsFromConstraint(table.PrimaryKey).First().GetPropertyName()));

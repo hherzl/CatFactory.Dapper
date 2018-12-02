@@ -1,4 +1,4 @@
-﻿namespace CatFactory.Dapper.Tests
+﻿namespace CatFactory.Dapper.Tests.Models
 {
     public class Shipper
     {

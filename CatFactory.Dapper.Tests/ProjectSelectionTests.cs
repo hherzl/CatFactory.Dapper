@@ -12,14 +12,14 @@ namespace CatFactory.Dapper.Tests
 
             // Import database
             var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "dbo.sysdiagrams");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnLineStore;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Entity Framework Core project
             var project = new DapperProject
             {
-                Name = "Store",
+                Name = "OnLineStore",
                 Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.Dapper\\Store"
+                OutputDirectory = "C:\\Temp\\CatFactory.Dapper\\OnLineStore.Core"
             };
 
             // Act
@@ -30,11 +30,11 @@ namespace CatFactory.Dapper.Tests
                 settings.ForceOverwrite = true;
             });
 
-            project.Select("Sales.Order", settings => settings.UseStringBuilderForQueries = false);
+            project.Select("Sales.OrderHeader", settings => settings.UseStringBuilderForQueries = false);
 
-            var order = database.FindTable("Sales.Order");
+            var orderHeader = database.FindTable("Sales.OrderHeader");
 
-            var selectionForOrder = project.GetSelection(order);
+            var selectionForOrder = project.GetSelection(orderHeader);
 
             // Assert
             Assert.True(project.Selections.Count == 2);
