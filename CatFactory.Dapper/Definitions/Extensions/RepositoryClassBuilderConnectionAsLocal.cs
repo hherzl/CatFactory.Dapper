@@ -2,6 +2,7 @@
 using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.NetCore;
 using CatFactory.ObjectOrientedProgramming;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
@@ -158,7 +159,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                    parameters.Add(new ParameterDefinition(db.ResolveType(column), column.GetParameterName()) { DefaultValue = "null" });
+                    parameters.Add(new ParameterDefinition(db.ResolveDatebaseType(column), column.GetParameterName()) { DefaultValue = "null" });
                 }
             }
 
@@ -663,7 +664,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(" Retrieve value for output parameters"));
-                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", identityColumn.GetPropertyName(), db.ResolveType(identityColumn), identityColumn.GetParameterName()));
+                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", identityColumn.GetPropertyName(), db.ResolveDatebaseType(identityColumn), identityColumn.GetParameterName()));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CodeLine("return affectedRows;"));

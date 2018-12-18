@@ -43,13 +43,13 @@ namespace CatFactory.Dapper.Tests
                 settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
             });
 
-            project.Select("Warehouse.*", settings =>
+            project.Selection("Warehouse.*", settings =>
             {
                 settings.UseStringBuilderForQueries = false;
                 settings.AddPagingForGetAllOperation = true;
             });
 
-            project.Select("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
+            project.Selection("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -134,7 +134,7 @@ namespace CatFactory.Dapper.Tests
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
-            project.Select("Sales.SalesOrderHeader", settings => settings.AddPagingForGetAllOperation = true);
+            project.Selection("Sales.SalesOrderHeader", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -174,7 +174,7 @@ namespace CatFactory.Dapper.Tests
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
-            project.Select("Warehouse.StockItems", settings => settings.AddPagingForGetAllOperation = true);
+            project.Selection("Warehouse.StockItems", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();

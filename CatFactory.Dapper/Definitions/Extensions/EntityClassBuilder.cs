@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CatFactory.CodeFactory;
+using CatFactory.NetCore;
 using CatFactory.NetCore.ObjectOrientedProgramming;
 using CatFactory.ObjectOrientedProgramming;
 using CatFactory.ObjectRelationalMapping;
@@ -40,7 +41,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveType(column), column.GetParameterName()))
+                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveDatebaseType(column), column.GetParameterName()))
                 {
                     Lines =
                     {
@@ -56,14 +57,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 if (selection.Settings.EnableDataBindings)
                 {
-                    classDefinition.AddViewModelProperty(project.Database.ResolveType(column), table.GetPropertyNameHack(column));
+                    classDefinition.AddViewModelProperty(project.Database.ResolveDatebaseType(column), table.GetPropertyNameHack(column));
                 }
                 else
                 {
                     if (selection.Settings.UseAutomaticPropertiesForEntities)
-                        classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), table.GetPropertyNameHack(column)));
+                        classDefinition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatebaseType(column), table.GetPropertyNameHack(column)));
                     else
-                        classDefinition.AddPropertyWithField(project.Database.ResolveType(column), table.GetPropertyNameHack(column));
+                        classDefinition.AddPropertyWithField(project.Database.ResolveDatebaseType(column), table.GetPropertyNameHack(column));
                 }
             }
 
@@ -97,9 +98,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var column in view.Columns)
             {
                 if (selection.Settings.UseAutomaticPropertiesForEntities)
-                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), view.GetPropertyNameHack(column)));
+                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatebaseType(column), view.GetPropertyNameHack(column)));
                 else
-                    definition.AddPropertyWithField(project.Database.ResolveType(column), view.GetPropertyNameHack(column));
+                    definition.AddPropertyWithField(project.Database.ResolveDatebaseType(column), view.GetPropertyNameHack(column));
             }
 
             definition.Implements.Add("IEntity");
@@ -133,7 +134,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var column in tableFunction.Columns)
             {
-                definition.Properties.Add(new PropertyDefinition(project.Database.ResolveType(column), column.GetPropertyName()));
+                definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatebaseType(column), column.GetPropertyName()));
             }
 
             definition.Implements.Add("IEntity");

@@ -33,10 +33,7 @@ namespace CatFactory.Dapper
 
             foreach (var column in table.Columns)
             {
-                if (selection.Settings.InsertExclusions.Contains(column.Name))
-                    continue;
-
-                if (table.Identity != null && table.Identity.Name == column.Name)
+                if (table.Identity?.Name == column.Name || selection.Settings.InsertExclusions.Contains(column.Name))
                     continue;
 
                 yield return column;
@@ -85,7 +82,7 @@ namespace CatFactory.Dapper
         public static ProjectSelection<DapperProjectSettings> GlobalSelection(this DapperProject project)
             => project.Selections.FirstOrDefault(item => item.IsGlobal);
 
-        public static DapperProject Select(this DapperProject project, string pattern, Action<DapperProjectSettings> action = null)
+        public static DapperProject Selection(this DapperProject project, string pattern, Action<DapperProjectSettings> action = null)
         {
             var selection = project.Selections.FirstOrDefault(item => item.Pattern == pattern);
 
@@ -116,5 +113,9 @@ namespace CatFactory.Dapper
 
             return project;
         }
+
+        [Obsolete("Use Selection method.")]
+        public static DapperProject Select(this DapperProject project, string pattern, Action<DapperProjectSettings> action = null)
+            => project.Select(pattern, action);
     }
 }

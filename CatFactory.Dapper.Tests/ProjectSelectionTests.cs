@@ -30,7 +30,7 @@ namespace CatFactory.Dapper.Tests
                 settings.ForceOverwrite = true;
             });
 
-            project.Select("Sales.OrderHeader", settings => settings.UseStringBuilderForQueries = false);
+            project.Selection("Sales.OrderHeader", settings => settings.UseStringBuilderForQueries = false);
 
             var orderHeader = database.FindTable("Sales.OrderHeader");
 
