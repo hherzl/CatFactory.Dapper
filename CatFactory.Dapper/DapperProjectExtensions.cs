@@ -10,22 +10,22 @@ namespace CatFactory.Dapper
     public static class DapperProjectExtensions
     {
         public static string GetEntityLayerDirectory(this DapperProject project)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.EntityLayer);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.EntityLayer);
 
         public static string GetEntityLayerDirectory(this DapperProject project, string schema)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.EntityLayer, schema);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.EntityLayer, schema);
 
         public static string GetDataLayerDirectory(this DapperProject project)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.DataLayer);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.DataLayer);
 
         public static string GetDataLayerContractsDirectory(this DapperProject project)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.DataLayer, project.Namespaces.Contracts);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.DataLayer, project.ProjectNamespaces.Contracts);
 
         public static string GetDataLayerDataContractsDirectory(this DapperProject project)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.DataLayer, project.Namespaces.DataContracts);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.DataLayer, project.ProjectNamespaces.DataContracts);
 
         public static string GetDataLayerRepositoriesDirectory(this DapperProject project)
-            => Path.Combine(project.OutputDirectory, project.Namespaces.DataLayer, project.Namespaces.Repositories);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.DataLayer, project.ProjectNamespaces.Repositories);
 
         public static IEnumerable<Column> GetInsertColumns(this DapperProject project, ITable table)
         {

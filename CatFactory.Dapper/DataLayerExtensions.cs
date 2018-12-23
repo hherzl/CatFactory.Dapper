@@ -41,9 +41,8 @@ namespace CatFactory.Dapper
 
                 var interfaceDefinition = repositoryClassDefinition.RefactInterface();
 
-                interfaceDefinition.Implements.Add("IRepository");
-
                 interfaceDefinition.Namespace = project.GetDataLayerContractsNamespace();
+                interfaceDefinition.Implements.Add("IRepository");
 
                 ScaffoldDataLayerContract(project, interfaceDefinition);
 

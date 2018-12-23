@@ -13,6 +13,21 @@ namespace CatFactory.Dapper
         {
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private DapperProjectNamespaces m_projectNamespaces;
+
+        public DapperProjectNamespaces ProjectNamespaces
+        {
+            get
+            {
+                return m_projectNamespaces ?? (m_projectNamespaces = new DapperProjectNamespaces());
+            }
+            set
+            {
+                m_projectNamespaces = value;
+            }
+        }
+
         public override void BuildFeatures()
         {
             if (Database == null)
@@ -53,21 +68,6 @@ namespace CatFactory.Dapper
             // todo: Add stored procedures
 
             return result;
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ProjectNamespaces m_namespaces;
-
-        public ProjectNamespaces Namespaces
-        {
-            get
-            {
-                return m_namespaces ?? (m_namespaces = new ProjectNamespaces());
-            }
-            set
-            {
-                m_namespaces = value;
-            }
         }
     }
 }

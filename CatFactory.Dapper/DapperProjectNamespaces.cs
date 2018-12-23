@@ -1,8 +1,8 @@
 ﻿namespace CatFactory.Dapper
 {
-    public class ProjectNamespaces
+    public class DapperProjectNamespaces
     {
-        public ProjectNamespaces()
+        public DapperProjectNamespaces()
         {
             EntityLayer = "EntityLayer";
             DataLayer = "DataLayer";

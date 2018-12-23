@@ -7,6 +7,10 @@ namespace CatFactory.Dapper
 {
     public class DapperProjectSettings : ProjectSettings
     {
+        public DapperProjectSettings()
+        {
+        }
+
         public bool ForceOverwrite { get; set; }
 
         public bool SimplifyDataTypes { get; set; }
