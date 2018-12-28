@@ -62,6 +62,18 @@ namespace CatFactory.Dapper
                     CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(tableFunction.Schema), selection.Settings.ForceOverwrite, classDefinition);
             }
 
+            foreach (var storedProcedure in project.Database.StoredProcedures)
+            {
+                var selection = project.GetSelection(storedProcedure);
+
+                var classDefinition = project.CreateEntity(storedProcedure);
+
+                if (project.Database.HasDefaultSchema(storedProcedure))
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(), selection.Settings.ForceOverwrite, project.CreateEntity(storedProcedure));
+                else
+                    CSharpCodeBuilder.CreateFiles(project.OutputDirectory, project.GetEntityLayerDirectory(storedProcedure.Schema), selection.Settings.ForceOverwrite, classDefinition);
+            }
+
             return project;
         }
     }

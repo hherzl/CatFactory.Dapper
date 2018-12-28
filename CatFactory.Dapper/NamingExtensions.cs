@@ -57,6 +57,12 @@ namespace CatFactory.Dapper
         public static string GetPluralName(this IDbObject dbObject)
             => NamingService.Pluralize(dbObject.GetEntityName());
 
+        public static string GetResultName(this ITableFunction tableFunction)
+            => string.Format("{0}Result", CodeNamingConvention.GetClassName(tableFunction.Name));
+
+        public static string GetResultName(this StoredProcedure storedProcedure)
+            => string.Format("{0}Result", CodeNamingConvention.GetClassName(storedProcedure.Name));
+
         public static string GetGetAllRepositoryMethodName(this IDbObject dbObject)
             => string.Format("Get{0}Async", dbObject.GetPluralName());
 

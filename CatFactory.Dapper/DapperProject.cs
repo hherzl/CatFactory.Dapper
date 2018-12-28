@@ -65,7 +65,10 @@ namespace CatFactory.Dapper
                 .Where(x => x.Schema == schema)
                 .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
 
-            // todo: Add stored procedures
+            result.AddRange(Database
+                .StoredProcedures
+                .Where(x => x.Schema == schema)
+                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "StoredProcedure" }));
 
             return result;
         }

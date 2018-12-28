@@ -6,6 +6,10 @@ namespace CatFactory.Dapper.Sql
 {
     public class Query
     {
+        public Query()
+        {
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IDatabaseNamingConvention m_namingConvention;
 

@@ -6,6 +6,10 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class DeleteFrom<TEntity> : Query
     {
+        public DeleteFrom()
+        {
+        }
+
         public string Table { get; set; }
 
         public string Key { get; set; }

@@ -6,6 +6,10 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Select<Entity> : Query
     {
+        public Select()
+        {
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_columns;
 
@@ -48,8 +52,7 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.Append("select");
-            output.AppendLine();
+            output.AppendLine("select");
 
             for (var i = 0; i < Columns.Count; i++)
             {
@@ -57,13 +60,14 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.AppendFormat(" from {0} ", From);
+            output.AppendLine("from ");
+
+            output.AppendFormat(" {0} ", From);
             output.AppendLine();
 
             if (Where.Count > 0)
             {
-                output.Append(" where ");
-                output.AppendLine();
+                output.AppendLine("where ");
 
                 for (var i = 0; i < Where.Count; i++)
                 {
@@ -77,7 +81,7 @@ namespace CatFactory.Dapper.Sql.Dml
                     else if (Where[i].ComparisonOperator == ComparisonOperator.NotEquals)
                         comparisonOperator = "<>";
 
-                    output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, Where[i].Column);
+                    output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, NamingConvention.GetParameterName(Where[i].Column));
                     output.AppendLine();
                 }
             }

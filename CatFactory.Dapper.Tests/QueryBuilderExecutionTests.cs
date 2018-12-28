@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using CatFactory.Dapper.Sql;
 using CatFactory.Dapper.Sql.Dml;
 using CatFactory.Dapper.Tests.Models;
+using CatFactory.SqlServer;
 using Xunit;
 
 namespace CatFactory.Dapper.Tests
@@ -53,7 +54,7 @@ namespace CatFactory.Dapper.Tests
             var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
 
             var query = QueryBuilder
-                .Select<Shipper>("dbo.Shippers")
+                .Select<Shipper>("dbo.Shippers", new SqlServerDatabaseNamingConvention())
                 .Where("ShipperID", ComparisonOperator.Equals, 1);
 
             var entity = default(Shipper);
@@ -64,6 +65,11 @@ namespace CatFactory.Dapper.Tests
             var command = connection.CreateCommand();
 
             command.CommandText = query.ToString();
+
+            foreach (var condition in query.Where)
+            {
+                command.Parameters.Add(new SqlParameter(query.NamingConvention.GetParameterName(condition.Column), condition.Value));
+            }
 
             using (var dataReader = command.ExecuteReader())
             {
@@ -102,6 +108,11 @@ namespace CatFactory.Dapper.Tests
             var command = connection.CreateCommand();
 
             command.CommandText = query.ToString();
+
+            foreach (var condition in query.Where)
+            {
+                command.Parameters.Add(new SqlParameter(query.NamingConvention.GetParameterName(condition.Column), condition.Value));
+            }
 
             using (var dataReader = command.ExecuteReader())
             {

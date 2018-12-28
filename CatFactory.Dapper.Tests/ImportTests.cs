@@ -76,8 +76,30 @@ namespace CatFactory.Dapper.Tests
         public void ProjectScaffoldingFromNorthwindDatabaseTest()
         {
             // Import database
-            var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Northwind;integrated security=yes;", "dbo.sysdiagrams");
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
+                    ImportScalarFunctions = true,
+                    ImportTableFunctions = true,
+                    ImportStoredProcedures = true,
+                    Exclusions =
+                    {
+                        "dbo.sp_alterdiagram",
+                        "dbo.sp_creatediagram",
+                        "dbo.sp_dropdiagram",
+                        "dbo.sp_helpdiagramdefinition",
+                        "dbo.sp_helpdiagrams",
+                        "dbo.sp_renamediagram",
+                        "dbo.sp_upgraddiagrams",
+                        "dbo.sysdiagrams",
+                        "dbo.fn_diagramobjects"
+                    }
+                }
+            };
+
+            var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
             var project = new DapperProject
@@ -89,6 +111,8 @@ namespace CatFactory.Dapper.Tests
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
+
+            project.Selection("dbo.Ten Most Expensive Products", settings => settings.UseStringBuilderForQueries = false);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();

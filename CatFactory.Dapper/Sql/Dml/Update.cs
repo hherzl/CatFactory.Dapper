@@ -7,6 +7,10 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Update<TEntity> : Query
     {
+        public Update()
+        {
+        }
+
         public string Table { get; set; }
 
         public string Key { get; set; }

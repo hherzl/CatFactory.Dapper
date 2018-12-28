@@ -1,13 +1,17 @@
 ﻿using System.Linq;
 using CatFactory.Dapper.Sql.Dml;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper.Sql
 {
     public class QueryBuilder
     {
-        public static Select<TEntity> Select<TEntity>(string table = null)
+        public static Select<TEntity> Select<TEntity>(string table = null, IDatabaseNamingConvention databaseNamingConvention = null)
         {
             var query = new Select<TEntity>();
+
+            if (databaseNamingConvention != null)
+                query.NamingConvention = databaseNamingConvention;
 
             var type = typeof(TEntity);
 

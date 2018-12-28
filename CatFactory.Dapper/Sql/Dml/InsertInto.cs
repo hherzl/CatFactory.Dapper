@@ -7,6 +7,10 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class InsertInto<TEntity> : Query
     {
+        public InsertInto()
+        {
+        }
+
         public string Table { get; set; }
 
         public string Identity { get; set; }

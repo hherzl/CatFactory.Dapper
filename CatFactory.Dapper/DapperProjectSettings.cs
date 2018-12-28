@@ -13,7 +13,7 @@ namespace CatFactory.Dapper
 
         public bool ForceOverwrite { get; set; }
 
-        public bool SimplifyDataTypes { get; set; }
+        public bool SimplifyDataTypes { get; set; } = true;
 
         public bool UseAutomaticPropertiesForEntities { get; set; } = true;
 

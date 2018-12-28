@@ -31,7 +31,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
             if (selection.Settings.EnableDataBindings)
             {
                 classDefinition.Namespaces.Add("System.ComponentModel");
-
                 classDefinition.Implements.Add("INotifyPropertyChanged");
 
                 classDefinition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged"));
@@ -111,40 +110,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateEntity(this DapperProject project, ITableFunction tableFunction)
-        {
-            var definition = new EntityClassDefinition
-            {
-                Namespaces =
-                {
-                    "System"
-                },
-                Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema),
-                Name = tableFunction.GetEntityName(),
-                Constructors =
-                {
-                    new ClassConstructorDefinition()
-                }
-            };
-
-            if (!string.IsNullOrEmpty(tableFunction.Description))
-                definition.Documentation.Summary = tableFunction.Description;
-
-            var selection = project.GetSelection(tableFunction);
-
-            foreach (var column in tableFunction.Columns)
-            {
-                definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatabaseType(column), column.GetPropertyName()));
-            }
-
-            definition.Implements.Add("IEntity");
-
-            if (selection.Settings.SimplifyDataTypes)
-                definition.SimplifyDataTypes();
-
-            return definition;
-        }
-
         public static EntityClassDefinition CreateEntity(this DapperProject project, ScalarFunction scalarFunction)
         {
             var definition = new EntityClassDefinition
@@ -170,6 +135,75 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             if (selection.Settings.SimplifyDataTypes)
                 definition.SimplifyDataTypes();
+
+            return definition;
+        }
+
+        public static EntityClassDefinition CreateEntity(this DapperProject project, ITableFunction tableFunction)
+        {
+            var definition = new EntityClassDefinition
+            {
+                Namespaces =
+                {
+                    "System"
+                },
+                Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema),
+                Name = tableFunction.GetResultName(),
+                Constructors =
+                {
+                    new ClassConstructorDefinition()
+                }
+            };
+
+            if (!string.IsNullOrEmpty(tableFunction.Description))
+                definition.Documentation.Summary = tableFunction.Description;
+
+            var selection = project.GetSelection(tableFunction);
+
+            foreach (var column in tableFunction.Columns)
+            {
+                definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatabaseType(column), column.GetPropertyName()));
+            }
+
+            definition.Implements.Add("IEntity");
+
+            if (selection.Settings.SimplifyDataTypes)
+                definition.SimplifyDataTypes();
+
+            return definition;
+        }
+
+        public static EntityClassDefinition CreateEntity(this DapperProject project, StoredProcedure storedProcedure)
+        {
+            var definition = new EntityClassDefinition
+            {
+                Namespaces =
+                {
+                    "System"
+                },
+                Namespace = project.Database.HasDefaultSchema(storedProcedure) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(storedProcedure.Schema),
+                Name = storedProcedure.GetResultName(),
+                Constructors =
+                {
+                    new ClassConstructorDefinition()
+                }
+            };
+
+            foreach (var resultSet in storedProcedure.FirstResultSetsForObject)
+            {
+                var databaseType = project.Database.ResolveType(resultSet.SystemTypeName);
+                var type = "object";
+
+                if (databaseType != null)
+                {
+                    if (databaseType.AllowClrNullable)
+                        type = databaseType.HasClrAliasType ? string.Format("{0}?", databaseType.ClrAliasType) : string.Format("Nullable<{0}>", databaseType.ClrFullNameType);
+                    else
+                        type = databaseType.HasClrAliasType ? databaseType.ClrAliasType : databaseType.ClrFullNameType;
+                }
+
+                definition.Properties.Add(new PropertyDefinition(type, resultSet.Name));
+            }
 
             return definition;
         }
