@@ -426,9 +426,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         private static MethodDefinition GetByUniqueMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table, Unique unique)
         {
             var selection = projectFeature.GetDapperProject().GetSelection(table);
-
             var lines = new List<ILine>();
-
+            var db = projectFeature.Project.Database;
             var key = table.GetColumnsFromConstraint(unique).ToList();
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -438,8 +437,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(" Create sql statement"));
                 lines.Add(new CodeLine("query.Append(\" select \");"));
-
-                var db = projectFeature.Project.Database;
 
                 for (var i = 0; i < table.Columns.Count; i++)
                 {
@@ -464,7 +461,30 @@ namespace CatFactory.Dapper.Definitions.Extensions
             }
             else
             {
-                // todo: Add flag to validate if StringBuilder must be used to create query inside of methods
+                lines.Add(new CodeLine("var query = @\" select "));
+
+                for (var i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+
+                    lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                }
+
+                lines.Add(new CodeLine(" from "));
+                lines.Add(new CodeLine("  {0} ", db.GetFullName(table)));
+
+                lines.Add(new CodeLine(" where "));
+
+                for (var i = 0; i < key.Count; i++)
+                {
+                    var column = key[i];
+
+                    lines.Add(new CodeLine("  {0} = {1} {2} ", db.GetColumnName(column), db.GetParameterName(column), i < key.Count - 1 ? "and" : string.Empty));
+                }
+
+                lines.Add(new CodeLine("\";"));
+
+                lines.Add(new CodeLine());
             }
 
             lines.Add(new CommentLine(" Create parameters collection"));
@@ -483,7 +503,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CodeLine());
 
             lines.Add(new CommentLine(" Retrieve result from database and convert to entity class"));
-            lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+
+            if (selection.Settings.UseStringBuilderForQueries)
+                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+            else
+                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query, parameters);", table.GetEntityName()));
 
             return new MethodDefinition(string.Format("Task<{0}>", table.GetEntityName()), table.GetGetByUniqueRepositoryMethodName(unique), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
@@ -544,12 +568,20 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             if (scalarFunctionParameters.Count == 0)
             {
-                lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query.ToString());"));
+                if (selection.Settings.UseStringBuilderForQueries)
+                    lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query.ToString());"));
+                else
+                    lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query);"));
+
                 lines.Add(new CodeLine("return ({0})scalar;", typeToReturn));
             }
             else
             {
-                lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query.ToString(), parameters);", typeToReturn));
+                if (selection.Settings.UseStringBuilderForQueries)
+                    lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query.ToString(), parameters);", typeToReturn));
+                else
+                    lines.Add(new CodeLine("var scalar = await Connection.ExecuteScalarAsync(query, parameters);", typeToReturn));
+
                 lines.Add(new CodeLine("return ({0})scalar;", typeToReturn));
             }
 
@@ -630,9 +662,19 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to typed list"));
 
             if (tableFunction.Parameters.Count == 0)
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", tableFunction.GetResultName()));
+            {
+                if (selection.Settings.UseStringBuilderForQueries)
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", tableFunction.GetResultName()));
+                else
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query);", tableFunction.GetResultName()));
+            }
             else
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", tableFunction.GetResultName()));
+            {
+                if (selection.Settings.UseStringBuilderForQueries)
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", tableFunction.GetResultName()));
+                else
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query, parameters);", tableFunction.GetResultName()));
+            }
 
             var parameters = new List<ParameterDefinition>();
 
