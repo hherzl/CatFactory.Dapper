@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CatFactory.Dapper.Tests
 {
-    public class ImportTests
+    public class ScaffoldingTests
     {
         [Fact]
         public void ProjectScaffoldingFromOnLineStoreDatabaseTest()
