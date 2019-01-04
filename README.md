@@ -26,6 +26,72 @@ The flow to import an existing database is:
 4. Build Features (One feature per schema)
 5. Scaffold objects, these methods read all objects from database and create instances for code builders
 
+Sample code:
+
+```csharp
+// Create database factory
+var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+{
+	DatabaseImportSettings = new DatabaseImportSettings
+	{
+		ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+		ImportTableFunctions = true,
+		Exclusions =
+		{
+			"dbo.sysdiagrams",
+			"dbo.fn_diagramobjects"
+		}
+	}
+};
+
+// Import database
+var database = databaseFactory.Import();
+
+// Create instance of Dapper Project
+var project = new DapperProject
+{
+	Name = "OnLineStore.Core",
+	Database = database,
+	OutputDirectory = @"C:\Projects\OnLineStore.Core"
+};
+
+// Apply settings for project
+project.GlobalSelection(settings =>
+{
+	settings.ForceOverwrite = true;
+	settings.UpdateExclusions = new List<string> { "CreationUser", "CreationDateTime", "Timestamp" };
+	settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
+});
+
+project.Selection("Warehouse.*", settings =>
+{
+	settings.UseStringBuilderForQueries = false;
+	settings.AddPagingForGetAllOperation = true;
+});
+
+project.Selection("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
+
+// Build features for project, group all entities by schema into a feature
+project.BuildFeatures();
+
+// Add event handlers to before and after of scaffold
+
+project.ScaffoldingDefinition += (source, args) =>
+{
+	// Add code to perform operations with code builder instance before to create code file
+};
+
+project.ScaffoldedDefinition += (source, args) =>
+{
+	// Add code to perform operations after of create code file
+};
+
+// Scaffolding =^^=
+project
+	.ScaffoldEntityLayer()
+	.ScaffoldDataLayer();
+```
+
 ## Roadmap
 
 There will be a lot of improvements for CatFactory on road:
