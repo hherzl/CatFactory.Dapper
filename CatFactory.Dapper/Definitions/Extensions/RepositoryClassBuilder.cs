@@ -28,6 +28,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     "Dapper"
                 },
                 Namespace = projectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace(),
+                AccessModifier = AccessModifier.Public,
                 Name = projectFeature.GetClassRepositoryName(),
                 BaseClass = "Repository",
                 Implements =
@@ -38,6 +39,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     new ClassConstructorDefinition(new ParameterDefinition("IDbConnection", "connection"))
                     {
+                        AccessModifier = AccessModifier.Public,
                         Invocation = "base(connection)"
                     }
                 }
@@ -273,7 +275,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             }
 
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -327,7 +329,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to typed list"));
             lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", view.GetEntityName()));
 
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", view.GetEntityName()), view.GetGetAllRepositoryMethodName())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", view.GetEntityName()), view.GetGetAllRepositoryMethodName())
             {
                 IsAsync = true,
                 Lines = lines
@@ -416,7 +418,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to entity class"));
             lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
 
-            return new MethodDefinition(string.Format("Task<{0}>", table.GetEntityName()), table.GetGetRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", table.GetEntityName()), table.GetGetRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -509,7 +511,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             else
                 lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query, parameters);", table.GetEntityName()));
 
-            return new MethodDefinition(string.Format("Task<{0}>", table.GetEntityName()), table.GetGetByUniqueRepositoryMethodName(unique), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", table.GetEntityName()), table.GetGetByUniqueRepositoryMethodName(unique), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -590,7 +592,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var parameter in scalarFunctionParameters)
                 parameters.Add(new ParameterDefinition(db.ResolveType(parameter.Type).GetClrType().Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
-            return new MethodDefinition(string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -681,7 +683,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var parameter in tableFunction.Parameters)
                 parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveType(parameter.Type).ClrAliasType, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", tableFunction.GetResultName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", tableFunction.GetResultName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -770,7 +772,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             }
 
-            return new MethodDefinition(string.Format("Task<IEnumerable<{0}>>", storedProcedure.GetResultName()), storedProcedure.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", storedProcedure.GetResultName()), storedProcedure.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -913,7 +915,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine("return affectedRows;"));
             }
 
-            return new MethodDefinition("Task<Int32>", table.GetAddRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetAddRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -1007,7 +1009,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Execute query in database"));
             lines.Add(new CodeLine("return await Connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
-            return new MethodDefinition("Task<Int32>", table.GetUpdateRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetUpdateRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -1077,7 +1079,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Execute query in database"));
             lines.Add(new CodeLine("return await Connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
-            return new MethodDefinition("Task<Int32>", table.GetDeleteRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetDeleteRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
             {
                 IsAsync = true,
                 Lines = lines

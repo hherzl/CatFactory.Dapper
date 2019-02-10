@@ -14,10 +14,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     project.GetEntityLayerNamespace()
                 },
                 Namespace = project.GetDataLayerContractsNamespace(),
+                AccessModifier = AccessModifier.Public,
                 Name = "Repository",
                 Constructors =
                 {
-                    new ClassConstructorDefinition(new ParameterDefinition("IDbConnection", "connection"))
+                    new ClassConstructorDefinition(AccessModifier.Public, new ParameterDefinition("IDbConnection", "connection"))
                     {
                         Lines =
                         {
@@ -27,9 +28,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Properties =
                 {
-                    new PropertyDefinition("IDbConnection", "Connection")
+                    new PropertyDefinition(AccessModifier.Protected, "IDbConnection", "Connection")
                     {
-                        AccessModifier = AccessModifier.Protected,
                         IsReadOnly = true
                     }
                 }

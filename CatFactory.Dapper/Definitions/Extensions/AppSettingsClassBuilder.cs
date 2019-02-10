@@ -8,10 +8,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
             => new AppSettingsClassDefinition
             {
                 Namespace = project.GetDataLayerNamespace(),
+                AccessModifier = AccessModifier.Public,
                 Name = "AppSettings",
                 Properties =
                 {
-                    new PropertyDefinition("string", "ConnectionString")
+                    new PropertyDefinition(AccessModifier.Public, "string", "ConnectionString")
+                    {
+                        IsReadOnly = true
+                    }
                 }
             };
     }

@@ -4,6 +4,7 @@ using CatFactory.Collections;
 using CatFactory.Dapper.Definitions.Extensions;
 using CatFactory.NetCore.CodeFactory;
 using CatFactory.NetCore.ObjectOrientedProgramming;
+using CatFactory.ObjectOrientedProgramming;
 
 namespace CatFactory.Dapper
 {
@@ -40,6 +41,9 @@ namespace CatFactory.Dapper
                 var repositoryClassDefinition = projectFeature.GetRepositoryClassDefinition();
 
                 var interfaceDefinition = repositoryClassDefinition.RefactInterface();
+
+                // todo: Remove this line
+                interfaceDefinition.AccessModifier = AccessModifier.Public;
 
                 interfaceDefinition.Namespace = project.GetDataLayerContractsNamespace();
                 interfaceDefinition.Implements.Add("IRepository");

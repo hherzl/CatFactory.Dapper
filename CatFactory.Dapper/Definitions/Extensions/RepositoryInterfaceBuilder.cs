@@ -1,4 +1,6 @@
-﻿namespace CatFactory.Dapper.Definitions.Extensions
+﻿using CatFactory.ObjectOrientedProgramming;
+
+namespace CatFactory.Dapper.Definitions.Extensions
 {
     public static class RepositoryInterfaceBuilder
     {
@@ -6,6 +8,7 @@
             => new RepositoryInterfaceDefinition
             {
                 Namespace = project.GetDataLayerContractsNamespace(),
+                AccessModifier = AccessModifier.Public,
                 Name = "IRepository"
             };
     }

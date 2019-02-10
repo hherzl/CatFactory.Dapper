@@ -1,6 +1,7 @@
 ﻿using CatFactory.Dapper.Definitions.Extensions;
 using CatFactory.NetCore.CodeFactory;
 using CatFactory.NetCore.ObjectOrientedProgramming;
+using CatFactory.ObjectOrientedProgramming;
 using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper
@@ -14,6 +15,7 @@ namespace CatFactory.Dapper
             var interfaceDefinition = new CSharpInterfaceDefinition
             {
                 Namespace = project.GetEntityLayerNamespace(),
+                AccessModifier = AccessModifier.Public,
                 Name = "IEntity"
             };
 

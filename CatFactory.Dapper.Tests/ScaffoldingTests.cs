@@ -14,7 +14,7 @@ namespace CatFactory.Dapper.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ImportTableFunctions = true,
                     Exclusions =
                     {
@@ -30,9 +30,9 @@ namespace CatFactory.Dapper.Tests
             // Create instance of Dapper Project
             var project = new DapperProject
             {
-                Name = "OnLineStore.Core",
+                Name = "OnlineStore.Core",
                 Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnLineStore.Core"
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnlineStore.Core"
             };
 
             // Apply settings for project
