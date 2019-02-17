@@ -524,7 +524,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
             var db = projectFeature.Project.Database;
-            var typeToReturn = db.ResolveType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type).GetClrType().Name;
+            var typeToReturn = db.ResolveDatabaseType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type).GetClrType().Name;
             var scalarFunctionParameters = scalarFunction.Parameters.Where(item => !string.IsNullOrEmpty(item.Name)).ToList();
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -590,7 +590,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in scalarFunctionParameters)
-                parameters.Add(new ParameterDefinition(db.ResolveType(parameter.Type).GetClrType().Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type).GetClrType().Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
             return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
@@ -681,7 +681,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in tableFunction.Parameters)
-                parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveType(parameter.Type).ClrAliasType, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type).ClrAliasType, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
             return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", tableFunction.GetResultName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {

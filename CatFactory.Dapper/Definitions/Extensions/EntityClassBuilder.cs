@@ -212,15 +212,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var resultSet in storedProcedure.FirstResultSetsForObject)
             {
-                var databaseType = project.Database.ResolveType(resultSet.SystemTypeName);
+                var db = project.Database.ResolveDatabaseType(resultSet.SystemTypeName);
                 var type = "object";
 
-                if (databaseType != null)
+                if (db != null)
                 {
-                    if (databaseType.AllowClrNullable)
-                        type = databaseType.HasClrAliasType ? string.Format("{0}?", databaseType.ClrAliasType) : string.Format("Nullable<{0}>", databaseType.ClrFullNameType);
+                    if (db.AllowClrNullable)
+                        type = db.HasClrAliasType ? string.Format("{0}?", db.ClrAliasType) : string.Format("Nullable<{0}>", db.ClrFullNameType);
                     else
-                        type = databaseType.HasClrAliasType ? databaseType.ClrAliasType : databaseType.ClrFullNameType;
+                        type = db.HasClrAliasType ? db.ClrAliasType : db.ClrFullNameType;
                 }
 
                 definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, type, resultSet.Name)
