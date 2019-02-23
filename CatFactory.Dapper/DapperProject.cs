@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.NetCore.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper
@@ -11,6 +12,8 @@ namespace CatFactory.Dapper
         public DapperProject()
             : base()
         {
+            CodeNamingConvention = new DotNetNamingConvention();
+            NamingService = new NamingService();
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -43,34 +46,45 @@ namespace CatFactory.Dapper
 
         private IEnumerable<DbObject> GetDbObjects(Database database, string schema)
         {
-            var result = new List<DbObject>();
+            foreach (var table in Database.Tables.Where(item => item.Schema == schema))
+            {
+                yield return new DbObject(table.Schema, table.Name)
+                {
+                    Type = "Table"
+                };
+            }
 
-            result.AddRange(Database
-                .Tables
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "Table" }));
+            foreach (var view in Database.Views.Where(item => item.Schema == schema))
+            {
+                yield return new DbObject(view.Schema, view.Name)
+                {
+                    Type = "View"
+                };
+            }
 
-            result.AddRange(Database
-                .Views
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "View" }));
+            foreach (var scalarFunction in Database.ScalarFunctions.Where(item => item.Schema == schema))
+            {
+                yield return new DbObject(scalarFunction.Schema, scalarFunction.Name)
+                {
+                    Type = "ScalarFunction"
+                };
+            }
 
-            result.AddRange(Database
-                .ScalarFunctions
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "ScalarFunction" }));
+            foreach (var tableFunction in Database.TableFunctions.Where(item => item.Schema == schema))
+            {
+                yield return new DbObject(tableFunction.Schema, tableFunction.Name)
+                {
+                    Type = "TableFunction"
+                };
+            }
 
-            result.AddRange(Database
-                .TableFunctions
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "TableFunction" }));
-
-            result.AddRange(Database
-                .StoredProcedures
-                .Where(x => x.Schema == schema)
-                .Select(y => new DbObject { Schema = y.Schema, Name = y.Name, Type = "StoredProcedure" }));
-
-            return result;
+            foreach (var storedProcedure in Database.StoredProcedures.Where(item => item.Schema == schema))
+            {
+                yield return new DbObject(storedProcedure.Schema, storedProcedure.Name)
+                {
+                    Type = "StoredProcedure"
+                };
+            }
         }
     }
 }

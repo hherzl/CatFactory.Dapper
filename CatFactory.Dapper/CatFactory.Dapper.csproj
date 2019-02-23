@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build29</Version>
+    <Version>1.0.0-beta-sun-build30</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build29 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build30 Version:
 
-* Core package update
+* Addition of paging for views in repository class
+* Addition of parameters for views in repository class
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>

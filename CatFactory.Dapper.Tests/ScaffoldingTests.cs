@@ -43,13 +43,13 @@ namespace CatFactory.Dapper.Tests
                 settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
             });
 
-            project.Selection("Warehouse.*", settings =>
+            project.Selection("Sales.*", settings =>
             {
-                settings.UseStringBuilderForQueries = false;
+                //settings.UseStringBuilderForQueries = false;
                 settings.AddPagingForGetAllOperation = true;
             });
 
-            project.Selection("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
+            //project.Selection("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();

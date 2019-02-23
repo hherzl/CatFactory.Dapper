@@ -12,7 +12,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
     {
         public static EntityClassDefinition CreateEntity(this DapperProject project, ITable table)
         {
-            var classDefinition = new EntityClassDefinition
+            var definition = new EntityClassDefinition
             {
                 Namespaces =
                 {
@@ -34,10 +34,10 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             if (selection.Settings.EnableDataBindings)
             {
-                classDefinition.Namespaces.Add("System.ComponentModel");
-                classDefinition.Implements.Add("INotifyPropertyChanged");
+                definition.Namespaces.Add("System.ComponentModel");
+                definition.Implements.Add("INotifyPropertyChanged");
 
-                classDefinition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged")
+                definition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged")
                 {
                     AccessModifier = AccessModifier.Public
                 });
@@ -47,7 +47,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                classDefinition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveDatabaseType(column), column.GetParameterName()))
+                definition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveDatabaseType(column), column.GetParameterName()))
                 {
                     AccessModifier = AccessModifier.Public,
                     Lines =
@@ -58,32 +58,32 @@ namespace CatFactory.Dapper.Definitions.Extensions
             }
 
             if (!string.IsNullOrEmpty(table.Description))
-                classDefinition.Documentation.Summary = table.Description;
+                definition.Documentation.Summary = table.Description;
 
             foreach (var column in table.Columns)
             {
                 if (selection.Settings.EnableDataBindings)
                 {
-                    classDefinition.AddViewModelProperty(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
+                    definition.AddViewModelProperty(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
                 }
                 else
                 {
                     if (selection.Settings.UseAutomaticPropertiesForEntities)
-                        classDefinition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column))
+                        definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column))
                         {
                             IsAutomatic = true
                         });
                     else
-                        classDefinition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
+                        definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
                 }
             }
 
-            classDefinition.Implements.Add("IEntity");
+            definition.Implements.Add("IEntity");
 
             if (selection.Settings.SimplifyDataTypes)
-                classDefinition.SimplifyDataTypes();
+                definition.SimplifyDataTypes();
 
-            return classDefinition;
+            return definition;
         }
 
         public static EntityClassDefinition CreateEntity(this DapperProject project, IView view)
