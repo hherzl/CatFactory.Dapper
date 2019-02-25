@@ -440,11 +440,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetGetMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
-            var lines = new List<ILine>();
-
-            var selection = projectFeature.GetDapperProject().GetSelection(table);
-            var db = projectFeature.Project.Database;
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(table);
+            var db = project.Database;
             var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
+
+            var lines = new List<ILine>();
 
             if (selection.Settings.UseStringBuilderForQueries)
             {
@@ -512,7 +513,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
@@ -529,10 +530,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
         private static MethodDefinition GetByUniqueMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table, Unique unique)
         {
-            var selection = projectFeature.GetDapperProject().GetSelection(table);
-            var lines = new List<ILine>();
-            var db = projectFeature.Project.Database;
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(table);
+            var db = project.Database;
             var key = table.GetColumnsFromConstraint(unique).ToList();
+
+            var lines = new List<ILine>();
 
             if (selection.Settings.UseStringBuilderForQueries)
             {
@@ -601,7 +604,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
@@ -626,7 +629,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
             var db = projectFeature.Project.Database;
-            var typeToReturn = db.ResolveDatabaseType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type).GetClrType().Name;
+            var typeToReturn = db.ResolveDatabaseType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type);
             var scalarFunctionParameters = scalarFunction.Parameters.Where(item => !string.IsNullOrEmpty(item.Name)).ToList();
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -692,7 +695,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in scalarFunctionParameters)
-                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type).GetClrType().Name, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
             return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
@@ -783,7 +786,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in tableFunction.Parameters)
-                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type).ClrAliasType, NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
             return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", tableFunction.GetResultName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
             {
@@ -884,12 +887,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
         private static MethodDefinition GetAddMethod(ProjectFeature<DapperProjectSettings> projectFeature, ITable table)
         {
             var lines = new List<ILine>();
-            var db = projectFeature.Project.Database;
+            var project = projectFeature.GetDapperProject();
+            var db = project.Database;
 
             if (table.PrimaryKey != null && db.PrimaryKeyIsGuid(table))
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
-                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", table.GetColumnsFromConstraint(table.PrimaryKey).First().GetPropertyName()));
+                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", project.GetPropertyName(table, table.GetColumnsFromConstraint(table.PrimaryKey).First())));
                 lines.Add(new CodeLine());
             }
 
@@ -985,7 +989,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), table.GetPropertyNameHack(column)));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
                 }
 
                 lines.Add(new CodeLine());
@@ -998,7 +1002,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), table.GetPropertyNameHack(column)));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
                 }
 
                 var identityColumn = table.GetIdentityColumn();
@@ -1011,7 +1015,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(" Retrieve value for output parameters"));
-                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", identityColumn.GetPropertyName(), db.ResolveDatabaseType(identityColumn), identityColumn.GetParameterName()));
+                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", project.GetPropertyName(table, identityColumn), db.ResolveDatabaseType(identityColumn), identityColumn.GetParameterName()));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CodeLine("return affectedRows;"));
@@ -1028,9 +1032,10 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(table);
-            var db = projectFeature.Project.Database;
-            var sets = projectFeature.GetDapperProject().GetUpdateColumns(table).ToList();
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(table);
+            var db = project.Database;
+            var sets = project.GetUpdateColumns(table).ToList();
             var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -1097,14 +1102,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = sets[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), table.GetPropertyNameHack(column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
             }
 
             for (var i = 0; i < key.Count; i++)
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), table.GetPropertyNameHack(column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
@@ -1122,8 +1127,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(table);
-            var db = projectFeature.Project.Database;
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(table);
+            var db = project.Database;
             var key = table.GetColumnsFromConstraint(table.PrimaryKey).ToList();
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -1174,7 +1180,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = columns[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), column.GetPropertyName()));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());

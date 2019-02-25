@@ -47,12 +47,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                definition.Constructors.Add(new ClassConstructorDefinition(new ParameterDefinition(project.Database.ResolveDatabaseType(column), column.GetParameterName()))
+                definition.Constructors.Add(new ClassConstructorDefinition(AccessModifier.Public, new ParameterDefinition(project.Database.ResolveDatabaseType(column), column.GetParameterName()))
                 {
-                    AccessModifier = AccessModifier.Public,
                     Lines =
                     {
-                        new CodeLine("{0} = {1};", column.GetPropertyName(), column.GetParameterName())
+                        new CodeLine("{0} = {1};", project.GetPropertyName(table, column), column.GetParameterName())
                     }
                 });
             }
@@ -64,17 +63,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 if (selection.Settings.EnableDataBindings)
                 {
-                    definition.AddViewModelProperty(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
+                    definition.AddViewModelProperty(project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column));
                 }
                 else
                 {
                     if (selection.Settings.UseAutomaticPropertiesForEntities)
-                        definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column))
+                        definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column))
                         {
                             IsAutomatic = true
                         });
                     else
-                        definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), table.GetPropertyNameHack(column));
+                        definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column));
                 }
             }
 
@@ -109,12 +108,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var column in view.Columns)
             {
                 if (selection.Settings.UseAutomaticPropertiesForEntities)
-                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatabaseType(column), view.GetPropertyNameHack(column))
+                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatabaseType(column), project.GetPropertyName(view, column))
                     {
                         IsAutomatic = true
                     });
                 else
-                    definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), view.GetPropertyNameHack(column));
+                    definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), project.GetPropertyName(view, column));
             }
 
             definition.Implements.Add("IEntity");
@@ -179,7 +178,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var column in tableFunction.Columns)
             {
-                definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), column.GetPropertyName())
+                definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), project.GetPropertyName(column.Name))
                 {
                     IsAutomatic = true
                 });
@@ -212,16 +211,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var resultSet in storedProcedure.FirstResultSetsForObject)
             {
-                var db = project.Database.ResolveDatabaseType(resultSet.SystemTypeName);
-                var type = "object";
-
-                if (db != null)
-                {
-                    if (db.AllowClrNullable)
-                        type = db.HasClrAliasType ? string.Format("{0}?", db.ClrAliasType) : string.Format("Nullable<{0}>", db.ClrFullNameType);
-                    else
-                        type = db.HasClrAliasType ? db.ClrAliasType : db.ClrFullNameType;
-                }
+                var type = project.Database.ResolveDatabaseType(resultSet.SystemTypeName);
 
                 definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, type, resultSet.Name)
                 {
