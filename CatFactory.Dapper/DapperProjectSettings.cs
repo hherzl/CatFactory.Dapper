@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.Diagnostics;
 
 namespace CatFactory.Dapper
 {
-    public class DapperProjectSettings : ProjectSettings
+    public class DapperProjectSettings : IProjectSettings
     {
+        public ValidationResult Validate()
+        {
+            // todo: Add this implementation
+            throw new NotImplementedException();
+        }
+
         public DapperProjectSettings()
         {
         }
