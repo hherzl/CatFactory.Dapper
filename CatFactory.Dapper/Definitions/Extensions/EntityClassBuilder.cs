@@ -10,7 +10,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 {
     public static class EntityClassBuilder
     {
-        public static EntityClassDefinition CreateEntity(this DapperProject project, ITable table)
+        public static EntityClassDefinition GetEntityClassDefinition(this DapperProject project, ITable table)
         {
             var definition = new EntityClassDefinition
             {
@@ -85,7 +85,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateEntity(this DapperProject project, IView view)
+        public static EntityClassDefinition GetEntityClassDefinition(this DapperProject project, IView view)
         {
             var definition = new EntityClassDefinition
             {
@@ -124,7 +124,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateEntity(this DapperProject project, ScalarFunction scalarFunction)
+        public static EntityClassDefinition GetEntityClassDefinition(this DapperProject project, ScalarFunction scalarFunction)
         {
             var definition = new EntityClassDefinition
             {
@@ -154,7 +154,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateEntity(this DapperProject project, ITableFunction tableFunction)
+        public static EntityClassDefinition GetEntityClassDefinition(this DapperProject project, ITableFunction tableFunction)
         {
             var definition = new EntityClassDefinition
             {
@@ -192,7 +192,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             return definition;
         }
 
-        public static EntityClassDefinition CreateEntity(this DapperProject project, StoredProcedure storedProcedure)
+        public static EntityClassDefinition GetEntityClassDefinition(this DapperProject project, StoredProcedure storedProcedure)
         {
             var definition = new EntityClassDefinition
             {

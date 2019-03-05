@@ -11,6 +11,7 @@ namespace CatFactory.Dapper
         public ValidationResult Validate()
         {
             // todo: Add this implementation
+
             throw new NotImplementedException();
         }
 
