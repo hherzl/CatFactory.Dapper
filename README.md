@@ -1,6 +1,6 @@
 # CatFactory.Dapper ==^^==
 
-This if the *CatFactory* package for *Dapper*.
+This is the *CatFactory* package for *Dapper*.
 
 ## What Is CatFactory?
 
