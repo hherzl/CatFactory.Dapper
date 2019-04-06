@@ -1,26 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build33</Version>
+    <Version>1.0.0-beta-sun-build32</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build33 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build32 Version:
 
 * Code fix for scaffolding event handlers
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>
-    <Description>CatFactory Package to scaffold Dapper</Description>
-    <RepositoryUrl>https://github.com/hherzl/CatFactory.Dapper</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Dapper</PackageTags>
-    <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
-    <Company>Herzl Corp.</Company>
-    <PackageLicenseUrl>https://github.com/hherzl/CatFactory.Dapper/blob/master/LICENSE</PackageLicenseUrl>
-  </PropertyGroup>
+        <Description>CatFactory Package to scaffold Dapper</Description>
+        <RepositoryUrl>https://github.com/hherzl/CatFactory.Dapper</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Dapper</PackageTags>
+        <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
+        <Company>Herzl Corp.</Company>
+        <PackageLicenseUrl>https://github.com/hherzl/CatFactory.Dapper/blob/master/LICENSE</PackageLicenseUrl>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build25" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build26" />
+    </ItemGroup>
 
 </Project>
