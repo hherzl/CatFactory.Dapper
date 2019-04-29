@@ -18,14 +18,14 @@ namespace CatFactory.Dapper
             {
                 var definition = project.GetEntityClassDefinition(table);
 
-                project.Scaffold(definition, project.GetEntityLayerDirectory(), project.Database.HasDefaultSchema(table) ? "" : table.Schema);
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(table) ? "" : table.Schema));
             }
 
             foreach (var view in project.Database.Views)
             {
                 var definition = project.GetEntityClassDefinition(view);
 
-                project.Scaffold(definition, project.GetEntityLayerDirectory(), project.Database.HasDefaultSchema(view) ? "" : view.Schema);
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(view) ? "" : view.Schema));
             }
 
             foreach (var tableFunction in project.Database.TableFunctions)
@@ -34,7 +34,7 @@ namespace CatFactory.Dapper
 
                 var definition = project.GetEntityClassDefinition(tableFunction);
 
-                project.Scaffold(definition, project.GetEntityLayerDirectory(), project.Database.HasDefaultSchema(tableFunction) ? "" : tableFunction.Schema);
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(tableFunction) ? "" : tableFunction.Schema));
             }
 
             foreach (var storedProcedure in project.Database.StoredProcedures)
@@ -43,7 +43,7 @@ namespace CatFactory.Dapper
 
                 var definition = project.GetEntityClassDefinition(storedProcedure);
 
-                project.Scaffold(definition, project.GetEntityLayerDirectory(), project.Database.HasDefaultSchema(storedProcedure) ? "" : storedProcedure.Schema);
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(storedProcedure) ? "" : storedProcedure.Schema));
             }
 
             return project;

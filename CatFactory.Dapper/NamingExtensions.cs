@@ -17,7 +17,7 @@ namespace CatFactory.Dapper
             CodeNamingConvention = new DotNetNamingConvention();
             NamingService = new NamingService();
         }
-        
+
         public static string GetFullName(this Database database, IDbObject dbObject)
             => database.NamingConvention.GetObjectName(dbObject.Schema, dbObject.Name);
 
@@ -33,6 +33,9 @@ namespace CatFactory.Dapper
         public static string GetColumnName(this Database database, Column column)
             => database.NamingConvention.GetObjectName(column.Name);
 
+        public static string GetPropertyName(this Column column)
+            => CodeNamingConvention.GetPropertyName(column.Name);
+
         public static string GetParameterName(this Column column)
             => CodeNamingConvention.GetParameterName(column.Name);
 
@@ -42,11 +45,17 @@ namespace CatFactory.Dapper
         public static string GetParameterName(this Database database, Parameter param)
             => database.NamingConvention.GetParameterName(param.Name);
 
+        //public static string GetInterfaceRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
+        //    => CodeNamingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
+
+        //public static string GetClassRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
+        //    => CodeNamingConvention.GetClassName(string.Format("{0}Repository", projectFeature.Name));
+
         public static string GetInterfaceRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
-            => CodeNamingConvention.GetInterfaceName(string.Format("{0}Repository", projectFeature.Name));
+        => string.Format("{0}Repository", CodeNamingConvention.GetInterfaceName(projectFeature.Name));
 
         public static string GetClassRepositoryName(this ProjectFeature<DapperProjectSettings> projectFeature)
-            => CodeNamingConvention.GetClassName(string.Format("{0}Repository", projectFeature.Name));
+            => string.Format("{0}Repository", CodeNamingConvention.GetClassName(projectFeature.Name));
 
         public static string GetEntityName(this IDbObject dbObject)
             => string.Format("{0}", CodeNamingConvention.GetClassName(dbObject.Name));
@@ -85,7 +94,7 @@ namespace CatFactory.Dapper
             => CodeNamingConvention.GetNamespace(project.Name, project.ProjectNamespaces.EntityLayer);
 
         public static string GetEntityLayerNamespace(this DapperProject project, string ns)
-            => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : CodeNamingConvention.GetNamespace(project.Name, project.ProjectNamespaces.EntityLayer, ns);
+            => string.IsNullOrEmpty(ns) ? GetEntityLayerNamespace(project) : CodeNamingConvention.GetNamespace(project.Name, project.ProjectNamespaces.EntityLayer, CodeNamingConvention.GetClassName(ns));
 
         public static string GetDataLayerNamespace(this DapperProject project)
             => CodeNamingConvention.GetNamespace(project.Name, project.ProjectNamespaces.DataLayer);

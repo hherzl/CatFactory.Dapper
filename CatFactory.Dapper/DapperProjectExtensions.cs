@@ -2,18 +2,29 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CatFactory.CodeFactory;
 using CatFactory.CodeFactory.Scaffolding;
+using CatFactory.NetCore.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper
 {
     public static class DapperProjectExtensions
     {
+        public static ICodeNamingConvention CodeNamingConvention;
+        public static INamingService NamingService;
+
+        static DapperProjectExtensions()
+        {
+            CodeNamingConvention = new DotNetNamingConvention();
+            NamingService = new NamingService();
+        }
+
         public static string GetEntityLayerDirectory(this DapperProject project)
             => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.EntityLayer);
 
         public static string GetEntityLayerDirectory(this DapperProject project, string schema)
-            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.EntityLayer, schema);
+            => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.EntityLayer, CodeNamingConvention.GetClassName(schema));
 
         public static string GetDataLayerDirectory(this DapperProject project)
             => Path.Combine(project.OutputDirectory, project.ProjectNamespaces.DataLayer);

@@ -143,7 +143,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = column.GetPropertyName();
+
+                    if (columnName != propertyName)
+                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -206,6 +212,10 @@ namespace CatFactory.Dapper.Definitions.Extensions
                             var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
                             lines.Add(new CodeLine("  ({0} is null or {1} = {0}) {2} ", db.GetParameterName(column), db.GetColumnName(column), i < table.ForeignKeys.Count - 1 ? "and" : string.Empty));
+                        }
+                        else
+                        {
+                            // todo: add foreign key with multiple columns
                         }
                     }
                 }
@@ -309,7 +319,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = view.Columns[i];
 
-                    lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = column.GetPropertyName();
+
+                    if (columnName != propertyName)
+                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < view.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < view.Columns.Count - 1 ? "," : string.Empty));
+
+                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -459,7 +477,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = column.GetPropertyName();
+
+                    if (columnName != propertyName)
+                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
+
+                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -549,7 +575,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = column.GetPropertyName();
+
+                    if (columnName != propertyName)
+                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
+
+                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));

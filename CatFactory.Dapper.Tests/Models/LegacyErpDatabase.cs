@@ -34,7 +34,8 @@ namespace CatFactory.Dapper.Tests.Models
                         },
                         PrimaryKey = new PrimaryKey("COMPANY_ID")
                     }
-                }
+                },
+                NamingConvention = new SqlServer.SqlServerDatabaseNamingConvention()
             }
             .AddDbObjectsFromTables();
     }
