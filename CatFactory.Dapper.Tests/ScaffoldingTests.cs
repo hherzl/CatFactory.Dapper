@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CatFactory.Dapper.Tests.Models;
 using CatFactory.SqlServer;
 using Xunit;
 
@@ -7,7 +8,7 @@ namespace CatFactory.Dapper.Tests
     public class ScaffoldingTests
     {
         [Fact]
-        public void ProjectScaffoldingFromOnLineStoreDatabaseTest()
+        public void ProjectScaffoldingFromOnlineStoreDatabaseTest()
         {
             // Create database factory
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -199,6 +200,47 @@ namespace CatFactory.Dapper.Tests
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
             project.Selection("Warehouse.StockItems", settings => settings.AddPagingForGetAllOperation = true);
+
+            // Build features for project, group all entities by schema into a feature
+            project.BuildFeatures();
+
+            // Scaffolding =^^=
+            project
+                .ScaffoldEntityLayer()
+                .ScaffoldDataLayer();
+        }
+
+        [Fact]
+        public void ProjectScaffoldingFromLegacyErpDatabaseTest()
+        {
+            // Create database factory
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ImportTableFunctions = true,
+                    Exclusions =
+                    {
+                        "dbo.sysdiagrams",
+                        "dbo.fn_diagramobjects"
+                    }
+                }
+            };
+
+            // Import database
+            var database = Databases.LegacyErpDatabase;
+
+            // Create instance of Dapper Project
+            var project = new DapperProject
+            {
+                Name = "OnlineStore.Core",
+                Database = database,
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\LegacyErp.Core"
+            };
+
+            // Apply settings for project
+            project.GlobalSelection(settings => settings.ForceOverwrite = true);
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
