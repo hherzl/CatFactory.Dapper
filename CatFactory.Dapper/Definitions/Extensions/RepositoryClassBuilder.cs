@@ -127,7 +127,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(table);
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(table);
             var db = projectFeature.Project.Database;
             var filters = table.ForeignKeys.Count > 0 || selection.Settings.AddPagingForGetAllOperation ? true : false;
 
@@ -144,9 +145,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     var column = table.Columns[i];
 
                     var columnName = db.GetColumnName(column);
-                    var propertyName = column.GetPropertyName();
+                    var propertyName = project.GetPropertyName(column);
 
-                    if (columnName != propertyName)
+                    if (column.Name != propertyName)
                         lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
                     else
                         lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
@@ -176,7 +177,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     lines.Add(new CodeLine("query.Append(\" order by \");"));
 
-                    lines.Add(new CodeLine("query.Append(\" {0} \");", db.GetColumnName(table.Columns.First())));
+                    lines.Add(new CodeLine("query.Append(\"  {0} \");", db.GetColumnName(table.Columns.First())));
 
                     lines.Add(new CodeLine("query.Append(\" offset @pageSize * (@pageNumber - 1) rows \");"));
                     lines.Add(new CodeLine("query.Append(\" fetch next @pageSize rows only \");"));
@@ -193,7 +194,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = project.GetPropertyName(column);
+
+                    if (column.Name != propertyName)
+                        lines.Add(new CodeLine("  {0}{1}{2} ", db.GetColumnName(column), propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(" from "));
@@ -224,7 +231,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     lines.Add(new CodeLine(" order by "));
 
-                    lines.Add(new CodeLine(" {0} ", db.GetColumnName(table.Columns.First())));
+                    lines.Add(new CodeLine("  {0} ", db.GetColumnName(table.Columns.First())));
 
                     lines.Add(new CodeLine(" offset @pageSize * (@pageNumber - 1) rows "));
                     lines.Add(new CodeLine(" fetch next @pageSize rows only "));
@@ -253,7 +260,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", {1});", db.GetParameterName(column), column.GetParameterName()));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", {1});", db.GetParameterName(column), project.GetParameterName(column)));
                 }
 
                 lines.Add(new CodeLine());
@@ -262,9 +269,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to typed list"));
 
             if (filters)
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(new CommandDefinition(query.ToString(), parameters));", table.GetEntityName()));
+                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(new CommandDefinition(query.ToString(), parameters));", project.GetEntityName(table)));
             else
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", table.GetEntityName())); ;
+                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", project.GetEntityName(table)));
 
             var parameters = new List<ParameterDefinition>();
 
@@ -282,13 +289,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
-                    parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(column), column.GetParameterName()) { DefaultValue = "null" });
+                    parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(column), project.GetParameterName(column)) { DefaultValue = "null" });
                 }
             }
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", table.GetEntityName()), table.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<IEnumerable<{0}>>", project.GetEntityName(table)),
+                Name = project.GetGetAllRepositoryMethodName(table),
+                Parameters = parameters,
                 Lines = lines
             };
         }
@@ -297,7 +308,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(view);
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(view);
             var db = projectFeature.Project.Database;
             var primaryKeys = db
                 .Tables
@@ -320,14 +332,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     var column = view.Columns[i];
 
                     var columnName = db.GetColumnName(column);
-                    var propertyName = column.GetPropertyName();
+                    var propertyName = project.GetPropertyName(column);
 
-                    if (columnName != propertyName)
+                    if (column.Name != propertyName)
                         lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < view.Columns.Count - 1 ? "," : string.Empty));
                     else
                         lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < view.Columns.Count - 1 ? "," : string.Empty));
-
-                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -355,11 +365,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                     if (primaryKeys.Count == 0)
                     {
-                        lines.Add(new CodeLine("query.Append(\" {0} \");", db.GetColumnName(view.Columns.First())));
+                        lines.Add(new CodeLine("query.Append(\"  {0} \");", db.GetColumnName(view.Columns.First())));
                     }
                     else
                     {
-                        lines.Add(new CodeLine("query.Append(\" {0} \");", string.Join(", ", pksInView.Select(item => db.NamingConvention.GetObjectName(item.Name)))));
+                        lines.Add(new CodeLine("query.Append(\"  {0} \");", string.Join(", ", pksInView.Select(item => db.NamingConvention.GetObjectName(item.Name)))));
                     }
 
                     lines.Add(new CodeLine("query.Append(\" offset @pageSize * (@pageNumber - 1) rows \");"));
@@ -377,7 +387,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = view.Columns[i];
 
-                    lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = project.GetPropertyName(column);
+
+                    if (column.Name != propertyName)
+                        lines.Add(new CodeLine("  {0}{1}{2} ", db.GetColumnName(column), propertyName, i < view.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < view.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(" from "));
@@ -400,13 +416,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     lines.Add(new CodeLine(" order by "));
 
                     if (pksInView.Count == 0)
-                    {
                         lines.Add(new CodeLine("  {0} ", db.GetColumnName(view.Columns.First())));
-                    }
                     else
-                    {
                         lines.Add(new CodeLine("  {0} ", string.Join(", ", pksInView.Select(item => db.NamingConvention.GetObjectName(item.Name)))));
-                    }
 
                     lines.Add(new CodeLine(" offset @pageSize * (@pageNumber - 1) rows "));
                     lines.Add(new CodeLine(" fetch next @pageSize rows only "));
@@ -426,14 +438,14 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 foreach (var column in pksInView)
                 {
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", {1});", db.GetParameterName(column), column.GetParameterName()));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", {1});", db.GetParameterName(column), project.GetParameterName(column)));
                 }
 
                 lines.Add(new CodeLine());
             }
 
             lines.Add(new CommentLine(" Retrieve result from database and convert to typed list"));
-            lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", view.GetEntityName()));
+            lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", project.GetEntityName(view)));
 
             var parameters = new List<ParameterDefinition>();
 
@@ -448,7 +460,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 parameters.Add(new ParameterDefinition(projectFeature.Project.Database.ResolveDatabaseType(pk), projectFeature.Project.CodeNamingConvention.GetParameterName(pk.Name), "null"));
             }
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", view.GetEntityName()), view.GetGetAllRepositoryMethodName())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", project.GetEntityName(view)), project.GetGetAllRepositoryMethodName(view))
             {
                 IsAsync = true,
                 Parameters = parameters,
@@ -478,14 +490,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     var column = table.Columns[i];
 
                     var columnName = db.GetColumnName(column);
-                    var propertyName = column.GetPropertyName();
+                    var propertyName = project.GetPropertyName(column);
 
-                    if (columnName != propertyName)
+                    if (column.Name != propertyName)
                         lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
                     else
                         lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
-
-                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -510,7 +520,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = table.Columns[i];
 
-                    lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    var columnName = db.GetColumnName(column);
+                    var propertyName = project.GetPropertyName(column);
+
+                    if (column.Name == propertyName)
+                        lines.Add(new CodeLine("  {0}{1} ", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("  {0}{1}{2} ", db.GetColumnName(column), propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine(" from "));
@@ -539,15 +555,15 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.GetParameterName(column), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
 
             lines.Add(new CommentLine(" Retrieve result from database and convert to entity class"));
-            lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+            lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", project.GetEntityName(table)));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", table.GetEntityName()), table.GetGetRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", project.GetEntityName(table)), project.GetGetRepositoryMethodName(table), new ParameterDefinition(project.GetEntityName(table), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -576,14 +592,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     var column = table.Columns[i];
 
                     var columnName = db.GetColumnName(column);
-                    var propertyName = column.GetPropertyName();
+                    var propertyName = project.GetPropertyName(column);
 
-                    if (columnName != propertyName)
-                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
-                    else
+                    if (column.Name == propertyName)
                         lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", columnName, i < table.Columns.Count - 1 ? "," : string.Empty));
-
-                    //lines.Add(new CodeLine("query.Append(\"  {0}{1} \");", db.GetColumnName(column), i < table.Columns.Count - 1 ? "," : string.Empty));
+                    else
+                        lines.Add(new CodeLine("query.Append(\"  {0} {1}{2} \");", columnName, propertyName, i < table.Columns.Count - 1 ? "," : string.Empty));
                 }
 
                 lines.Add(new CodeLine("query.Append(\" from \");"));
@@ -638,7 +652,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
@@ -646,11 +660,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to entity class"));
 
             if (selection.Settings.UseStringBuilderForQueries)
-                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", table.GetEntityName()));
+                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", project.GetEntityName(table)));
             else
-                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query, parameters);", table.GetEntityName()));
+                lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query, parameters);", project.GetEntityName(table)));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", table.GetEntityName()), table.GetGetByUniqueRepositoryMethodName(unique), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", project.GetEntityName(table)), project.GetGetByUniqueRepositoryMethodName(table, unique), new ParameterDefinition(project.GetEntityName(table), "entity"))
             {
                 IsAsync = true,
                 Lines = lines
@@ -661,7 +675,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(scalarFunction);
             var db = projectFeature.Project.Database;
             var typeToReturn = db.ResolveDatabaseType(scalarFunction.Parameters.FirstOrDefault(item => string.IsNullOrEmpty(item.Name)).Type);
             var scalarFunctionParameters = scalarFunction.Parameters.Where(item => !string.IsNullOrEmpty(item.Name)).ToList();
@@ -731,7 +746,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var parameter in scalarFunctionParameters)
                 parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), scalarFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), project.GetGetAllRepositoryMethodName(scalarFunction), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -742,7 +757,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(tableFunction);
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(tableFunction);
             var db = projectFeature.Project.Database;
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -805,16 +821,16 @@ namespace CatFactory.Dapper.Definitions.Extensions
             if (tableFunction.Parameters.Count == 0)
             {
                 if (selection.Settings.UseStringBuilderForQueries)
-                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", tableFunction.GetResultName()));
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", project.GetResultName(tableFunction)));
                 else
-                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query);", tableFunction.GetResultName()));
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query);", project.GetResultName(tableFunction)));
             }
             else
             {
                 if (selection.Settings.UseStringBuilderForQueries)
-                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", tableFunction.GetResultName()));
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", project.GetResultName(tableFunction)));
                 else
-                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query, parameters);", tableFunction.GetResultName()));
+                    lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query, parameters);", project.GetResultName(tableFunction)));
             }
 
             var parameters = new List<ParameterDefinition>();
@@ -822,7 +838,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             foreach (var parameter in tableFunction.Parameters)
                 parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", tableFunction.GetResultName()), tableFunction.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", project.GetResultName(tableFunction)), project.GetGetAllRepositoryMethodName(tableFunction), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -833,7 +849,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
         {
             var lines = new List<ILine>();
 
-            var selection = projectFeature.GetDapperProject().GetSelection(storedProcedure);
+            var project = projectFeature.GetDapperProject();
+            var selection = project.GetSelection(storedProcedure);
             var db = projectFeature.Project.Database;
 
             if (selection.Settings.UseStringBuilderForQueries)
@@ -893,9 +910,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to typed list"));
 
             if (storedProcedure.Parameters.Count == 0)
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", storedProcedure.GetResultName()));
+                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString());", project.GetResultName(storedProcedure)));
             else
-                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", storedProcedure.GetResultName()));
+                lines.Add(new CodeLine("return await Connection.QueryAsync<{0}>(query.ToString(), parameters);", project.GetResultName(storedProcedure)));
 
             var parameters = new List<ParameterDefinition>();
 
@@ -911,7 +928,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             }
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", storedProcedure.GetResultName()), storedProcedure.GetGetAllRepositoryMethodName(), parameters.ToArray())
+            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", project.GetResultName(storedProcedure)), project.GetGetAllRepositoryMethodName(storedProcedure), parameters.ToArray())
             {
                 IsAsync = true,
                 Lines = lines
@@ -1023,7 +1040,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
                 }
 
                 lines.Add(new CodeLine());
@@ -1036,12 +1053,12 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 {
                     var column = insertColumns[i];
 
-                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                    lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
                 }
 
                 var identityColumn = table.GetIdentityColumn();
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", dbType: {1}, direction: ParameterDirection.Output);", identityColumn.GetParameterName(), db.ResolveDbType(identityColumn)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", dbType: {1}, direction: ParameterDirection.Output);", project.Database.GetParameterName(identityColumn), db.ResolveDbType(identityColumn)));
 
                 lines.Add(new CodeLine());
                 lines.Add(new CommentLine(" Execute query in database"));
@@ -1049,15 +1066,22 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine());
 
                 lines.Add(new CommentLine(" Retrieve value for output parameters"));
-                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", project.GetPropertyName(table, identityColumn), db.ResolveDatabaseType(identityColumn), identityColumn.GetParameterName()));
+                lines.Add(new CodeLine("entity.{0} = parameters.Get<{1}>(\"{2}\");", project.GetPropertyName(table, identityColumn), db.ResolveDatabaseType(identityColumn), project.Database.GetParameterName(identityColumn)));
                 lines.Add(new CodeLine());
 
                 lines.Add(new CodeLine("return affectedRows;"));
             }
 
-            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetAddRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = "Task<int>",
+                Name = project.GetAddRepositoryMethodName(table),
+                Parameters =
+                {
+                    new ParameterDefinition(project.GetEntityName(table), "entity")
+                },
                 Lines = lines
             };
         }
@@ -1136,23 +1160,30 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = sets[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
 
             for (var i = 0; i < key.Count; i++)
             {
                 var column = key[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(" Execute query in database"));
             lines.Add(new CodeLine("return await Connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
-            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetUpdateRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = "Task<int>",
+                Name = project.GetUpdateRepositoryMethodName(table),
+                Parameters =
+                {
+                    new ParameterDefinition(project.GetEntityName(table), "entity")
+                },
                 Lines = lines
             };
         }
@@ -1214,16 +1245,23 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = columns[i];
 
-                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", column.GetParameterName(), project.GetPropertyName(table, column)));
+                lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
 
             lines.Add(new CodeLine());
             lines.Add(new CommentLine(" Execute query in database"));
             lines.Add(new CodeLine("return await Connection.ExecuteAsync(new CommandDefinition(query.ToString(), parameters));"));
 
-            return new MethodDefinition(AccessModifier.Public, "Task<Int32>", table.GetDeleteRepositoryMethodName(), new ParameterDefinition(table.GetEntityName(), "entity"))
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = "Task<int>",
+                Name = project.GetDeleteRepositoryMethodName(table),
+                Parameters =
+                {
+                    new ParameterDefinition(project.GetEntityName(table), "entity")
+                },
                 Lines = lines
             };
         }

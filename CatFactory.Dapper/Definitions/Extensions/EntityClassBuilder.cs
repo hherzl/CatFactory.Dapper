@@ -20,7 +20,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Namespace = project.Database.HasDefaultSchema(table) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(table.Schema),
                 AccessModifier = AccessModifier.Public,
-                Name = table.GetEntityName(),
+                Name = project.GetEntityName(table),
                 Constructors =
                 {
                     new ClassConstructorDefinition
@@ -47,11 +47,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                definition.Constructors.Add(new ClassConstructorDefinition(AccessModifier.Public, new ParameterDefinition(project.Database.ResolveDatabaseType(column), column.GetParameterName()))
+                definition.Constructors.Add(new ClassConstructorDefinition(AccessModifier.Public, new ParameterDefinition(project.Database.ResolveDatabaseType(column), project.GetParameterName(column)))
                 {
                     Lines =
                     {
-                        new CodeLine("{0} = {1};", project.GetPropertyName(table, column), column.GetParameterName())
+                        new CodeLine("{0} = {1};", project.GetPropertyName(table, column), project.GetParameterName(column))
                     }
                 });
             }
@@ -95,7 +95,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Namespace = project.Database.HasDefaultSchema(view) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(view.Schema),
                 AccessModifier = AccessModifier.Public,
-                Name = view.GetEntityName()
+                Name = project.GetEntityName(view)
             };
 
             definition.Constructors.Add(new ClassConstructorDefinition(AccessModifier.Public));
@@ -134,7 +134,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Namespace = project.Database.HasDefaultSchema(scalarFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(scalarFunction.Schema),
                 AccessModifier = AccessModifier.Public,
-                Name = scalarFunction.GetEntityName(),
+                Name = project.GetEntityName(scalarFunction),
                 Constructors =
                 {
                     new ClassConstructorDefinition(AccessModifier.Public)
@@ -164,7 +164,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Namespace = project.Database.HasDefaultSchema(tableFunction) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(tableFunction.Schema),
                 AccessModifier = AccessModifier.Public,
-                Name = tableFunction.GetResultName(),
+                Name = project.GetResultName(tableFunction),
                 Constructors =
                 {
                     new ClassConstructorDefinition(AccessModifier.Public)
@@ -202,7 +202,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 },
                 Namespace = project.Database.HasDefaultSchema(storedProcedure) ? project.GetEntityLayerNamespace() : project.GetEntityLayerNamespace(storedProcedure.Schema),
                 AccessModifier = AccessModifier.Public,
-                Name = storedProcedure.GetResultName(),
+                Name = project.GetResultName(storedProcedure),
                 Constructors =
                 {
                     new ClassConstructorDefinition(AccessModifier.Public)
