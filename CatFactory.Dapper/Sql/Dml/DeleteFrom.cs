@@ -6,27 +6,23 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class DeleteFrom<TEntity> : Query
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+
         public DeleteFrom()
+            : base()
         {
         }
+
+        public string Schema { get; set; }
 
         public string Table { get; set; }
 
         public string Key { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Condition> m_where;
-
         public List<Condition> Where
         {
-            get
-            {
-                return m_where ?? (m_where = new List<Condition>());
-            }
-            set
-            {
-                m_where = value;
-            }
+            get => m_where ?? (m_where = new List<Condition>());
+            set => m_where = value;
         }
 
         public override string ToString()
@@ -39,27 +35,39 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.AppendFormat(" delete from {0} ", Table);
+            output.AppendLine("delete from");
+
+            output.AppendFormat(" {0}", NamingConvention.GetObjectName(Schema, Table));
             output.AppendLine();
 
             if (Where.Count > 0)
             {
-                output.Append(" where ");
+                output.Append("where");
                 output.AppendLine();
 
                 for (var i = 0; i < Where.Count; i++)
                 {
+                    var item = Where[i];
+
                     if (i > 0)
-                        output.AppendFormat(" {0} ", Where[i].LogicOperator);
+                    {
+                        if (item.LogicOperator == LogicOperator.And)
+                            output.Append(" and");
+                        else if (item.LogicOperator == LogicOperator.Or)
+                            output.Append(" or");
+                    }
 
                     var comparisonOperator = string.Empty;
 
-                    if (Where[i].ComparisonOperator == ComparisonOperator.Equals)
+                    if (item.ComparisonOperator == ComparisonOperator.Equals)
                         comparisonOperator = "=";
-                    else if (Where[i].ComparisonOperator == ComparisonOperator.NotEquals)
+                    else if (item.ComparisonOperator == ComparisonOperator.NotEquals)
                         comparisonOperator = "<>";
 
-                    output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, Where[i].Column);
+                    var columnName = NamingConvention.GetObjectName(item.Column);
+                    var parameterName = NamingConvention.GetParameterName(item.Column);
+
+                    output.AppendFormat(" {0} {1} {2}", columnName, comparisonOperator, parameterName);
                     output.AppendLine();
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -6,40 +7,26 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Select<Entity> : Query
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_columns;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+
         public Select()
+            : base()
         {
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_columns;
-
         public List<string> Columns
         {
-            get
-            {
-                return m_columns ?? (m_columns = new List<string>());
-            }
-            set
-            {
-                m_columns = value;
-            }
+            get => m_columns ?? (m_columns = new List<string>());
+            set => m_columns = value;
         }
 
         public string From { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Condition> m_where;
-
         public List<Condition> Where
         {
-            get
-            {
-                return m_where ?? (m_where = new List<Condition>());
-            }
-            set
-            {
-                m_where = value;
-            }
+            get => m_where ?? (m_where = new List<Condition>());
+            set => m_where = value;
         }
 
         public override string ToString()
@@ -60,28 +47,42 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.AppendLine("from ");
+            output.AppendLine("from");
 
             output.AppendFormat(" {0} ", From);
             output.AppendLine();
 
             if (Where.Count > 0)
             {
-                output.AppendLine("where ");
+                output.AppendLine("where");
 
                 for (var i = 0; i < Where.Count; i++)
                 {
+                    var item = Where[i];
+
                     if (i > 0)
-                        output.AppendFormat(" {0} ", Where[i].LogicOperator);
+                    {
+                        if (item.LogicOperator == LogicOperator.And)
+                            output.Append(" and");
+                        else if (item.LogicOperator == LogicOperator.Or)
+                            output.Append(" or");
+                    }
 
                     var comparisonOperator = string.Empty;
 
-                    if (Where[i].ComparisonOperator == ComparisonOperator.Equals)
+                    if (item.ComparisonOperator == ComparisonOperator.Equals)
                         comparisonOperator = "=";
-                    else if (Where[i].ComparisonOperator == ComparisonOperator.NotEquals)
+                    else if (item.ComparisonOperator == ComparisonOperator.NotEquals)
                         comparisonOperator = "<>";
+                    else if (item.ComparisonOperator == ComparisonOperator.Like)
+                        comparisonOperator = "like";
+                    else
+                        throw new Exception(string.Format("'{0}' ComparisonOperator is not supported", comparisonOperator));
 
-                    output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, NamingConvention.GetParameterName(Where[i].Column));
+                    var columnName = NamingConvention.GetObjectName(item.Column);
+                    var parameterName = NamingConvention.GetParameterName(item.Column);
+
+                    output.AppendFormat(" {0} {1} {2}", columnName, comparisonOperator, parameterName);
                     output.AppendLine();
                 }
             }

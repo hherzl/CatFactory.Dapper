@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using CatFactory.CodeFactory.Scaffolding;
 using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Actions;
 using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.Dapper
@@ -187,7 +188,8 @@ namespace CatFactory.Dapper
                         UseStringBuilderForQueries = globalSettings.UseStringBuilderForQueries,
                         InsertExclusions = globalSettings.InsertExclusions.Select(item => item).ToList(),
                         UpdateExclusions = globalSettings.UpdateExclusions.Select(item => item).ToList(),
-                        AddPagingForGetAllOperation = globalSettings.AddPagingForGetAllOperation
+                        AddPagingForGetAllOperation = globalSettings.AddPagingForGetAllOperation,
+                        Actions = globalSettings.Actions.Select(item => (IEntityAction)Activator.CreateInstance(item.GetType())).ToList()
                     }
                 };
 

@@ -28,14 +28,8 @@ namespace CatFactory.Dapper
 
         public DapperProjectNamespaces ProjectNamespaces
         {
-            get
-            {
-                return m_projectNamespaces ?? (m_projectNamespaces = new DapperProjectNamespaces());
-            }
-            set
-            {
-                m_projectNamespaces = value;
-            }
+            get => m_projectNamespaces ?? (m_projectNamespaces = new DapperProjectNamespaces());
+            set => m_projectNamespaces = value;
         }
 
         public override void BuildFeatures()

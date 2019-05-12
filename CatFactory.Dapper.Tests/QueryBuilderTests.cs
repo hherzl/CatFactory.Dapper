@@ -62,7 +62,7 @@ namespace CatFactory.Dapper.Tests
         {
             // Arrange
             var query = QueryBuilder
-                .InsertInto<Shipper>(identity: "ShipperID");
+                .InsertInto(new Shipper(), identity: "ShipperID");
 
             // Act
             var sql = query.ToString();
@@ -77,7 +77,7 @@ namespace CatFactory.Dapper.Tests
         {
             // Arrange
             var query = QueryBuilder
-                .Update<Shipper>(key: "ShipperID");
+                .Update(new Shipper(), key: "ShipperID");
 
             // Act
             var sql = query.ToString();
@@ -92,7 +92,7 @@ namespace CatFactory.Dapper.Tests
         {
             // Arrange
             var query = QueryBuilder
-                .DeleteFrom<Shipper>(key: "ShipperID");
+                .DeleteFrom(new Shipper(), key: "ShipperID");
 
             // Act
             var sql = query.ToString();

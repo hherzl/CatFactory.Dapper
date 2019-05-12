@@ -6,6 +6,7 @@ using CatFactory.Collections;
 using CatFactory.NetCore;
 using CatFactory.ObjectOrientedProgramming;
 using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Actions;
 using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.Dapper.Definitions.Extensions
@@ -14,6 +15,8 @@ namespace CatFactory.Dapper.Definitions.Extensions
     {
         public static RepositoryClassDefinition GetRepositoryClassDefinition(this ProjectFeature<DapperProjectSettings> projectFeature)
         {
+            var dapperProject = projectFeature.GetDapperProject();
+
             var definition = new RepositoryClassDefinition
             {
                 Namespaces =
@@ -27,7 +30,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     "System.Threading.Tasks",
                     "Dapper"
                 },
-                Namespace = projectFeature.GetDapperProject().GetDataLayerRepositoriesNamespace(),
+                Namespace = dapperProject.GetDataLayerRepositoriesNamespace(),
                 AccessModifier = AccessModifier.Public,
                 Name = projectFeature.GetClassRepositoryName(),
                 BaseClass = "Repository",
@@ -45,9 +48,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             };
 
-            foreach (var table in projectFeature.Project.Database.Tables)
+            foreach (var table in dapperProject.Database.Tables)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(table);
+                var selection = dapperProject.GetSelection(table);
 
                 if (projectFeature.Project.Database.HasDefaultSchema(table))
                     definition.Namespaces.AddUnique(projectFeature.GetDapperProject().GetEntityLayerNamespace());
@@ -59,63 +62,83 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             var dbos = projectFeature.DbObjects.Select(dbo => dbo.FullName).ToList();
 
-            var db = projectFeature.Project.Database;
+            var db = dapperProject.Database;
 
-            var tables = db.Tables.Where(t => dbos.Contains(t.FullName)).ToList();
+            var tables = db.Tables.Where(item => dbos.Contains(item.FullName)).ToList();
 
             foreach (var table in tables)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(table);
+                var selection = dapperProject.GetSelection(table);
 
-                definition.Methods.Add(GetGetAllMethod(projectFeature, table));
+                if (selection.Settings.Actions.Any(item => item is ReadAllAction))
+                    definition.Methods.Add(GetGetAllMethod(projectFeature, table));
 
-                if (table.PrimaryKey != null)
-                    definition.Methods.Add(GetGetMethod(projectFeature, table));
+                if (selection.Settings.Actions.Any(item => item is ReadByKeyAction))
+                {
+                    if (table.PrimaryKey != null)
+                        definition.Methods.Add(GetGetMethod(projectFeature, table));
+                }
 
                 foreach (var unique in table.Uniques)
-                    definition.Methods.Add(GetByUniqueMethod(projectFeature, table, unique));
+                {
+                    if (selection.Settings.Actions.Any(item => item is ReadByUniqueAction))
+                    {
+                        definition.Methods.Add(GetByUniqueMethod(projectFeature, table, unique));
+                    }
+                }
 
-                definition.Methods.Add(GetAddMethod(projectFeature, table));
+                if (selection.Settings.Actions.Any(item => item is AddEntityAction))
+                {
+                    definition.Methods.Add(GetAddMethod(projectFeature, table));
+                }
 
                 if (table.PrimaryKey != null)
                 {
-                    definition.Methods.Add(GetUpdateMethod(projectFeature, table));
-                    definition.Methods.Add(GetRemoveMethod(projectFeature, table));
+                    if (selection.Settings.Actions.Any(item => item is UpdateEntityAction))
+                    {
+                        definition.Methods.Add(GetUpdateMethod(projectFeature, table));
+                    }
+
+                    if (selection.Settings.Actions.Any(item => item is RemoveEntityAction))
+                    {
+                        definition.Methods.Add(GetRemoveMethod(projectFeature, table));
+                    }
                 }
             }
 
-            var views = db.Views.Where(v => dbos.Contains(v.FullName)).ToList();
+            var views = db.Views.Where(item => dbos.Contains(item.FullName)).ToList();
 
             foreach (var view in views)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(view);
+                var selection = dapperProject.GetSelection(view);
 
-                definition.Methods.Add(GetGetAllMethod(projectFeature, view));
+                if (selection.Settings.Actions.Any(item => item is ReadAllAction))
+                    definition.Methods.Add(GetGetAllMethod(projectFeature, view));
             }
 
-            var scalarFunctions = db.ScalarFunctions.Where(sf => dbos.Contains(sf.FullName)).ToList();
+            var scalarFunctions = db.ScalarFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
 
             foreach (var scalarFunction in scalarFunctions)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(scalarFunction);
+                var selection = dapperProject.GetSelection(scalarFunction);
 
                 definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
             }
 
-            var tableFunctions = db.TableFunctions.Where(tf => dbos.Contains(tf.FullName)).ToList();
+            var tableFunctions = db.TableFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
 
             foreach (var tableFunction in tableFunctions)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(tableFunction);
+                var selection = dapperProject.GetSelection(tableFunction);
 
                 definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
             }
 
-            var storedProcedures = db.StoredProcedures.Where(sp => dbos.Contains(sp.FullName)).ToList();
+            var storedProcedures = db.StoredProcedures.Where(item => dbos.Contains(item.FullName)).ToList();
 
             foreach (var storedProcedure in storedProcedures)
             {
-                var selection = projectFeature.GetDapperProject().GetSelection(storedProcedure);
+                var selection = dapperProject.GetSelection(storedProcedure);
 
                 definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
             }

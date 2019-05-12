@@ -7,7 +7,10 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class InsertInto<TEntity> : Query
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<InsertIntoColumn> m_columns;
+
         public InsertInto()
+            : base()
         {
         }
 
@@ -15,19 +18,10 @@ namespace CatFactory.Dapper.Sql.Dml
 
         public string Identity { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_columns;
-
-        public List<string> Columns
+        public List<InsertIntoColumn> Columns
         {
-            get
-            {
-                return m_columns ?? (m_columns = new List<string>());
-            }
-            set
-            {
-                m_columns = value;
-            }
+            get => m_columns ?? (m_columns = new List<InsertIntoColumn>());
+            set => m_columns = value;
         }
 
         public override string ToString()
@@ -40,24 +34,26 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.AppendFormat(" insert into {0} ", Table);
+            output.AppendFormat("insert into {0} ", Table);
             output.AppendLine();
 
-            var columns = string.IsNullOrEmpty(Identity) ? Columns : Columns.Where(item => item != Identity).ToList();
+            var columns = string.IsNullOrEmpty(Identity) ? Columns : Columns.Where(item => item.Name != Identity).ToList();
 
             output.Append("(");
             output.AppendLine();
 
             for (var i = 0; i < columns.Count; i++)
             {
-                output.AppendFormat("{0}{1}", columns[i], i < columns.Count - 1 ? ", " : string.Empty);
+                var item = columns[i];
+
+                output.AppendFormat(" {0}{1}", NamingConvention.GetObjectName(item.Name), i < columns.Count - 1 ? ", " : string.Empty);
                 output.AppendLine();
             }
 
             output.Append(")");
             output.AppendLine();
 
-            output.Append(" values ");
+            output.Append("values ");
             output.AppendLine();
 
             output.Append("(");
@@ -65,7 +61,9 @@ namespace CatFactory.Dapper.Sql.Dml
 
             for (var i = 0; i < columns.Count; i++)
             {
-                output.AppendFormat(" {0}{1}", columns[i], i < columns.Count - 1 ? ", " : string.Empty);
+                var item = columns[i];
+
+                output.AppendFormat(" {0}{1}", NamingConvention.GetParameterName(item.Name), i < columns.Count - 1 ? ", " : string.Empty);
                 output.AppendLine();
             }
 
@@ -74,7 +72,9 @@ namespace CatFactory.Dapper.Sql.Dml
 
             if (!string.IsNullOrEmpty(Identity))
             {
-                output.AppendFormat("select {0} = @@identity", Identity);
+                output.AppendLine();
+
+                output.AppendFormat("select {0} = scope_identity()", NamingConvention.GetParameterName(Identity));
                 output.AppendLine();
             }
 

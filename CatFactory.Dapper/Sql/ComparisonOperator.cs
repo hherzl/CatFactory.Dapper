@@ -3,6 +3,7 @@
     public enum ComparisonOperator
     {
         Equals,
-        NotEquals
+        NotEquals,
+        Like
     }
 }

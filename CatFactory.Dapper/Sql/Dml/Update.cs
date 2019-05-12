@@ -7,7 +7,11 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Update<TEntity> : Query
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<UpdateColumn> m_columns;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+
         public Update()
+            : base()
         {
         }
 
@@ -15,34 +19,16 @@ namespace CatFactory.Dapper.Sql.Dml
 
         public string Key { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_columns;
-
-        public List<string> Columns
+        public List<UpdateColumn> Columns
         {
-            get
-            {
-                return m_columns ?? (m_columns = new List<string>());
-            }
-            set
-            {
-                m_columns = value;
-            }
+            get => m_columns ?? (m_columns = new List<UpdateColumn>());
+            set => m_columns = value;
         }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Condition> m_where;
 
         public List<Condition> Where
         {
-            get
-            {
-                return m_where ?? (m_where = new List<Condition>());
-            }
-            set
-            {
-                m_where = value;
-            }
+            get => m_where ?? (m_where = new List<Condition>());
+            set => m_where = value;
         }
 
         public override string ToString()
@@ -61,11 +47,16 @@ namespace CatFactory.Dapper.Sql.Dml
             output.Append(" set ");
             output.AppendLine();
 
-            var columns = string.IsNullOrEmpty(Key) ? Columns : Columns.Where(item => item != Key).ToList();
+            var columns = string.IsNullOrEmpty(Key) ? Columns : Columns.Where(item => item.Name != Key).ToList();
 
             for (var i = 0; i < columns.Count; i++)
             {
-                output.AppendFormat("{0} = {1}{2}", columns[i], columns[i], i < columns.Count - 1 ? ", " : string.Empty);
+                var item = columns[i];
+
+                var columnName = NamingConvention.GetObjectName(item.Name);
+                var parameterName = NamingConvention.GetParameterName(item.Name);
+
+                output.AppendFormat("{0} = {1}{2}", columnName, parameterName, i < columns.Count - 1 ? ", " : string.Empty);
                 output.AppendLine();
             }
 
@@ -76,17 +67,27 @@ namespace CatFactory.Dapper.Sql.Dml
 
                 for (var i = 0; i < Where.Count; i++)
                 {
+                    var item = Where[i];
+
                     if (i > 0)
-                        output.AppendFormat(" {0} ", Where[i].LogicOperator);
+                    {
+                        if (item.LogicOperator == LogicOperator.And)
+                            output.Append(" and");
+                        else if (item.LogicOperator == LogicOperator.Or)
+                            output.Append(" or");
+                    }
 
                     var comparisonOperator = string.Empty;
 
-                    if (Where[i].ComparisonOperator == ComparisonOperator.Equals)
+                    if (item.ComparisonOperator == ComparisonOperator.Equals)
                         comparisonOperator = "=";
-                    else if (Where[i].ComparisonOperator == ComparisonOperator.NotEquals)
+                    else if (item.ComparisonOperator == ComparisonOperator.NotEquals)
                         comparisonOperator = "<>";
 
-                    output.AppendFormat(" {0} {1} {2}", Where[i].Column, comparisonOperator, Where[i].Column);
+                    var columnName = NamingConvention.GetObjectName(item.Column);
+                    var parameterName = NamingConvention.GetParameterName(item.Column);
+
+                    output.AppendFormat(" {0} {1} {2}", columnName, comparisonOperator, parameterName);
                     output.AppendLine();
                 }
             }

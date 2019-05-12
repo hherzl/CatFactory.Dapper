@@ -4,34 +4,42 @@ using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper.Sql
 {
-    public class QueryBuilder
+    public static class QueryBuilder
     {
-        public static Select<TEntity> Select<TEntity>(string table = null, IDatabaseNamingConvention databaseNamingConvention = null)
+        public static IDatabaseNamingConvention DatabaseNamingConvention;
+
+        static QueryBuilder()
         {
-            var query = new Select<TEntity>();
+            DatabaseNamingConvention = new DatabaseNamingConvention();
+        }
 
-            if (databaseNamingConvention != null)
-                query.NamingConvention = databaseNamingConvention;
-
+        public static Select<TEntity> Select<TEntity>(string table = null, IDatabaseNamingConvention dbNamingConvention = null)
+        {
             var type = typeof(TEntity);
+
+            var query = new Select<TEntity>
+            {
+                NamingConvention = dbNamingConvention ?? DatabaseNamingConvention,
+                From = string.IsNullOrEmpty(table) ? type.Name : table
+            };
 
             foreach (var property in type.GetProperties())
             {
                 query.Columns.Add(property.Name);
             }
 
-            query.From = string.IsNullOrEmpty(table) ? type.Name : table;
-
             return query;
         }
 
-        public static InsertInto<TEntity> InsertInto<TEntity>(string table = null, string identity = null)
+        public static InsertInto<TEntity> InsertInto<TEntity>(TEntity entity, string table = null, string identity = null, IDatabaseNamingConvention dbNamingConvention = null)
         {
-            var query = new InsertInto<TEntity>();
-
             var type = typeof(TEntity);
 
-            query.Table = string.IsNullOrEmpty(table) ? type.Name : table;
+            var query = new InsertInto<TEntity>
+            {
+                NamingConvention = dbNamingConvention ?? DatabaseNamingConvention,
+                Table = string.IsNullOrEmpty(table) ? type.Name : table
+            };
 
             var properties = type.GetProperties().ToList();
 
@@ -43,22 +51,23 @@ namespace CatFactory.Dapper.Sql
                 if (!string.IsNullOrEmpty(identity) && identity == property.Name)
                     continue;
 
-                query.Columns.Add(property.Name);
-            }
+                var value = property.GetValue(entity);
 
-            if (!string.IsNullOrEmpty(query.Identity))
-                query.Footer = identity;
+                query.Columns.Add(new InsertIntoColumn { Name = property.Name, Value = value });
+            }
 
             return query;
         }
 
-        public static Update<TEntity> Update<TEntity>(string table = null, string key = null)
+        public static Update<TEntity> Update<TEntity>(TEntity entity, string table = null, string key = null, IDatabaseNamingConvention dbNamingConvention = null)
         {
-            var query = new Update<TEntity>();
-
             var type = typeof(TEntity);
 
-            query.Table = string.IsNullOrEmpty(table) ? type.Name : table;
+            var query = new Update<TEntity>
+            {
+                NamingConvention = dbNamingConvention ?? DatabaseNamingConvention,
+                Table = string.IsNullOrEmpty(table) ? type.Name : table
+            };
 
             var properties = type.GetProperties().ToList();
 
@@ -70,28 +79,33 @@ namespace CatFactory.Dapper.Sql
                 if (!string.IsNullOrEmpty(key) && key == property.Name)
                     continue;
 
-                query.Columns.Add(property.Name);
+                var value = property.GetValue(entity);
+
+                query.Columns.Add(new UpdateColumn { Name = property.Name, Value = value });
             }
 
-            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = key });
+            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = type.GetProperty(key).GetValue(entity) });
 
             return query;
         }
 
-        public static DeleteFrom<TEntity> DeleteFrom<TEntity>(string table = null, string key = null)
+        public static DeleteFrom<TEntity> DeleteFrom<TEntity>(TEntity entity, string schema = null, string table = null, string key = null, IDatabaseNamingConvention dbNamingConvention = null)
         {
-            var query = new DeleteFrom<TEntity>();
-
             var type = typeof(TEntity);
 
-            query.Table = string.IsNullOrEmpty(table) ? type.Name : table;
+            var query = new DeleteFrom<TEntity>
+            {
+                NamingConvention = dbNamingConvention ?? DatabaseNamingConvention,
+                Schema = schema,
+                Table = string.IsNullOrEmpty(table) ? type.Name : table
+            };
 
             var properties = type.GetProperties().ToList();
 
             if (properties.Any(item => item.Name == key))
                 query.Key = key;
 
-            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = key });
+            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = type.GetProperty(key).GetValue(entity) });
 
             return query;
         }

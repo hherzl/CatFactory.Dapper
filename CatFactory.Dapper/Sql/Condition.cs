@@ -2,6 +2,10 @@
 {
     public class Condition
     {
+        public Condition()
+        {
+        }
+
         public LogicOperator LogicOperator { get; set; }
 
         public string Column { get; set; }
