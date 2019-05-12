@@ -20,67 +20,15 @@ The flow to import an existing database is:
 4. Build Features (One feature per schema)
 5. Scaffold objects, these methods read all objects from database and create instances for code builders
 
+## Donation
+
+You can make a donation via PayPal using this link: [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=XB49JFNSMGY6U&item_name=CatFactory&currency_code=USD&source=url)
+
+Thanks for your help! ==^^==
+
 ## Code Snippet
 
-```csharp
-// Create database factory
-var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
-{
-	DatabaseImportSettings = new DatabaseImportSettings
-	{
-		ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
-		ImportScalarFunctions = true,
-		ImportTableFunctions = true,
-		ImportStoredProcedures = true,
-		Exclusions =
-		{
-			"dbo.sysdiagrams",
-			"dbo.fn_diagramobjects"
-		}
-	}
-};
-
-// Import database
-var database = databaseFactory.Import();
-
-// Create instance of Dapper Project
-var project = new DapperProject
-{
-	Name = "OnlineStore.Core",
-	Database = database,
-	OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnlineStore.Core"
-};
-
-// Apply settings for project
-project.GlobalSelection(settings =>
-{
-	settings.ForceOverwrite = true;
-	settings.UpdateExclusions = new List<string> { "CreationUser", "CreationDateTime", "Timestamp" };
-	settings.InsertExclusions = new List<string> { "LastUpdateUser", "LastUpdateDateTime", "Timestamp" };
-});
-
-project.Selection("Sales.OrderHeader", settings => settings.AddPagingForGetAllOperation = true);
-
-// Build features for project, group all entities by schema into a feature
-project.BuildFeatures();
-
-// Add event handlers to before and after of scaffold
-
-project.ScaffoldingDefinition += (source, args) =>
-{
-	// Add code to perform operations with code builder instance before to create code file
-};
-
-project.ScaffoldedDefinition += (source, args) =>
-{
-	// Add code to perform operations after of create code file
-};
-
-// Scaffolding =^^=
-project
-	.ScaffoldEntityLayer()
-	.ScaffoldDataLayer();
-```
+You can check the [`Wiki`](https://github.com/hherzl/CatFactory.Dapper/wiki) to get code snippets for this package.
 
 Also these technologies are supported:
 
