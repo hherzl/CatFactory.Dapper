@@ -82,27 +82,19 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 foreach (var unique in table.Uniques)
                 {
                     if (selection.Settings.Actions.Any(item => item is ReadByUniqueAction))
-                    {
                         definition.Methods.Add(GetByUniqueMethod(projectFeature, table, unique));
-                    }
                 }
 
                 if (selection.Settings.Actions.Any(item => item is AddEntityAction))
-                {
                     definition.Methods.Add(GetAddMethod(projectFeature, table));
-                }
 
                 if (table.PrimaryKey != null)
                 {
                     if (selection.Settings.Actions.Any(item => item is UpdateEntityAction))
-                    {
                         definition.Methods.Add(GetUpdateMethod(projectFeature, table));
-                    }
 
                     if (selection.Settings.Actions.Any(item => item is RemoveEntityAction))
-                    {
                         definition.Methods.Add(GetRemoveMethod(projectFeature, table));
-                    }
                 }
             }
 

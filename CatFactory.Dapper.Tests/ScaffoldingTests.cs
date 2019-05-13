@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CatFactory.Dapper.Tests.Models;
 using CatFactory.ObjectRelationalMapping.Actions;
 using CatFactory.SqlServer;
@@ -38,7 +37,8 @@ namespace CatFactory.Dapper.Tests
                 OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnlineStore.Core"
             };
 
-            // Apply settings for project
+            /* Apply settings for project */
+
             project.GlobalSelection(settings =>
             {
                 settings.ForceOverwrite = true;
@@ -48,14 +48,16 @@ namespace CatFactory.Dapper.Tests
 
             project.Selection("Warehouse.*", settings => settings.UseStringBuilderForQueries = false);
 
-            project.Selection("Sales.*", settings =>settings.AddPagingForGetAllOperation = true);
+            project.Selection("Sales.*", settings => settings.AddPagingForGetAllOperation = true);
 
-            project.Selection("Sales.OrderDetail", settings => settings.Actions.Remove(settings.Actions.First(item => item is ReadAllAction)));
+            project.Selection("Sales.OrderDetail", settings =>
+                settings.RemoveAction<ReadAllAction>()
+            );
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
 
-            // Add event handlers to before and after of scaffold
+            /* Add event handlers to before and after of scaffold */
 
             project.ScaffoldingDefinition += (source, args) =>
             {

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build37</Version>
+    <Version>1.0.0-beta-sun-build38</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build37 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build38 Version:
 
-* Addition of actions for entities
+* Addition of extension methods to remove actions for entities
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>
