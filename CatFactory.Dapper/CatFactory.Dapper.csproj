@@ -6,7 +6,7 @@
     <Authors>H. Herzl</Authors>
     <PackageReleaseNotes>1.0.0-beta-sun-build38 Version:
 
-* Addition of extension methods to remove actions for entities
+* Core package update
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>
@@ -20,7 +20,7 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
     </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build27" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build28" />
   </ItemGroup>
 
 </Project>
