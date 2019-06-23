@@ -10,23 +10,16 @@ namespace CatFactory.Dapper
     {
         public static DapperProject ScaffoldDataLayer(this DapperProject project)
         {
-            ScaffoldAppSettings(project);
-            ScaffoldDataRepositories(project);
+            ScaffoldRepositories(project);
             ScaffoldReadMe(project);
 
             return project;
         }
 
-        private static void ScaffoldAppSettings(DapperProject project)
+        private static void ScaffoldRepositories(DapperProject project)
         {
-            project.Scaffold(project.GetAppSettingsClassDefinition(), project.GetDataLayerDirectory());
-        }
-
-        private static void ScaffoldDataRepositories(DapperProject project)
-        {
-            var projectSelection = project.GlobalSelection();
-
             ScaffoldRepositoryInterface(project);
+
             ScaffoldBaseRepositoryClassDefinition(project);
 
             foreach (var projectFeature in project.Features)
@@ -38,6 +31,7 @@ namespace CatFactory.Dapper
                 var interfaceDefinition = repositoryClassDefinition.RefactInterface();
 
                 interfaceDefinition.Namespace = project.GetDataLayerContractsNamespace();
+
                 interfaceDefinition.Implements.Add("IRepository");
 
                 project.Scaffold(interfaceDefinition, project.GetDataLayerContractsDirectory());

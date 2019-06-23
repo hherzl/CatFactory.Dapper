@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build38</Version>
+    <Version>1.0.0-beta-sun-build39</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build38 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build39 Version:
 
-* Core package update
+* Code fix: set access modifier as public for properties in entities to represent views
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>

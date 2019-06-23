@@ -50,8 +50,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var table in dapperProject.Database.Tables)
             {
-                var selection = dapperProject.GetSelection(table);
-
                 if (projectFeature.Project.Database.HasDefaultSchema(table))
                     definition.Namespaces.AddUnique(projectFeature.GetDapperProject().GetEntityLayerNamespace());
                 else
@@ -112,8 +110,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var scalarFunction in scalarFunctions)
             {
-                var selection = dapperProject.GetSelection(scalarFunction);
-
                 definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
             }
 
@@ -121,8 +117,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var tableFunction in tableFunctions)
             {
-                var selection = dapperProject.GetSelection(tableFunction);
-
                 definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
             }
 
@@ -130,8 +124,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var storedProcedure in storedProcedures)
             {
-                var selection = dapperProject.GetSelection(storedProcedure);
-
                 definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
             }
 
@@ -358,11 +350,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 lines.Add(new CodeLine("query.Append(\" from \");"));
                 lines.Add(new CodeLine("query.Append(\"  {0} \");", db.GetFullName(view)));
 
-                if (pksInView.Count == 0)
-                {
-                    lines.Add(new CodeLine());
-                }
-                else
+                if (pksInView.Count > 0)
                 {
                     lines.Add(new CodeLine("query.Append(\" where \");"));
 

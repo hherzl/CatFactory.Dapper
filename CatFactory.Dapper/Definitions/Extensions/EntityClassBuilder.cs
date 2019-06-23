@@ -35,20 +35,23 @@ namespace CatFactory.Dapper.Definitions.Extensions
             if (selection.Settings.EnableDataBindings)
             {
                 definition.Namespaces.Add("System.ComponentModel");
+
                 definition.Implements.Add("INotifyPropertyChanged");
 
-                definition.Events.Add(new EventDefinition("PropertyChangedEventHandler", "PropertyChanged")
-                {
-                    AccessModifier = AccessModifier.Public
-                });
+                definition.Events.Add(new EventDefinition(AccessModifier.Public, "PropertyChangedEventHandler", "PropertyChanged"));
             }
 
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
             {
                 var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
-                definition.Constructors.Add(new ClassConstructorDefinition(AccessModifier.Public, new ParameterDefinition(project.Database.ResolveDatabaseType(column), project.GetParameterName(column)))
+                definition.Constructors.Add(new ClassConstructorDefinition
                 {
+                    AccessModifier = AccessModifier.Public,
+                    Parameters =
+                    {
+                        new ParameterDefinition(project.Database.ResolveDatabaseType(column), project.GetParameterName(column))
+                    },
                     Lines =
                     {
                         new CodeLine("{0} = {1};", project.GetPropertyName(table, column), project.GetParameterName(column))
@@ -61,19 +64,29 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var column in table.Columns)
             {
+                var propertyType = project.Database.ResolveDatabaseType(column);
+                var propertyName = project.GetPropertyName(table, column);
+
                 if (selection.Settings.EnableDataBindings)
                 {
-                    definition.AddViewModelProperty(project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column));
+                    definition.AddViewModelProperty(propertyType, propertyName);
                 }
                 else
                 {
                     if (selection.Settings.UseAutomaticPropertiesForEntities)
-                        definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column))
+                    {
+                        definition.Properties.Add(new PropertyDefinition
                         {
+                            AccessModifier = AccessModifier.Public,
+                            Type = propertyType,
+                            Name = propertyName,
                             IsAutomatic = true
                         });
+                    }
                     else
-                        definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), project.GetPropertyName(table, column));
+                    {
+                        definition.AddPropertyWithField(propertyType, propertyName);
+                    }
                 }
             }
 
@@ -107,13 +120,23 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var column in view.Columns)
             {
+                var propertyType = project.Database.ResolveDatabaseType(column);
+                var propertyName = project.GetPropertyName(view, column);
+
                 if (selection.Settings.UseAutomaticPropertiesForEntities)
-                    definition.Properties.Add(new PropertyDefinition(project.Database.ResolveDatabaseType(column), project.GetPropertyName(view, column))
+                {
+                    definition.Properties.Add(new PropertyDefinition
                     {
+                        AccessModifier = AccessModifier.Public,
+                        Type = project.Database.ResolveDatabaseType(column),
+                        Name = project.GetPropertyName(view, column),
                         IsAutomatic = true
                     });
+                }
                 else
-                    definition.AddPropertyWithField(project.Database.ResolveDatabaseType(column), project.GetPropertyName(view, column));
+                {
+                    definition.AddPropertyWithField(propertyType, propertyName);
+                }
             }
 
             definition.Implements.Add("IEntity");
@@ -178,8 +201,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             foreach (var column in tableFunction.Columns)
             {
-                definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, project.Database.ResolveDatabaseType(column), project.GetPropertyName(column.Name))
+                definition.Properties.Add(new PropertyDefinition
                 {
+                    AccessModifier = AccessModifier.Public,
+                    Type = project.Database.ResolveDatabaseType(column),
+                    Name = project.GetPropertyName(column.Name),
                     IsAutomatic = true
                 });
             }
@@ -213,8 +239,11 @@ namespace CatFactory.Dapper.Definitions.Extensions
             {
                 var type = project.Database.ResolveDatabaseType(resultSet.SystemTypeName);
 
-                definition.Properties.Add(new PropertyDefinition(AccessModifier.Public, type, resultSet.Name)
+                definition.Properties.Add(new PropertyDefinition
                 {
+                    AccessModifier = AccessModifier.Public,
+                    Type = type,
+                    Name = resultSet.Name,
                     IsAutomatic = true
                 });
             }

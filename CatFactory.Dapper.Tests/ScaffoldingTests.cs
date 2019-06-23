@@ -254,5 +254,42 @@ namespace CatFactory.Dapper.Tests
                 .ScaffoldEntityLayer()
                 .ScaffoldDataLayer();
         }
+
+        [Fact]
+        public void SqlDomScaffoldingFromWideWorldImportersDatabaseTest()
+        {
+            // Import database
+            var factory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;",
+                    ImportTables = false,
+                    ImportViews = true,
+                    ImportCommandText = "select 'sys' as 'schema_name', 'types' as 'object_name', 'VIEW' as 'object_type'"
+                }
+            };
+
+            var database = factory.Import();
+            
+            // Create instance of Dapper Project
+            var project = new DapperProject
+            {
+                Name = "SqlDom.Core",
+                Database = database,
+                OutputDirectory = @"C:\Temp\CatFactory.Dapper\SqlDom.Core"
+            };
+
+            // Apply settings for project
+            project.GlobalSelection(settings => settings.ForceOverwrite = true);
+
+            // Build features for project, group all entities by schema into a feature
+            project.BuildFeatures();
+
+            // Scaffolding =^^=
+            project
+                .ScaffoldEntityLayer()
+                .ScaffoldDataLayer();
+        }
     }
 }

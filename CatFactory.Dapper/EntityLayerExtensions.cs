@@ -30,8 +30,6 @@ namespace CatFactory.Dapper
 
             foreach (var tableFunction in project.Database.TableFunctions)
             {
-                var selection = project.GetSelection(tableFunction);
-
                 var definition = project.GetEntityClassDefinition(tableFunction);
 
                 project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(tableFunction) ? "" : tableFunction.Schema));
@@ -39,8 +37,6 @@ namespace CatFactory.Dapper
 
             foreach (var storedProcedure in project.Database.StoredProcedures)
             {
-                var selection = project.GetSelection(storedProcedure);
-
                 var definition = project.GetEntityClassDefinition(storedProcedure);
 
                 project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(storedProcedure) ? "" : storedProcedure.Schema));
