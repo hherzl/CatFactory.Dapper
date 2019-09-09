@@ -53,7 +53,7 @@ namespace CatFactory.Dapper.Sql
 
                 var value = property.GetValue(entity);
 
-                query.Columns.Add(new InsertIntoColumn { Name = property.Name, Value = value });
+                query.Columns.Add(new InsertIntoColumn(property.Name, value));
             }
 
             return query;
@@ -81,10 +81,10 @@ namespace CatFactory.Dapper.Sql
 
                 var value = property.GetValue(entity);
 
-                query.Columns.Add(new UpdateColumn { Name = property.Name, Value = value });
+                query.Columns.Add(new UpdateColumn(property.Name, value));
             }
 
-            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = type.GetProperty(key).GetValue(entity) });
+            query.Where.Add(new Condition(key, ComparisonOperator.Equals, type.GetProperty(key).GetValue(entity)));
 
             return query;
         }
@@ -105,7 +105,7 @@ namespace CatFactory.Dapper.Sql
             if (properties.Any(item => item.Name == key))
                 query.Key = key;
 
-            query.Where.Add(new Condition { Column = key, ComparisonOperator = ComparisonOperator.Equals, Value = type.GetProperty(key).GetValue(entity) });
+            query.Where.Add(new Condition(key, ComparisonOperator.Equals, type.GetProperty(key).GetValue(entity)));
 
             return query;
         }

@@ -7,8 +7,11 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Select<Entity> : Query
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_columns;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_columns;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<Condition> m_where;
 
         public Select()
             : base()

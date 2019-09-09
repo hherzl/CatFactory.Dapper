@@ -6,7 +6,8 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class DeleteFrom<TEntity> : Query
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<Condition> m_where;
 
         public DeleteFrom()
             : base()

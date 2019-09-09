@@ -4,10 +4,13 @@ using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.Dapper.Sql
 {
-    public class Query
+    public class Query : IQuery
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private IDatabaseNamingConvention m_namingConvention;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_headers;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IDatabaseNamingConvention m_namingConvention;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_headers;
 
         public Query()
         {

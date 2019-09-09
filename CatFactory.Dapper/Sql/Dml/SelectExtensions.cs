@@ -7,7 +7,7 @@ namespace CatFactory.Dapper.Sql.Dml
         internal static Select<TEntity> Where<TEntity>(this Select<TEntity> select, LogicOperator logicOpr, string column, ComparisonOperator comparisonOpr, object value)
         {
             if (!select.Where.Any(item => item.LogicOperator == logicOpr && item.Column == column && item.ComparisonOperator == comparisonOpr && item.Value == value))
-                select.Where.Add(new Condition { LogicOperator = logicOpr, Column = column, ComparisonOperator = comparisonOpr, Value = value });
+                select.Where.Add(new Condition(logicOpr, column, comparisonOpr, value));
 
             return select;
         }
@@ -15,7 +15,7 @@ namespace CatFactory.Dapper.Sql.Dml
         public static Select<TEntity> Where<TEntity>(this Select<TEntity> select, string column, ComparisonOperator comparisonOpr, object value)
         {
             if (!select.Where.Any(item => item.LogicOperator == LogicOperator.And && item.Column == column && item.ComparisonOperator == comparisonOpr && item.Value == value))
-                select.Where.Add(new Condition { LogicOperator = LogicOperator.And, Column = column, ComparisonOperator = comparisonOpr, Value = value });
+                select.Where.Add(new Condition(LogicOperator.And, column, comparisonOpr, value));
 
             return select;
         }

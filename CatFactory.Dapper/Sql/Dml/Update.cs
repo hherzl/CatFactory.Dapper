@@ -7,8 +7,11 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class Update<TEntity> : Query
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<UpdateColumn> m_columns;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Condition> m_where;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<UpdateColumn> m_columns;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<Condition> m_where;
 
         public Update()
             : base()
@@ -41,7 +44,10 @@ namespace CatFactory.Dapper.Sql.Dml
                 output.AppendLine();
             }
 
-            output.AppendFormat(" update {0} ", Table);
+            output.AppendFormat(" update ");
+            output.AppendLine();
+
+            output.AppendFormat(" {0} ", Table);
             output.AppendLine();
 
             output.Append(" set ");
@@ -56,7 +62,7 @@ namespace CatFactory.Dapper.Sql.Dml
                 var columnName = NamingConvention.GetObjectName(item.Name);
                 var parameterName = NamingConvention.GetParameterName(item.Name);
 
-                output.AppendFormat("{0} = {1}{2}", columnName, parameterName, i < columns.Count - 1 ? ", " : string.Empty);
+                output.AppendFormat("  {0} = {1}{2} ", columnName, parameterName, i < columns.Count - 1 ? ", " : string.Empty);
                 output.AppendLine();
             }
 

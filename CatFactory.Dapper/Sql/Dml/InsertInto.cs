@@ -7,7 +7,8 @@ namespace CatFactory.Dapper.Sql.Dml
 {
     public class InsertInto<TEntity> : Query
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<InsertIntoColumn> m_columns;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<InsertIntoColumn> m_columns;
 
         public InsertInto()
             : base()
