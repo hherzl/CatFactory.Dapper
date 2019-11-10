@@ -14,25 +14,25 @@ namespace CatFactory.Dapper
         public static string GetFullName(this Database database, IDbObject dbObject)
             => database.NamingConvention.GetObjectName(dbObject.Schema, dbObject.Name);
 
-        public static string GetColumnName(this Database database, ITable table, Column column)
+        public static string GetColumnName(this Database database, ITable table, IColumn column)
             => database.NamingConvention.GetObjectName(table.Schema, table.Name, column.Name);
 
-        public static string GetColumnName(this Database database, IView view, Column column)
+        public static string GetColumnName(this Database database, IView view, IColumn column)
             => database.NamingConvention.GetObjectName(view.Schema, view.Name, column.Name);
 
-        public static string GetColumnName(this Database database, TableFunction tableFunction, Column column)
+        public static string GetColumnName(this Database database, TableFunction tableFunction, IColumn column)
             => database.NamingConvention.GetObjectName(tableFunction.Schema, tableFunction.Name, column.Name);
 
-        public static string GetColumnName(this Database database, Column column)
+        public static string GetColumnName(this Database database, IColumn column)
             => database.NamingConvention.GetObjectName(column.Name);
 
-        public static string GetPropertyName(this DapperProject project, Column column)
+        public static string GetPropertyName(this DapperProject project, IColumn column)
             => project.CodeNamingConvention.GetPropertyName(column.Name);
 
-        public static string GetParameterName(this DapperProject project, Column column)
+        public static string GetParameterName(this DapperProject project, IColumn column)
             => project.CodeNamingConvention.GetParameterName(column.Name);
 
-        public static string GetParameterName(this Database database, Column column)
+        public static string GetParameterName(this Database database, IColumn column)
             => database.NamingConvention.GetParameterName(column.Name);
 
         public static string GetParameterName(this Database database, Parameter param)
@@ -135,7 +135,7 @@ namespace CatFactory.Dapper
                 if (selection.Settings.UpdateExclusions.Contains(column.Name))
                     continue;
 
-                yield return column;
+                yield return (Column)column;
             }
         }
 

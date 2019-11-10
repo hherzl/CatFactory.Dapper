@@ -294,7 +294,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 foreach (var foreignKey in table.ForeignKeys)
                 {
-                    var column = table.GetColumnsFromConstraint(foreignKey).ToList().First();
+                    var column = (Column)table.GetColumnsFromConstraint(foreignKey).ToList().First();
 
                     parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(column), project.GetParameterName(column)) { DefaultValue = "null" });
                 }
@@ -325,6 +325,69 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 .ToList();
 
             var pksInView = view.Columns.Where(item => primaryKeys.Contains(item.Name)).ToList();
+
+
+
+
+
+
+
+
+
+            for (var i = 0; i < view.Columns.Count; i++)
+            {
+                var column = view.Columns[i];
+
+                var columnName = db.GetColumnName(column);
+                var propertyName = project.GetPropertyName(column);
+
+                var type = "";
+                var method = "";
+
+                if (db.ColumnIsString(column))
+                {
+                    type = "string.Empty";
+                    method = "GetString";
+                }
+                else if (db.ColumnIsInt32(column))
+                {
+                    type = "0";
+                    method = "GetInt32";
+                }
+                else if (db.ColumnIsInt16(column))
+                {
+                    type = "0";
+                    method = "GetInt16";
+                }
+                else if (db.ColumnIsDouble(column))
+                {
+                    type = "0.0";
+                    method = "GetSingle";
+                }
+                else if (db.ColumnIsBoolean(column))
+                {
+                    type = "false";
+                    method = "GetBoolean";
+                }
+                else if (db.ColumnIsDateTime(column))
+                {
+                    type = "DateTime.Now";
+                    method = "GetDateTime";
+                }
+
+                var n = "";
+
+                if (column.Nullable)
+                {
+                    n = string.Format("reader[{0}] is DBNull ? {1} : reader.{2}({0})", i, type, method);
+                }
+                else
+                {
+                    n = string.Format("reader.{0}({1})", method, i);
+                }
+
+                lines.Add(new CodeLine("{0} = {1},", propertyName, n));
+            }
 
             if (selection.Settings.UseStringBuilderForQueries)
             {
@@ -556,7 +619,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             for (var i = 0; i < key.Count; i++)
             {
-                var column = key[i];
+                var column = (Column)key[i];
 
                 lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.GetParameterName(column), project.GetPropertyName(table, column)));
             }
@@ -653,7 +716,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             for (var i = 0; i < key.Count; i++)
             {
-                var column = key[i];
+                var column = (Column)key[i];
 
                 lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
@@ -947,7 +1010,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
             if (table.PrimaryKey != null && db.PrimaryKeyIsGuid(table))
             {
                 lines.Add(new CommentLine(" Generate value for Guid property"));
-                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", project.GetPropertyName(table, table.GetColumnsFromConstraint(table.PrimaryKey).First())));
+                lines.Add(new CodeLine("entity.{0} = Guid.NewGuid();", project.GetPropertyName(table, (Column)table.GetColumnsFromConstraint(table.PrimaryKey).First())));
                 lines.Add(new CodeLine());
             }
 
@@ -1059,7 +1122,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
                 }
 
-                var identityColumn = table.GetIdentityColumn();
+                var identityColumn = (Column)table.GetIdentityColumn();
 
                 lines.Add(new CodeLine("parameters.Add(\"{0}\", dbType: {1}, direction: ParameterDirection.Output);", project.Database.GetParameterName(identityColumn), db.ResolveDbType(identityColumn)));
 
@@ -1168,7 +1231,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             for (var i = 0; i < key.Count; i++)
             {
-                var column = key[i];
+                var column = (Column)key[i];
 
                 lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }
@@ -1212,7 +1275,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 for (var i = 0; i < key.Count; i++)
                 {
-                    var column = key[i];
+                    var column = (Column)key[i];
 
                     lines.Add(new CodeLine("query.Append(\"  {0} = {1}{2} \");", db.GetColumnName(column), db.GetParameterName(column), i < key.Count - 1 ? " and " : string.Empty));
                 }
@@ -1246,7 +1309,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             for (var i = 0; i < columns.Count(); i++)
             {
-                var column = columns[i];
+                var column = (Column)columns[i];
 
                 lines.Add(new CodeLine("parameters.Add(\"{0}\", entity.{1});", project.Database.GetParameterName(column), project.GetPropertyName(table, column)));
             }

@@ -266,7 +266,7 @@ namespace CatFactory.Dapper.Tests
                     ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;",
                     ImportTables = false,
                     ImportViews = true,
-                    ImportCommandText = "select 'sys' as 'schema_name', 'types' as 'object_name', 'VIEW' as 'object_type'"
+                    ImportCommandText = "select 'sys' as 'schema_name', 'columns' as 'object_name', 'VIEW' as 'object_type'"
                 }
             };
 

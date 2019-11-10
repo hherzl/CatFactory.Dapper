@@ -43,7 +43,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             if (table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1)
             {
-                var column = table.GetColumnsFromConstraint(table.PrimaryKey).First();
+                var column = (Column)table.GetColumnsFromConstraint(table.PrimaryKey).First();
 
                 definition.Constructors.Add(new ClassConstructorDefinition
                 {
