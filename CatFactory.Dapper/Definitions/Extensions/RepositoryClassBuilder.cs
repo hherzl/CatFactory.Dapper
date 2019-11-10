@@ -326,69 +326,6 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
             var pksInView = view.Columns.Where(item => primaryKeys.Contains(item.Name)).ToList();
 
-
-
-
-
-
-
-
-
-            for (var i = 0; i < view.Columns.Count; i++)
-            {
-                var column = view.Columns[i];
-
-                var columnName = db.GetColumnName(column);
-                var propertyName = project.GetPropertyName(column);
-
-                var type = "";
-                var method = "";
-
-                if (db.ColumnIsString(column))
-                {
-                    type = "string.Empty";
-                    method = "GetString";
-                }
-                else if (db.ColumnIsInt32(column))
-                {
-                    type = "0";
-                    method = "GetInt32";
-                }
-                else if (db.ColumnIsInt16(column))
-                {
-                    type = "0";
-                    method = "GetInt16";
-                }
-                else if (db.ColumnIsDouble(column))
-                {
-                    type = "0.0";
-                    method = "GetSingle";
-                }
-                else if (db.ColumnIsBoolean(column))
-                {
-                    type = "false";
-                    method = "GetBoolean";
-                }
-                else if (db.ColumnIsDateTime(column))
-                {
-                    type = "DateTime.Now";
-                    method = "GetDateTime";
-                }
-
-                var n = "";
-
-                if (column.Nullable)
-                {
-                    n = string.Format("reader[{0}] is DBNull ? {1} : reader.{2}({0})", i, type, method);
-                }
-                else
-                {
-                    n = string.Format("reader.{0}({1})", method, i);
-                }
-
-                lines.Add(new CodeLine("{0} = {1},", propertyName, n));
-            }
-
             if (selection.Settings.UseStringBuilderForQueries)
             {
                 lines.Add(new CommentLine(" Create string builder for query"));

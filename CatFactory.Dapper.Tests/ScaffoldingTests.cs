@@ -233,7 +233,7 @@ namespace CatFactory.Dapper.Tests
             // Import database
             var database = Databases.LegacyErpDatabase;
 
-            database.NamingConvention = new CatFactory.SqlServer.SqlServerDatabaseNamingConvention();
+            database.NamingConvention = new SqlServerDatabaseNamingConvention();
 
             // Create instance of Dapper Project
             var project = new DapperProject
