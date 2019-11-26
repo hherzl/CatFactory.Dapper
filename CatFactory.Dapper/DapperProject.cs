@@ -13,6 +13,14 @@ namespace CatFactory.Dapper
 {
     public class DapperProject : CSharpProject<DapperProjectSettings>
     {
+        public static DapperProject Create(string name, Database database, string outputDirectory)
+            => new DapperProject
+            {
+                Name = name,
+                Database = database,
+                OutputDirectory = outputDirectory
+            };
+
         public DapperProject()
             : base()
         {

@@ -106,26 +106,26 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     definition.Methods.Add(GetGetAllMethod(projectFeature, view));
             }
 
-            var scalarFunctions = db.ScalarFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
+            //var scalarFunctions = db.ScalarFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
 
-            foreach (var scalarFunction in scalarFunctions)
-            {
-                definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
-            }
+            //foreach (var scalarFunction in scalarFunctions)
+            //{
+            //    definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
+            //}
 
-            var tableFunctions = db.TableFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
+            //var tableFunctions = db.TableFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
 
-            foreach (var tableFunction in tableFunctions)
-            {
-                definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
-            }
+            //foreach (var tableFunction in tableFunctions)
+            //{
+            //    definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
+            //}
 
-            var storedProcedures = db.StoredProcedures.Where(item => dbos.Contains(item.FullName)).ToList();
+            //var storedProcedures = db.StoredProcedures.Where(item => dbos.Contains(item.FullName)).ToList();
 
-            foreach (var storedProcedure in storedProcedures)
-            {
-                definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
-            }
+            //foreach (var storedProcedure in storedProcedures)
+            //{
+            //    definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
+            //}
 
             return definition;
         }

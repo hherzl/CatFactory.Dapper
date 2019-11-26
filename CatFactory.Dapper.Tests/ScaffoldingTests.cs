@@ -30,12 +30,7 @@ namespace CatFactory.Dapper.Tests
             var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "OnlineStore.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\OnlineStore.Core"
-            };
+            var project = DapperProject.Create("OnlineStore.Core", database, @"C:\Temp\CatFactory.Dapper\OnlineStore.Core");
 
             /* Apply settings for project */
 
@@ -105,12 +100,7 @@ namespace CatFactory.Dapper.Tests
             var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "Northwind.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\Northwind.Core"
-            };
+            var project = DapperProject.Create("Northwind.Core", database, @"C:\Temp\CatFactory.Dapper\Northwind.Core");
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
@@ -151,12 +141,7 @@ namespace CatFactory.Dapper.Tests
             var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "AdventureWorks.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\AdventureWorks.Core"
-            };
+            var project = DapperProject.Create("AdventureWorks.Core", database, @"C:\Temp\CatFactory.Dapper\AdventureWorks.Core");
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
@@ -191,12 +176,7 @@ namespace CatFactory.Dapper.Tests
             var database = databaseFactory.Import();
 
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "WideWorldImporters.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\WideWorldImporters.Core"
-            };
+            var project = DapperProject.Create("WideWorldImporters.Core", database, @"C:\Temp\CatFactory.Dapper\WideWorldImporters.Core");
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
@@ -236,12 +216,7 @@ namespace CatFactory.Dapper.Tests
             database.NamingConvention = new SqlServerDatabaseNamingConvention();
 
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "OnlineStore.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\LegacyErp.Core"
-            };
+            var project = DapperProject.Create("OnlineStore.Core", database, @"C:\Temp\CatFactory.Dapper\LegacyErp.Core");
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
@@ -271,14 +246,9 @@ namespace CatFactory.Dapper.Tests
             };
 
             var database = factory.Import();
-            
+
             // Create instance of Dapper Project
-            var project = new DapperProject
-            {
-                Name = "SqlDom.Core",
-                Database = database,
-                OutputDirectory = @"C:\Temp\CatFactory.Dapper\SqlDom.Core"
-            };
+            var project = DapperProject.Create("SqlDom.Core", database, @"C:\Temp\CatFactory.Dapper\SqlDom.Core");
 
             // Apply settings for project
             project.GlobalSelection(settings => settings.ForceOverwrite = true);
