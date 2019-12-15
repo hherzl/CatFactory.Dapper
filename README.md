@@ -35,17 +35,6 @@ Also these technologies are supported:
 + [`Entity Framework Core`](https://github.com/hherzl/CatFactory.EntityFrameworkCore)
 + [`ASP.NET Core`](https://github.com/hherzl/CatFactory.AspNetCore)
 
-## Database Objects
-
-|Object|Supported|
-|------|---------|
-|Table|Yes|
-|View|Yes|
-|Scalar Function|Yes|
-|Table Function|Yes|
-|Stored Procedures|Yes|
-|Sequences|Not yet|
-
 ## Roadmap
 
 There will be a lot of improvements for CatFactory on road:
@@ -60,115 +49,26 @@ There will be a lot of improvements for CatFactory on road:
 
 ## Concepts behind CatFactory
 
-### Database Type Map
+    Database Type
+    Project Selection
+    Event Handlers to Scaffold
+    Database Object Model
+    Import Bag
 
-One of things I don't like to get equivalent between SQL data type for CLR is use magic strings, after of review the more "fancy" way to resolve a type equivalence is to have a class that allows to know the equivalence between SQL data type and CLR type.
+Read more on: [`Concepts behind CatFactory`](https://github.com/hherzl/CatFactory/wiki/Concepts-behind-CatFactory)
 
-This concept was created from this matrix: [`SQL Server Data Type Mappings`](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-data-type-mappings).
+## Packages
 
-Using this matrix as reference, now CatFactory has a class named DatabaseTypeMap. Database class contains a property with all mappings named DatebaseTypeMaps, so this property is filled by Import feature for SQL Server package.
+    CatFactory
+    CatFactory.SqlServer
+    CatFactory.PostgreSql
+    CatFactory.NetCore
+    CatFactory.EntityFrameworkCore
+    CatFactory.AspNetCore
+    CatFactory.Dapper
+    CatFactory.TypeScript
 
-```csharp
-public class DatabaseTypeMap
-{
-    public string DatabaseType { get; set; }
-
-    public bool AllowsLengthInDeclaration { get; set; }
-
-    public bool AllowsPrecInDeclaration { get; set; }
-
-    public bool AllowsScaleInDeclaration { get; set; }
-
-    public string ClrFullNameType { get; set; }
-
-    public bool HasClrFullNameType { get; }
-
-    public string ClrAliasType { get; set; }
-
-    public bool HasClrAliasType { get; }
-
-    public bool AllowClrNullable { get; set; }
-
-    public DbType DbTypeEnum { get; set; }
-
-    public bool IsUserDefined { get; set; }
-
-    public string ParentDatabaseType { get; set; }
-
-    public string Collation { get; set; }
-}
-```
-
-DatabaseTypeMap is the class to represent database type definition, for database instance we need to create a collection of DatabaseTypeMap class to have a matrix to resolve data types.
-
-Suppose there is a class with name DatabaseTypeMapList, this class has a property to get data types. Once we have imported an existing database we can resolve data types:
-
-Resolve without extension methods:
-
-```csharp
-// Import database
-var database = SqlServerDatabaseFactory
-	.Import("server=(local);database=OnlineStore;integrated security=yes;");
-				
-// Resolve CLR type
-var mapsForString = database.DatabaseTypeMaps.Where(item => item.GetClrType() == typeof(string)).ToList();
-
-// Resolve SQL Server type
-var mapForVarchar = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == "varchar");
-```
-
-SQL Server allows to define data types, suppose the database instance has a data type defined by user with name Flag, Flag data type is a bit, bool in C#. Import method retrieve user data types, so in DatabaseTypeMaps collection we can search the parent data type for Flag:
-
-### Project Selection
-
-A project selection is a limit to apply settings for objects that match with pattern.
-
-GlobalSelection is the default selection for project, contains a default instance of settings.
-
-Patterns:
-
-|Pattern|Scope|
-|-------|-----|
-|Sales.OrderHeader|Applies for specific object with name Sales.OrderHeader|
-|Sales.\*|Applies for all objects inside of Sales schema|
-|\*.OrderHeader|Applies for all objects with name Order with no matter schema|
-|\*.\*|Applies for all objects, this is the global selection|
-
-Sample:
-
-```csharp
-// Apply settings for Project
-project.GlobalSelection(settings =>
-{
-    settings.ForceOverwrite = true;
-    settings.AuditEntity = new AuditEntity("CreationUser", "CreationDateTime", "LastUpdateUser", "LastUpdateDateTime");
-    settings.ConcurrencyToken = "Timestamp";
-});
-
-// Apply settings for specific object
-project.Select("Sales.OrderHeader", settings =>
-{
-    settings.EntitiesWithDataContracts = true;
-});
-```
-
-### Event Handlers to Scaffold
-
-In order to provide a more flexible way to scaffold, there are two delegates in CatFactory, one to perform an action before of scaffolding and another one to handle and action after of scaffolding.
-
-```csharp
-// Add event handlers to before and after of scaffold
-
-project.ScaffoldingDefinition += (source, args) =>
-{
-    // Add code to perform operations with code builder instance before to create code file
-};
-
-project.ScaffoldedDefinition += (source, args) =>
-{
-    // Add code to perform operations after of create code file
-};
-```
+Read more on: [`Packages Features Chart`](https://github.com/hherzl/CatFactory/wiki/Packages-Features-Chart)
 
 ## Quick Starts
 
