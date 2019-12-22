@@ -13,7 +13,7 @@ namespace CatFactory.Dapper.Tests
 
             // Get database
             var database = await SqlServerDatabaseFactory
-                .ImportAsync(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;", "dbo.sysdiagrams");
+                .ImportAsync("server=(local);database=OnlineStore;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Entity Framework Core project
             var project = DapperProject

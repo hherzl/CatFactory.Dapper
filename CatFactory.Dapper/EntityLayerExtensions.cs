@@ -28,19 +28,26 @@ namespace CatFactory.Dapper
                 project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(view) ? "" : view.Schema));
             }
 
-            //foreach (var tableFunction in project.Database.TableFunctions)
-            //{
-            //    var definition = project.GetEntityClassDefinition(tableFunction);
+            foreach (var scalarFunction in project.Database.GetScalarFunctions())
+            {
+                var definition = project.GetEntityClassDefinition(scalarFunction);
 
-            //    project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(tableFunction) ? "" : tableFunction.Schema));
-            //}
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(scalarFunction) ? "" : scalarFunction.Schema));
+            }
 
-            //foreach (var storedProcedure in project.Database.StoredProcedures)
-            //{
-            //    var definition = project.GetEntityClassDefinition(storedProcedure);
+            foreach (var tableFunction in project.Database.GetTableFunctions())
+            {
+                var definition = project.GetEntityClassDefinition(tableFunction);
 
-            //    project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(storedProcedure) ? "" : storedProcedure.Schema));
-            //}
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(tableFunction) ? "" : tableFunction.Schema));
+            }
+
+            foreach (var storedProcedure in project.Database.GetStoredProcedures())
+            {
+                var definition = project.GetEntityClassDefinition(storedProcedure);
+
+                project.Scaffold(definition, project.GetEntityLayerDirectory(project.Database.HasDefaultSchema(storedProcedure) ? "" : storedProcedure.Schema));
+            }
 
             return project;
         }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CatFactory.CodeFactory;
 using CatFactory.CodeFactory.Scaffolding;
@@ -38,6 +39,38 @@ namespace CatFactory.Dapper
         {
             get => m_projectNamespaces ?? (m_projectNamespaces = new DapperProjectNamespaces());
             set => m_projectNamespaces = value;
+        }
+
+        protected override IEnumerable<DbObject> GetDbObjectsBySchema(string schema)
+        {
+            foreach (var item in base.GetDbObjectsBySchema(schema))
+            {
+                yield return item;
+            }
+
+            foreach (var item in Database.GetScalarFunctions().Where(tableFunction => tableFunction.Schema == schema))
+            {
+                yield return new DbObject(item.Schema, item.Name)
+                {
+                    Type = "ScalarFunction"
+                };
+            }
+
+            foreach (var item in Database.GetTableFunctions().Where(tableFunction => tableFunction.Schema == schema))
+            {
+                yield return new DbObject(item.Schema, item.Name)
+                {
+                    Type = "TableFunction"
+                };
+            }
+
+            foreach (var item in Database.GetStoredProcedures().Where(storedProcedure => storedProcedure.Schema == schema))
+            {
+                yield return new DbObject(item.Schema, item.Name)
+                {
+                    Type = "StoredProcedure"
+                };
+            }
         }
 
         public override void BuildFeatures()

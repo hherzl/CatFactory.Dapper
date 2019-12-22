@@ -106,26 +106,26 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     definition.Methods.Add(GetGetAllMethod(projectFeature, view));
             }
 
-            //var scalarFunctions = db.ScalarFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
+            var scalarFunctions = db.GetScalarFunctions().Where(item => dbos.Contains(item.FullName)).ToList();
 
-            //foreach (var scalarFunction in scalarFunctions)
-            //{
-            //    definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
-            //}
+            foreach (var scalarFunction in scalarFunctions)
+            {
+                definition.Methods.Add(GetGetAllMethod(projectFeature, scalarFunction));
+            }
 
-            //var tableFunctions = db.TableFunctions.Where(item => dbos.Contains(item.FullName)).ToList();
+            var tableFunctions = db.GetTableFunctions().Where(item => dbos.Contains(item.FullName)).ToList();
 
-            //foreach (var tableFunction in tableFunctions)
-            //{
-            //    definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
-            //}
+            foreach (var tableFunction in tableFunctions)
+            {
+                definition.Methods.Add(GetGetAllMethod(projectFeature, tableFunction));
+            }
 
-            //var storedProcedures = db.StoredProcedures.Where(item => dbos.Contains(item.FullName)).ToList();
+            var storedProcedures = db.GetStoredProcedures().Where(item => dbos.Contains(item.FullName)).ToList();
 
-            //foreach (var storedProcedure in storedProcedures)
-            //{
-            //    definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
-            //}
+            foreach (var storedProcedure in storedProcedures)
+            {
+                definition.Methods.Add(GetGetAllMethod(projectFeature, storedProcedure));
+            }
 
             return definition;
         }
@@ -566,9 +566,16 @@ namespace CatFactory.Dapper.Definitions.Extensions
             lines.Add(new CommentLine(" Retrieve result from database and convert to entity class"));
             lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query.ToString(), parameters);", project.GetEntityName(table)));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", project.GetEntityName(table)), project.GetGetRepositoryMethodName(table), new ParameterDefinition(project.GetEntityName(table), "entity"))
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<{0}>", project.GetEntityName(table)),
+                Name = project.GetGetRepositoryMethodName(table),
+                Parameters =
+                {
+                    new ParameterDefinition(project.GetEntityName(table), "entity")
+                },
                 Lines = lines
             };
         }
@@ -667,9 +674,16 @@ namespace CatFactory.Dapper.Definitions.Extensions
             else
                 lines.Add(new CodeLine("return await Connection.QueryFirstOrDefaultAsync<{0}>(query, parameters);", project.GetEntityName(table)));
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", project.GetEntityName(table)), project.GetGetByUniqueRepositoryMethodName(table, unique), new ParameterDefinition(project.GetEntityName(table), "entity"))
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<{0}>", project.GetEntityName(table)),
+                Name = project.GetGetByUniqueRepositoryMethodName(table, unique),
+                Parameters =
+                {
+                    new ParameterDefinition(project.GetEntityName(table), "entity")
+                },
                 Lines = lines
             };
         }
@@ -747,11 +761,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in scalarFunctionParameters)
-                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
-
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<{0}>", typeToReturn), project.GetGetAllRepositoryMethodName(scalarFunction), parameters.ToArray())
             {
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+            }
+
+            return new MethodDefinition
+            {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<{0}>", typeToReturn),
+                Name = project.GetGetAllRepositoryMethodName(scalarFunction),
+                Parameters = parameters,
                 Lines = lines
             };
         }
@@ -839,11 +859,17 @@ namespace CatFactory.Dapper.Definitions.Extensions
             var parameters = new List<ParameterDefinition>();
 
             foreach (var parameter in tableFunction.Parameters)
-                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
-
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", project.GetResultName(tableFunction)), project.GetGetAllRepositoryMethodName(tableFunction), parameters.ToArray())
             {
+                parameters.Add(new ParameterDefinition(db.ResolveDatabaseType(parameter.Type), NamingConvention.GetCamelCase(parameter.Name.Replace("@", ""))));
+            }
+
+            return new MethodDefinition
+            {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<IEnumerable<{0}>>", project.GetResultName(tableFunction)),
+                Name = project.GetGetAllRepositoryMethodName(tableFunction),
+                Parameters = parameters,
                 Lines = lines
             };
         }
@@ -931,9 +957,13 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             }
 
-            return new MethodDefinition(AccessModifier.Public, string.Format("Task<IEnumerable<{0}>>", project.GetResultName(storedProcedure)), project.GetGetAllRepositoryMethodName(storedProcedure), parameters.ToArray())
+            return new MethodDefinition
             {
+                AccessModifier = AccessModifier.Public,
                 IsAsync = true,
+                Type = string.Format("Task<IEnumerable<{0}>>", project.GetResultName(storedProcedure)),
+                Name = project.GetGetAllRepositoryMethodName(storedProcedure),
+                Parameters = parameters,
                 Lines = lines
             };
         }

@@ -52,18 +52,6 @@ namespace CatFactory.Dapper.Tests
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
 
-            /* Add event handlers to before and after of scaffold */
-
-            project.ScaffoldingDefinition += (source, args) =>
-            {
-                // Add code to perform operations with code builder instance before to create code file
-            };
-
-            project.ScaffoldedDefinition += (source, args) =>
-            {
-                // Add code to perform operations after of create code file
-            };
-
             // Scaffolding =^^=
             project
                 .ScaffoldEntityLayer()
