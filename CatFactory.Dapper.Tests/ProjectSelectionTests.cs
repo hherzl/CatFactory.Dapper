@@ -1,4 +1,5 @@
-﻿using CatFactory.SqlServer;
+﻿using System.Threading.Tasks;
+using CatFactory.SqlServer;
 using Xunit;
 
 namespace CatFactory.Dapper.Tests
@@ -6,21 +7,17 @@ namespace CatFactory.Dapper.Tests
     public class ProjectSelectionTests
     {
         [Fact]
-        public void TestProjectSelectionScope()
+        public async Task ProjectSelectionScopeAsync()
         {
             // Arrange
 
             // Get database
-            var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;", "dbo.sysdiagrams");
+            var database = await SqlServerDatabaseFactory
+                .ImportAsync(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;", "dbo.sysdiagrams");
 
             // Create instance of Entity Framework Core project
-            var project = new DapperProject
-            {
-                Name = "OnLineStore",
-                Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.Dapper\\OnlineStore.Core"
-            };
+            var project = DapperProject
+                .Create("OnlineStore", database, @"C:\Temp\CatFactory.Dapper\OnlineStore.Core");
 
             // Act
 
@@ -36,7 +33,9 @@ namespace CatFactory.Dapper.Tests
             // Assert
 
             Assert.True(project.Selections.Count == 2);
+
             Assert.True(project.GlobalSelection().Settings.UseStringBuilderForQueries == true);
+
             Assert.True(selectionForOrder.Settings.UseStringBuilderForQueries == false);
         }
     }
