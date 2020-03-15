@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build46</Version>
+    <Version>1.0.0-beta-sun-build47</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build46 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build47 Version:
 
 * Core package update
 * Addition of MD readme file
