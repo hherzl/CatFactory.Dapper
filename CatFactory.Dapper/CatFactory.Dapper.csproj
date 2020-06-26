@@ -18,7 +18,16 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
         <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
         <Company>Herzl Corp.</Company>
         <PackageLicenseUrl>https://github.com/hherzl/CatFactory.Dapper/blob/master/LICENSE</PackageLicenseUrl>
-    </PropertyGroup>
+    
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build36" />
