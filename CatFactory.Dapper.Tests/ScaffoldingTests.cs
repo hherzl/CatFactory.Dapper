@@ -9,7 +9,7 @@ namespace CatFactory.Dapper.Tests
     public class ScaffoldingTests
     {
         [Fact]
-        public void ProjectScaffoldingFromOnlineStoreDatabaseTest()
+        public void ProjectScaffoldingFromOnlineStoreDatabase()
         {
             // Create database factory
             var databaseFactory = new SqlServerDatabaseFactory
@@ -45,9 +45,7 @@ namespace CatFactory.Dapper.Tests
 
             project.Selection("Sales.*", settings => settings.AddPagingForGetAllOperation = true);
 
-            project.Selection("Sales.OrderDetail", settings =>
-                settings.RemoveAction<ReadAllAction>()
-            );
+            project.Selection("Sales.OrderDetail", settings => settings.RemoveAction<ReadAllAction>());
 
             // Build features for project, group all entities by schema into a feature
             project.BuildFeatures();
@@ -59,7 +57,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void ProjectScaffoldingFromNorthwindDatabaseTest()
+        public void ProjectScaffoldingFromNorthwindDatabase()
         {
             // Import database
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -105,7 +103,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void ProjectScaffoldingFromAdventureWorksDatabaseTest()
+        public void ProjectScaffoldingFromAdventureWorksDatabase()
         {
             // Import database
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -146,7 +144,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void ProjectScaffoldingFromWideWorldImportersDatabaseTest()
+        public void ProjectScaffoldingFromWideWorldImportersDatabase()
         {
             // Import database
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -181,7 +179,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void ProjectScaffoldingFromLegacyErpDatabaseTest()
+        public void ProjectScaffoldingFromLegacyErpDatabase()
         {
             // Create database factory
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -219,7 +217,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void SqlDomScaffoldingFromWideWorldImportersDatabaseTest()
+        public void SqlDomScaffoldingFromWideWorldImportersDatabase()
         {
             // Import database
             var factory = new SqlServerDatabaseFactory
