@@ -9,9 +9,14 @@ namespace CatFactory.Dapper
 {
     public class DapperProjectSettings : IProjectSettings
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_insertExclusions;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_updateExclusions;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<IEntityAction> m_actions;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_insertExclusions;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_updateExclusions;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<IEntityAction> m_actions;
 
         public DapperProjectSettings()
         {

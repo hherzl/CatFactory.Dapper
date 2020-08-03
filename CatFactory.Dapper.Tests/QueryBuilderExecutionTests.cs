@@ -17,7 +17,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestSelect()
+        public void SelectAll()
         {
             // Arrange
             using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
@@ -53,7 +53,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestSelectByID()
+        public void SelectByID()
         {
             // Arrange
             var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
@@ -95,7 +95,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestSelectSearchByIDAndName()
+        public void SelectSearchByIDAndName()
         {
             // Arrange
             var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
@@ -139,7 +139,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestBuildSelectCommandExtensionMethod()
+        public void BuildSelectCommandExtensionMethod()
         {
             // Arrange
             // Act
@@ -176,7 +176,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestBuildInsertIntoCommandExtensionMethod()
+        public void BuildInsertIntoCommandExtensionMethod()
         {
             using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
             {
@@ -204,7 +204,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestBuildUpdateCommandExtensionMethod()
+        public void BuildUpdateCommandExtensionMethod()
         {
             using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
             {
@@ -233,7 +233,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestBuildDeleteCommandExtensionMethod()
+        public void BuildDeleteCommandExtensionMethod()
         {
             using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
             {

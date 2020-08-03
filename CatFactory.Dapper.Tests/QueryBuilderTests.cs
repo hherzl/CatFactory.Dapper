@@ -8,7 +8,7 @@ namespace CatFactory.Dapper.Tests
     public class QueryBuilderTests
     {
         [Fact]
-        public void TestSelect()
+        public void SelectAll()
         {
             // Arrange
             var query = QueryBuilder
@@ -23,7 +23,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestSelectByID()
+        public void SelectByID()
         {
             // Arrange
             var query = QueryBuilder
@@ -40,7 +40,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestSelectSearch()
+        public void SelectSearch()
         {
             // Arrange
             var query = QueryBuilder
@@ -58,7 +58,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestInsertInto()
+        public void InsertInto()
         {
             // Arrange
             var query = QueryBuilder
@@ -73,7 +73,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestUpdate()
+        public void UpdateByKey()
         {
             // Arrange
             var query = QueryBuilder
@@ -88,7 +88,7 @@ namespace CatFactory.Dapper.Tests
         }
 
         [Fact]
-        public void TestDelete()
+        public void DeleteByKey()
         {
             // Arrange
             var query = QueryBuilder

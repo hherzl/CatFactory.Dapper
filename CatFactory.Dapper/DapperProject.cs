@@ -22,6 +22,9 @@ namespace CatFactory.Dapper
                 OutputDirectory = outputDirectory
             };
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private DapperProjectNamespaces _projectNamespaces;
+
         public DapperProject()
             : base()
         {
@@ -32,13 +35,10 @@ namespace CatFactory.Dapper
         {
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private DapperProjectNamespaces m_projectNamespaces;
-
         public DapperProjectNamespaces ProjectNamespaces
         {
-            get => m_projectNamespaces ?? (m_projectNamespaces = new DapperProjectNamespaces());
-            set => m_projectNamespaces = value;
+            get => _projectNamespaces ?? (_projectNamespaces = new DapperProjectNamespaces());
+            set => _projectNamespaces = value;
         }
 
         protected override IEnumerable<DbObject> GetDbObjectsBySchema(string schema)
