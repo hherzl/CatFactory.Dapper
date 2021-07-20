@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build49</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>1.0.0-beta-sun-build50</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build49 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build50 Version:
 
- Core package update
+ Upgrade for .NET Core version
 
 Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
 </PackageReleaseNotes>
@@ -29,7 +29,7 @@ Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-wit
 
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build38" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build39" />
   </ItemGroup>
 
 </Project>
