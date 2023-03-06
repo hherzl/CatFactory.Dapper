@@ -1,35 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.0-beta-sun-build50</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>1.0.0-beta-sun-build51</Version>
     <Authors>H. Herzl</Authors>
-    <PackageReleaseNotes>1.0.0-beta-sun-build50 Version:
+    <PackageReleaseNotes>
+      1.0.0-beta-sun-build51 Version:
 
- Upgrade for .NET Core version
+      Upgrade for .NET Core version
 
-Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
-</PackageReleaseNotes>
-        <Description>CatFactory Package to scaffold Dapper</Description>
-        <RepositoryUrl>https://github.com/hherzl/CatFactory.Dapper</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>Dapper</PackageTags>
-        <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
-        <Company>Herzl Corp.</Company>
-        <PackageLicenseUrl>https://github.com/hherzl/CatFactory.Dapper/blob/master/LICENSE</PackageLicenseUrl>
-    
+      Quick start: https://www.codeproject.com/Articles/1213355/Scaffolding-Dapper-with-CatFactory
+    </PackageReleaseNotes>
+    <Description>CatFactory Package to scaffold Dapper</Description>
+    <RepositoryUrl>https://github.com/hherzl/CatFactory.Dapper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Dapper</PackageTags>
+    <PackageProjectUrl>https://github.com/hherzl/CatFactory.Dapper</PackageProjectUrl>
+    <Company>Herzl Corp.</Company>
+    <PackageLicenseUrl>https://github.com/hherzl/CatFactory.Dapper/blob/master/LICENSE</PackageLicenseUrl>
+
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build39" />
+    <PackageReference Include="CatFactory.NetCore" Version="1.0.0-beta-sun-build42" />
   </ItemGroup>
 
 </Project>
