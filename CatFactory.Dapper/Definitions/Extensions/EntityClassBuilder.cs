@@ -235,9 +235,9 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
             };
 
-            foreach (var resultSet in storedProcedure.FirstResultSetsForObject)
+            foreach (var resultSet in storedProcedure.ResultSets)
             {
-                var type = project.Database.ResolveDatabaseType(resultSet.SystemTypeName);
+                var type = project.Database.ResolveDatabaseType(resultSet.Type);
 
                 definition.Properties.Add(new PropertyDefinition
                 {
