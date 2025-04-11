@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using System.Collections.Generic;
 using System.IO;
 using CatFactory.Dapper.Sql;
 using CatFactory.Dapper.Sql.Dml;
@@ -20,43 +20,42 @@ namespace CatFactory.Dapper.Tests
         public void SelectAll()
         {
             // Arrange
-            using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
+
+            var query = QueryBuilder
+                .Select<Shipper>("dbo.Shippers");
+
+            var list = new List<Shipper>();
+
+            // Act
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            command.CommandText = query.ToString();
+
+            using (var dataReader = command.ExecuteReader())
             {
-                var query = QueryBuilder
-                    .Select<Shipper>("dbo.Shippers");
-
-                var list = new List<Shipper>();
-
-                // Act
-                connection.Open();
-
-                var command = connection.CreateCommand();
-
-                command.CommandText = query.ToString();
-
-                using (var dataReader = command.ExecuteReader())
+                while (dataReader.Read())
                 {
-                    while (dataReader.Read())
+                    list.Add(new Shipper
                     {
-                        list.Add(new Shipper
-                        {
-                            ShipperID = dataReader.GetInt32(0),
-                            CompanyName = dataReader.GetString(1),
-                            Phone = dataReader.GetString(2)
-                        });
-                    }
+                        ShipperID = dataReader.GetInt32(0),
+                        CompanyName = dataReader.GetString(1),
+                        Phone = dataReader.GetString(2)
+                    });
                 }
-
-                // Assert
-                Assert.True(list.Count > 0);
             }
+
+            // Assert
+            Assert.True(list.Count > 0);
         }
 
         [Fact]
         public void SelectByID()
         {
             // Arrange
-            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
 
             var query = QueryBuilder
                 .Select<Shipper>("dbo.Shippers", new SqlServerDatabaseNamingConvention())
@@ -98,7 +97,7 @@ namespace CatFactory.Dapper.Tests
         public void SelectSearchByIDAndName()
         {
             // Arrange
-            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
 
             var query = QueryBuilder
                 .Select<Shipper>("dbo.Shippers")
@@ -146,28 +145,25 @@ namespace CatFactory.Dapper.Tests
 
             var list = new List<Product>();
 
-            using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
+
+            connection.Open();
+
+            var command = QueryBuilder
+                .Select<Product>("dbo.Products")
+                .And("ProductName", ComparisonOperator.Like, "%ha%")
+                .CreateCommand(connection);
+
+            File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\SelectProductByProductName.txt", command.CommandText);
+
+            using var dataReader = command.ExecuteReader();
+            while (dataReader.Read())
             {
-                connection.Open();
-
-                var command = QueryBuilder
-                    .Select<Product>("dbo.Products")
-                    .And("ProductName", ComparisonOperator.Like, "%ha%")
-                    .CreateCommand(connection);
-
-                File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\SelectProductByProductName.txt", command.CommandText);
-
-                using (var dataReader = command.ExecuteReader())
+                list.Add(new Product
                 {
-                    while (dataReader.Read())
-                    {
-                        list.Add(new Product
-                        {
-                            ProductID = dataReader.GetInt32(0),
-                            ProductName = dataReader.GetString(1)
-                        });
-                    }
-                }
+                    ProductID = dataReader.GetInt32(0),
+                    ProductName = dataReader.GetString(1)
+                });
             }
 
             // Assert
@@ -178,82 +174,76 @@ namespace CatFactory.Dapper.Tests
         [Fact]
         public void BuildInsertIntoCommandExtensionMethod()
         {
-            using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
+            connection.Open();
+
+            var entity = new Shipper
             {
-                connection.Open();
+                CompanyName = "Company name from unit tests",
+                Phone = "778899665544"
+            };
 
-                var entity = new Shipper
-                {
-                    CompanyName = "Company name from unit tests",
-                    Phone = "778899665544"
-                };
+            var command = QueryBuilder
+                .InsertInto(entity, "dbo.Shippers", "ShipperID")
+                .CreateCommand(connection);
 
-                var command = QueryBuilder
-                    .InsertInto(entity, "dbo.Shippers", "ShipperID")
-                    .CreateCommand(connection);
+            File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\InsertIntoShipper.txt", command.CommandText);
 
-                File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\InsertIntoShipper.txt", command.CommandText);
+            var affectedRows = command.ExecuteNonQuery();
 
-                var affectedRows = command.ExecuteNonQuery();
+            var outputParameter = (SqlParameter)command.Parameters["@shipperID"];
 
-                var outputParameter = (SqlParameter)command.Parameters["@shipperID"];
-
-                Assert.True(affectedRows == 1);
-                Assert.True((int)outputParameter.Value > 0);
-            }
+            Assert.True(affectedRows == 1);
+            Assert.True((int)outputParameter.Value > 0);
         }
 
         [Fact]
         public void BuildUpdateCommandExtensionMethod()
         {
-            using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
+            connection.Open();
+
+            var entity = new Shipper
             {
-                connection.Open();
+                ShipperID = 5,
+                CompanyName = "Company name update from unit tests",
+                Phone = "2244668800"
+            };
 
-                var entity = new Shipper
-                {
-                    ShipperID = 5,
-                    CompanyName = "Company name update from unit tests",
-                    Phone = "2244668800"
-                };
+            var command = QueryBuilder
+                .Update(entity, "dbo.Shippers", "ShipperID")
+                .CreateCommand(connection);
 
-                var command = QueryBuilder
-                    .Update(entity, "dbo.Shippers", "ShipperID")
-                    .CreateCommand(connection);
+            File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\UpdateShipper.txt", command.CommandText);
 
-                File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\UpdateShipper.txt", command.CommandText);
+            var affectedRows = command.ExecuteNonQuery();
 
-                var affectedRows = command.ExecuteNonQuery();
+            var outputParameter = (SqlParameter)command.Parameters["@shipperID"];
 
-                var outputParameter = (SqlParameter)command.Parameters["@shipperID"];
-
-                Assert.True(affectedRows >= 0);
-                Assert.True((int)outputParameter.Value > 0);
-            }
+            Assert.True(affectedRows >= 0);
+            Assert.True((int)outputParameter.Value > 0);
         }
 
         [Fact]
         public void BuildDeleteCommandExtensionMethod()
         {
-            using (var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;"))
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes; TrustServerCertificate=True;");
+            connection.Open();
+
+            var entity = new Shipper
             {
-                connection.Open();
+                ShipperID = 6
+            };
 
-                var entity = new Shipper
-                {
-                    ShipperID = 6
-                };
+            var command = QueryBuilder
+                .DeleteFrom(entity, "dbo", "Shippers", "ShipperID")
+                .CreateCommand(connection);
 
-                var command = QueryBuilder
-                    .DeleteFrom(entity, "dbo", "Shippers", "ShipperID")
-                    .CreateCommand(connection);
+            File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\DeleteShipper.txt", command.CommandText);
 
-                File.WriteAllText(@"C:\Temp\CatFactory.Dapper\Queries\DeleteShipper.txt", command.CommandText);
+            var affectedRows = command.ExecuteNonQuery();
 
-                var affectedRows = command.ExecuteNonQuery();
-
-                Assert.True(affectedRows >= 0);
-            }
+            Assert.True(affectedRows >= 0);
         }
     }
 }
