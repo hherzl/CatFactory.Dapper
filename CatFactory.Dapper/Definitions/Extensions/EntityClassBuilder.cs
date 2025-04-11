@@ -69,7 +69,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
 
                 if (selection.Settings.EnableDataBindings)
                 {
-                    definition.AddViewModelProperty(propertyType, propertyName);
+                    definition.AddPropWithField(propertyType, propertyName);
                 }
                 else
                 {
@@ -85,7 +85,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                     }
                     else
                     {
-                        definition.AddPropertyWithField(propertyType, propertyName);
+                        definition.AddPropWithField(propertyType, propertyName);
                     }
                 }
             }
@@ -135,7 +135,7 @@ namespace CatFactory.Dapper.Definitions.Extensions
                 }
                 else
                 {
-                    definition.AddPropertyWithField(propertyType, propertyName);
+                    definition.AddPropWithField(propertyType, propertyName);
                 }
             }
 
